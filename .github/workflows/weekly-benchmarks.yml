@@ -54,13 +54,9 @@ jobs:
         retention-days: 7
 
   competitive-benchmarks:
-    name: Competitive Analysis (${{ matrix.scenario }})
+    name: Competitive Analysis
     runs-on: ubuntu-latest
     needs: generate-test-data
-    strategy:
-      fail-fast: false
-      matrix:
-        scenario: ['api_fast', 'ml_training', 'secure_storage', 'large_data']
     
     steps:
     - name: Checkout repository
@@ -93,15 +89,14 @@ jobs:
       run: |
         python scripts/run_benchmarks.py \
           --competitive \
-          --scenario ${{ matrix.scenario }} \
-          --output data/results/weekly_competitive_${{ matrix.scenario }}_$(date +%Y%m%d_%H%M%S).json \
-          --verbose
+          --output-dir data/results \
+          --generate-report
       timeout-minutes: 30
     
     - name: Upload benchmark results
       uses: actions/upload-artifact@v4
       with:
-        name: competitive-results-${{ matrix.scenario }}
+        name: competitive-results
         path: data/results/
         retention-days: 30
 
@@ -136,8 +131,8 @@ jobs:
       run: |
         python scripts/run_benchmarks.py \
           --configurations \
-          --output data/results/weekly_configurations_$(date +%Y%m%d_%H%M%S).json \
-          --verbose
+          --output-dir data/results \
+          --generate-report
       timeout-minutes: 20
     
     - name: Upload configuration results
@@ -189,9 +184,8 @@ jobs:
       run: |
         python scripts/run_benchmarks.py \
           --versioning \
-          --version ${{ matrix.datason_version }} \
-          --output data/results/weekly_version_${{ matrix.datason_version }}_$(date +%Y%m%d_%H%M%S).json \
-          --verbose
+          --output-dir data/results \
+          --generate-report
       timeout-minutes: 15
     
     - name: Upload version results
@@ -279,7 +273,7 @@ jobs:
         git config --local user.name "GitHub Action"
         
         # Add new results
-        git add data/results/weekly/ data/results/latest.json docs/results/
+        git add data/results/weekly/ data/results/latest.json docs/results/ docs/index.md
         
         # Only commit if there are changes
         if ! git diff --staged --quiet; then
@@ -304,8 +298,15 @@ jobs:
         cp docs/results/weekly_report_$(date +%Y%m%d).html docs/weekly-reports/latest.html 2>/dev/null || true
         cp docs/results/weekly_summary_$(date +%Y%m%d).md docs/weekly-reports/latest.md 2>/dev/null || true
         
-        # Update index with latest reports
-        python scripts/update_docs_index.py
+        # Generate GitHub Pages HTML index for browsing all CI results
+        python scripts/generate_github_pages.py
+        
+        # Update general docs index with latest reports
+        if [ -f scripts/update_docs_index.py ]; then
+          python scripts/update_docs_index.py
+        else
+          echo "update_docs_index.py not found, skipping"
+        fi
       continue-on-error: true
     
     - name: Create performance summary comment

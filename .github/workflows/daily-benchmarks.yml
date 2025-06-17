@@ -138,6 +138,9 @@ jobs:
     - name: 📊 Generate GitHub Pages index
       run: |
         python scripts/generate_github_pages.py
+        
+        # Also update general docs index for navigation
+        python scripts/update_docs_index.py
       env:
         GITHUB_REPOSITORY: ${{ github.repository }}
 
@@ -150,6 +153,7 @@ jobs:
         git add -f data/results/ci_*_*.json
         git add -f docs/results/ci_*_*.html
         git add docs/results/index.html
+        git add docs/index.md
         
         # Commit if there are changes
         if ! git diff --staged --quiet; then
