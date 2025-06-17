@@ -266,62 +266,134 @@ jobs:
         else:
             print('⚠️ No benchmark results found')
         "
+    - name: 🔍 Advanced Regression Detection
+      run: |
+        # Install regression detection dependencies if needed
+        pip install pandas matplotlib 2>/dev/null || true
+        
+        # Run comprehensive regression detection
+        if [ -f data/results/latest.json ]; then
+          echo "📊 Running advanced regression detection..."
+          python scripts/regression_detector.py \
+            data/results/latest_competitive_*.json \
+            --baseline data/results/latest.json \
+            --output data/results/pr_regression_report.json \
+            --pr-comment pr_regression_comment.md \
+            --fail-threshold 0.25 \
+            --warn-threshold 0.10
+          
+          REGRESSION_EXIT_CODE=$?
+          echo "REGRESSION_EXIT_CODE=$REGRESSION_EXIT_CODE" >> $GITHUB_ENV
+          
+          if [ $REGRESSION_EXIT_CODE -ne 0 ]; then
+            echo "⚠️ Critical performance regressions detected!"
+            echo "PERFORMANCE_REGRESSION=true" >> $GITHUB_ENV
+          else
+            echo "✅ No critical regressions detected"
+            echo "PERFORMANCE_REGRESSION=false" >> $GITHUB_ENV
+          fi
+          
+        else
+          echo "📝 No baseline found - this will become the new baseline"
+          echo "PERFORMANCE_REGRESSION=false" >> $GITHUB_ENV
+          echo "🔄 **Performance Baseline**" > pr_regression_comment.md
+          echo "" >> pr_regression_comment.md
+          echo "This is the first benchmark run or no previous results were found." >> pr_regression_comment.md
+          echo "Future PRs will be compared against this baseline." >> pr_regression_comment.md
+        fi
+    - name: 🔍 Advanced Regression Detection
+      run: |
+        # Install regression detection dependencies if needed
+        pip install pandas matplotlib 2>/dev/null || true
+        
+        # Run comprehensive regression detection
+        if [ -f data/results/latest.json ]; then
+          echo "📊 Running advanced regression detection..."
+          python scripts/regression_detector.py \
+            data/results/latest_competitive_*.json \
+            --baseline data/results/latest.json \
+            --output data/results/pr_regression_report.json \
+            --pr-comment pr_regression_comment.md \
+            --fail-threshold 0.25 \
+            --warn-threshold 0.10
+          
+          REGRESSION_EXIT_CODE=$?
+          echo "REGRESSION_EXIT_CODE=$REGRESSION_EXIT_CODE" >> $GITHUB_ENV
+          
+          if [ $REGRESSION_EXIT_CODE -ne 0 ]; then
+            echo "⚠️ Critical performance regressions detected!"
+            echo "PERFORMANCE_REGRESSION=true" >> $GITHUB_ENV
+          else
+            echo "✅ No critical regressions detected"
+            echo "PERFORMANCE_REGRESSION=false" >> $GITHUB_ENV
+          fi
+          
+        else
+          echo "📝 No baseline found - this will become the new baseline"
+          echo "PERFORMANCE_REGRESSION=false" >> $GITHUB_ENV
+          echo "🔄 **Performance Baseline**" > pr_regression_comment.md
+          echo "" >> pr_regression_comment.md
+          echo "This is the first benchmark run or no previous results were found." >> pr_regression_comment.md
+          echo "Future PRs will be compared against this baseline." >> pr_regression_comment.md
+        fi
+
+
 
     - name: 💬 Comment on PR
       if: github.event_name == 'pull_request' && hashFiles('pr_comment.md') != ''
       uses: actions/github-script@v7
+      
+      
       with:
         script: |
           const fs = require('fs');
           
           try {
-            const comment = fs.readFileSync('pr_comment.md', 'utf8');
+            // Priority: Use regression comment if available, fallback to main comment
+            let comment = '';
             
-            // Check if we already commented on this PR
-            const { data: comments } = await github.rest.issues.listComments({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-            });
-            
-            const existingComment = comments.find(comment => 
-              comment.user.login === 'github-actions[bot]' && 
-              comment.body.includes('🚀 PR Performance Check Results')
-            );
-            
-            if (existingComment) {
-              // Update existing comment
-              await github.rest.issues.updateComment({
-                comment_id: existingComment.id,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: comment
-              });
-              console.log('Updated existing PR comment');
-            } else {
-              // Create new comment
-              await github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: comment
-              });
-              console.log('Created new PR comment');
+            if (fs.existsSync('pr_regression_comment.md')) {
+              const regressionComment = fs.readFileSync('pr_regression_comment.md', 'utf8');
+              
+              if (fs.existsSync('pr_comment.md')) {
+                const mainComment = fs.readFileSync('pr_comment.md', 'utf8');
+                comment = regressionComment + '
+
+---
+
+' + mainComment;
+              } else {
+                comment = regressionComment;
+              }
+            } else if (fs.existsSync('pr_comment.md')) {
+              comment = fs.readFileSync('pr_comment.md', 'utf8');
             }
-          } catch (error) {
-            console.log('Could not create/update PR comment:', error.message);
-          }
+            
+            if (!comment) {
+              console.log('No comment content found');
+              return;
+            }
+            
+            // Add regression warning to top if needed
+            const hasRegression = process.env.PERFORMANCE_REGRESSION === 'true';
+            if (hasRegression) {
+              comment = '🚨 **PERFORMANCE REGRESSION DETECTED**
+
+' + comment;
+            }
 
     - name: 📤 Upload enhanced artifacts
       uses: actions/upload-artifact@v4
       if: always()
-      with:
+                  with:
         name: pr-performance-check-${{ github.run_id }}
         path: |
           data/results/latest_*.json
           data/results/*_benchmark_*.json
+          data/results/pr_regression_report.json
           docs/results/*_report.html
           pr_comment.md
+          pr_regression_comment.md
         retention-days: 30
 
     - name: ✅ Performance check complete

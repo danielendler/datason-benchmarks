@@ -177,4 +177,14 @@ performance_*.json
 
 # Allow historical tracking files
 !data/results/history.json
-!data/results/trends.json 
+!data/results/trends.json
+
+# ==========================================
+# PHASE 2: SYNTHETIC DATA EXCLUSIONS
+# ==========================================
+# Generated data files - exclude large generated datasets
+data/synthetic/*_data.json
+data/synthetic/generation_summary.json
+
+# Keep the data generator script but not generated data
+!data/synthetic/data_generator.py 

@@ -1,0 +1,429 @@
+name: Weekly Comprehensive Benchmarks
+
+on:
+  schedule:
+    # Run every Monday at 2 AM UTC
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+    inputs:
+      full_analysis:
+        description: 'Run full competitive analysis'
+        required: false
+        default: true
+        type: boolean
+      test_all_configs:
+        description: 'Test all configurations'
+        required: false
+        default: true
+        type: boolean
+
+env:
+  DATASON_VERSION: "latest"
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  generate-test-data:
+    name: Generate Fresh Test Data
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install faker numpy pandas
+    
+    - name: Generate synthetic test data
+      run: |
+        python scripts/generate_data.py --scenario all --seed 42
+        echo "✅ Generated fresh synthetic test data"
+    
+    - name: Upload test data
+      uses: actions/upload-artifact@v3
+      with:
+        name: synthetic-test-data
+        path: data/synthetic/
+        retention-days: 7
+
+  competitive-benchmarks:
+    name: Competitive Analysis (${{ matrix.scenario }})
+    runs-on: ubuntu-latest
+    needs: generate-test-data
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario: ['api_fast', 'ml_training', 'secure_storage', 'large_data']
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Download test data
+      uses: actions/download-artifact@v3
+      with:
+        name: synthetic-test-data
+        path: data/synthetic/
+    
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Install competitive libraries
+      run: |
+        # Install all competitive libraries
+        pip install orjson ujson jsonpickle msgpack
+        pip install datason==${{ env.DATASON_VERSION }} || pip install datason
+        echo "✅ Installed competitive libraries"
+    
+    - name: Run competitive benchmarks
+      run: |
+        python scripts/run_benchmarks.py \
+          --competitive \
+          --scenario ${{ matrix.scenario }} \
+          --output data/results/weekly_competitive_${{ matrix.scenario }}_$(date +%Y%m%d_%H%M%S).json \
+          --verbose
+      timeout-minutes: 30
+    
+    - name: Upload benchmark results
+      uses: actions/upload-artifact@v3
+      with:
+        name: competitive-results-${{ matrix.scenario }}
+        path: data/results/
+        retention-days: 30
+
+  configuration-benchmarks:
+    name: Configuration Testing
+    runs-on: ubuntu-latest
+    needs: generate-test-data
+    if: ${{ github.event.inputs.test_all_configs != 'false' }}
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Download test data
+      uses: actions/download-artifact@v3
+      with:
+        name: synthetic-test-data
+        path: data/synthetic/
+    
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install datason==${{ env.DATASON_VERSION }} || pip install datason
+    
+    - name: Run configuration benchmarks
+      run: |
+        python scripts/run_benchmarks.py \
+          --configurations \
+          --output data/results/weekly_configurations_$(date +%Y%m%d_%H%M%S).json \
+          --verbose
+      timeout-minutes: 20
+    
+    - name: Upload configuration results
+      uses: actions/upload-artifact@v3
+      with:
+        name: configuration-results
+        path: data/results/
+        retention-days: 30
+
+  version-comparison:
+    name: DataSON Version Comparison
+    runs-on: ubuntu-latest
+    needs: generate-test-data
+    strategy:
+      fail-fast: false
+      matrix:
+        datason_version: ['0.11.0', '0.10.0', 'latest']
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Download test data
+      uses: actions/download-artifact@v3
+      with:
+        name: synthetic-test-data
+        path: data/synthetic/
+    
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Install DataSON version
+      run: |
+        if [ "${{ matrix.datason_version }}" = "latest" ]; then
+          pip install datason --upgrade
+        else
+          pip install datason==${{ matrix.datason_version }}
+        fi
+        echo "✅ Installed DataSON ${{ matrix.datason_version }}"
+    
+    - name: Run version benchmarks
+      run: |
+        python scripts/run_benchmarks.py \
+          --versioning \
+          --version ${{ matrix.datason_version }} \
+          --output data/results/weekly_version_${{ matrix.datason_version }}_$(date +%Y%m%d_%H%M%S).json \
+          --verbose
+      timeout-minutes: 15
+    
+    - name: Upload version results
+      uses: actions/upload-artifact@v3
+      with:
+        name: version-results-${{ matrix.datason_version }}
+        path: data/results/
+        retention-days: 30
+
+  performance-analysis:
+    name: Comprehensive Analysis & Reporting
+    runs-on: ubuntu-latest
+    needs: [competitive-benchmarks, configuration-benchmarks, version-comparison]
+    if: always()  # Run even if some benchmarks fail
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install matplotlib plotly pandas seaborn
+    
+    # Download all results
+    - name: Download competitive results
+      uses: actions/download-artifact@v3
+      with:
+        path: temp-results/
+      continue-on-error: true
+    
+    - name: Consolidate results
+      run: |
+        # Create results directory
+        mkdir -p data/results/weekly/$(date +%Y%m%d)
+        
+        # Move all downloaded results to results directory
+        find temp-results/ -name "*.json" -exec cp {} data/results/weekly/$(date +%Y%m%d)/ \; 2>/dev/null || true
+        
+        # List what we have
+        echo "📊 Available results:"
+        ls -la data/results/weekly/$(date +%Y%m%d)/ || echo "No results found"
+    
+    - name: Generate comprehensive report
+      run: |
+        # Generate analysis report
+        python scripts/generate_report.py \
+          --input-dir data/results/weekly/$(date +%Y%m%d) \
+          --output docs/results/weekly_report_$(date +%Y%m%d).html \
+          --format html \
+          --include-charts
+        
+        # Generate markdown summary for easy reading
+        python scripts/generate_report.py \
+          --input-dir data/results/weekly/$(date +%Y%m%d) \
+          --output docs/results/weekly_summary_$(date +%Y%m%d).md \
+          --format markdown
+      continue-on-error: true
+    
+    - name: Update latest results
+      run: |
+        # Update latest.json with most recent comprehensive results
+        if [ -f data/results/weekly/$(date +%Y%m%d)/*.json ]; then
+          cp data/results/weekly/$(date +%Y%m%d)/*.json data/results/latest.json 2>/dev/null || true
+        fi
+    
+    - name: Historical trend analysis
+      run: |
+        # Run trend analysis if we have historical data
+        python scripts/analyze_trends.py \
+          --input-dir data/results/ \
+          --output docs/results/trends_$(date +%Y%m%d).json \
+          --lookback-weeks 12
+      continue-on-error: true
+    
+    - name: Commit results to repository
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        # Add new results
+        git add data/results/weekly/ data/results/latest.json docs/results/
+        
+        # Only commit if there are changes
+        if ! git diff --staged --quiet; then
+          git commit -m "📊 Weekly benchmark results $(date +%Y-%m-%d)
+          
+          - Competitive analysis across scenarios
+          - Configuration testing
+          - Version comparison
+          - Trend analysis
+          
+          Generated by weekly-benchmarks workflow"
+          git push
+        else
+          echo "No changes to commit"
+        fi
+      continue-on-error: true
+    
+    - name: Update GitHub Pages
+      run: |
+        # Copy latest reports to docs/ for GitHub Pages
+        mkdir -p docs/weekly-reports/
+        cp docs/results/weekly_report_$(date +%Y%m%d).html docs/weekly-reports/latest.html 2>/dev/null || true
+        cp docs/results/weekly_summary_$(date +%Y%m%d).md docs/weekly-reports/latest.md 2>/dev/null || true
+        
+        # Update index with latest reports
+        python scripts/update_docs_index.py
+      continue-on-error: true
+    
+    - name: Create performance summary comment
+      run: |
+        # Generate summary for potential issue/discussion
+        echo "## 📊 Weekly Performance Report $(date +%Y-%m-%d)" > weekly_summary.md
+        echo "" >> weekly_summary.md
+        echo "**Automated weekly benchmark analysis completed**" >> weekly_summary.md
+        echo "" >> weekly_summary.md
+        
+        # Add results summary
+        if [ -f docs/results/weekly_summary_$(date +%Y%m%d).md ]; then
+          echo "### Key Findings" >> weekly_summary.md
+          head -20 docs/results/weekly_summary_$(date +%Y%m%d).md >> weekly_summary.md
+        fi
+        
+        echo "" >> weekly_summary.md
+        echo "📈 [View Full Report](https://$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]').github.io/weekly-reports/latest.html)" >> weekly_summary.md
+        echo "📊 [Historical Trends](https://$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]').github.io/)" >> weekly_summary.md
+        echo "" >> weekly_summary.md
+        echo "*Generated by [weekly-benchmarks workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})*" >> weekly_summary.md
+    
+    - name: Upload weekly summary
+      uses: actions/upload-artifact@v3
+      with:
+        name: weekly-summary
+        path: weekly_summary.md
+        retention-days: 30
+    
+    - name: Upload comprehensive results
+      uses: actions/upload-artifact@v3
+      with:
+        name: weekly-complete-results
+        path: |
+          data/results/weekly/
+          docs/results/
+        retention-days: 90
+
+  regression-check:
+    name: Regression Detection
+    runs-on: ubuntu-latest
+    needs: [competitive-benchmarks]
+    if: always()
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Download latest results
+      uses: actions/download-artifact@v3
+      with:
+        path: temp-results/
+      continue-on-error: true
+    
+    - name: Run regression detection
+      run: |
+        # Find latest results file
+        LATEST_RESULT=$(find temp-results/ -name "*.json" | head -1)
+        
+        if [ -n "$LATEST_RESULT" ]; then
+          python scripts/regression_detector.py "$LATEST_RESULT" \
+            --output data/results/regression_report_$(date +%Y%m%d).json \
+            --fail-threshold 0.20 \
+            --warn-threshold 0.10
+        else
+          echo "No results found for regression detection"
+        fi
+      continue-on-error: true
+    
+    - name: Upload regression analysis
+      uses: actions/upload-artifact@v3
+      with:
+        name: regression-analysis
+        path: data/results/regression_report_*.json
+        retention-days: 30
+
+  notify-completion:
+    name: Notification
+    runs-on: ubuntu-latest
+    needs: [performance-analysis, regression-check]
+    if: always()
+    
+    steps:
+    - name: Download weekly summary
+      uses: actions/download-artifact@v3
+      with:
+        name: weekly-summary
+        path: .
+      continue-on-error: true
+    
+    - name: Create workflow summary
+      run: |
+        echo "## 📊 Weekly Benchmark Workflow Complete" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Workflow Status:** ${{ needs.performance-analysis.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Date:** $(date +%Y-%m-%d)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Add summary if available
+        if [ -f weekly_summary.md ]; then
+          cat weekly_summary.md >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Workflow Jobs Status" >> $GITHUB_STEP_SUMMARY
+        echo "- **Data Generation:** ${{ needs.generate-test-data.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Competitive Benchmarks:** ${{ needs.competitive-benchmarks.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Configuration Testing:** ${{ needs.configuration-benchmarks.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Version Comparison:** ${{ needs.version-comparison.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Performance Analysis:** ${{ needs.performance-analysis.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Regression Check:** ${{ needs.regression-check.result }}" >> $GITHUB_STEP_SUMMARY 
