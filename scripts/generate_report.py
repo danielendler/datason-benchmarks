@@ -6,13 +6,29 @@ Report Generator for DataSON Benchmarks
 Generates HTML and markdown reports with interactive charts from benchmark results.
 """
 
-import json
 import logging
 import os
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
+
+try:
+    import datason
+    import json
+    
+    # Create a wrapper to match json.dumps interface
+    def serialize_with_datason(obj, **kwargs):
+        """DataSON serialize + json.dumps for string output."""
+        serialized_obj = datason.serialize(obj)
+        return json.dumps(serialized_obj, **kwargs)
+    
+    # Use DataSON for serialization but json.dumps for final string conversion
+    datason_serialize = serialize_with_datason
+except ImportError:
+    # Fallback to standard json if DataSON not available
+    import json
+    datason_serialize = json.dumps
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +78,92 @@ class ReportGenerator:
         else:
             # Local runs get temp prefix that will be gitignored
             return f"local_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    
+    def _format_time_adaptive(self, time_ms: float) -> str:
+        """
+        Format time with adaptive units for best readability.
+        
+        Args:
+            time_ms: Time in milliseconds
+            
+        Returns:
+            Formatted string with appropriate units
+        """
+        if time_ms == 0:
+            return "0"
+        
+        # Convert to different units and find the most readable one
+        time_s = time_ms / 1000
+        time_us = time_ms * 1000  # microseconds
+        time_ns = time_ms * 1_000_000  # nanoseconds
+        
+        # Choose the most appropriate unit (aim for 1-999 range when possible)
+        if time_s >= 1:
+            return f"{time_s:.3f}s"
+        elif time_ms >= 1:
+            return f"{time_ms:.3f}ms"
+        elif time_us >= 1:
+            return f"{time_us:.1f}μs"
+        else:
+            return f"{time_ns:.0f}ns"
+    
+    def _format_time_adaptive_header(self, time_values: List[float]) -> str:
+        """
+        Determine the best unit for a set of time values and return header suffix.
+        
+        Args:
+            time_values: List of time values in milliseconds
+            
+        Returns:
+            Unit string like "(ms)", "(μs)", etc.
+        """
+        if not time_values:
+            return "(ms)"
+        
+        # Use median for better representation of typical values
+        sorted_values = sorted([v for v in time_values if v > 0])
+        if not sorted_values:
+            return "(ms)"
+        
+        # Use median as representative value to avoid outliers skewing units
+        median_val = sorted_values[len(sorted_values) // 2]
+        
+        # Also check if max value would create very large numbers
+        max_val = max(sorted_values)
+        
+        if median_val >= 1000 or max_val >= 10000:  # >= 1 second or very large
+            return "(s)"
+        elif median_val >= 1 or max_val >= 0.015:   # >= 1 millisecond or would be > 15 μs
+            return "(ms)"
+        elif median_val >= 0.001:  # >= 1 microsecond
+            return "(μs)"
+        else:
+            return "(ns)"
+    
+    def _format_time_consistent(self, time_ms: float, unit: str) -> str:
+        """
+        Format time in a consistent unit for tables.
+        
+        Args:
+            time_ms: Time in milliseconds
+            unit: Target unit ("s", "ms", "μs", or "ns")
+            
+        Returns:
+            Formatted number string (without unit)
+        """
+        if time_ms == 0:
+            return "0"
+        
+        if unit == "(s)":
+            return f"{time_ms / 1000:.3f}"
+        elif unit == "(ms)":
+            return f"{time_ms:.3f}"
+        elif unit == "(μs)":
+            return f"{time_ms * 1000:.1f}"
+        elif unit == "(ns)":
+            return f"{time_ms * 1_000_000:.0f}"
+        else:
+            return f"{time_ms:.3f}"  # fallback to ms
     
     def generate_html_report(self, results: Dict[str, Any]) -> str:
         """Generate an interactive HTML report with charts from benchmark results."""
@@ -237,7 +339,7 @@ class ReportGenerator:
                         <details>
                             <summary>Click to view raw JSON data</summary>
                             <pre style="background: #f8f9fa; padding: 20px; border-radius: 5px; overflow-x: auto;">
-            """ + json.dumps(results, indent=2) + """
+            """ + datason_serialize(results, indent=2) + """
                             </pre>
                         </details>
                     </div>
@@ -258,34 +360,49 @@ class ReportGenerator:
             return ""
     
     def _generate_competitive_html_with_charts(self, competitive_data: Dict[str, Any]) -> str:
-        """Generate HTML with interactive charts for competitive analysis."""
-        html = '<div class="section"><h2>🏆 Competitive Analysis</h2>'
-        
-        summary = competitive_data.get("summary", {})
-        competitors = summary.get("competitors_tested", [])
-        
-        if competitors:
-            html += f"<p><strong>Tested Competitors:</strong> {', '.join(competitors)}</p>"
+        """Generate competitive results with adaptive time formatting."""
+        html = '<div class="section"><h2>🏆 Competitive Benchmarks</h2>'
         
         # Performance comparison chart
         chart_data = self._extract_competitive_chart_data(competitive_data)
         if chart_data:
             html += self._generate_performance_comparison_chart(chart_data)
         
-        # Detailed tables for each dataset
+        # Detailed results for each dataset
         for dataset_name, dataset_data in competitive_data.items():
             if dataset_name == "summary":
                 continue
                 
             html += f"<h3>📋 {dataset_name} - Detailed Results</h3>"
             
+            # Enhanced description with sample data
             if "description" in dataset_data:
                 html += f"<p><em>{dataset_data['description']}</em></p>"
             
-            # Serialization results table
+            # Add sample data structure based on dataset name
+            sample_html = self._generate_sample_data_html(dataset_name)
+            if sample_html:
+                html += sample_html
+            
+            # Serialization results table with adaptive formatting
             if "serialization" in dataset_data:
                 html += "<h4>Serialization Performance</h4>"
-                html += "<table><tr><th>Library</th><th>Mean (ms)</th><th>Min (ms)</th><th>Max (ms)</th><th>Std Dev (ms)</th><th>Success Rate</th></tr>"
+                
+                # Collect all time values to determine best unit
+                all_times = []
+                for lib, metrics in dataset_data["serialization"].items():
+                    if isinstance(metrics, dict) and "mean_ms" in metrics:
+                        all_times.extend([
+                            metrics["mean_ms"],
+                            metrics.get("min_ms", 0),
+                            metrics.get("max_ms", 0),
+                            metrics.get("std_ms", 0)
+                        ])
+                
+                # Determine best unit for this table
+                unit = self._format_time_adaptive_header(all_times)
+                
+                html += f"<table><tr><th>Library</th><th>Mean {unit}</th><th>Min {unit}</th><th>Max {unit}</th><th>Std Dev {unit}</th><th>Success Rate</th></tr>"
                 
                 for lib, metrics in dataset_data["serialization"].items():
                     if isinstance(metrics, dict) and "mean_ms" in metrics:
@@ -298,12 +415,18 @@ class ReportGenerator:
                         total = success + errors
                         rate = f"{success}/{total}" if total > 0 else "N/A"
                         
+                        # Format times consistently in chosen unit
+                        mean_formatted = self._format_time_consistent(mean_ms, unit)
+                        min_formatted = self._format_time_consistent(min_ms, unit)
+                        max_formatted = self._format_time_consistent(max_ms, unit)
+                        std_formatted = self._format_time_consistent(std_ms, unit)
+                        
                         # Color code performance relative to fastest
                         style = ""
                         if lib == "datason":
                             style = "style='background-color: #e3f2fd; font-weight: bold;'"
                         
-                        html += f"<tr {style}><td>{lib}</td><td>{mean_ms:.3f}</td><td>{min_ms:.3f}</td><td>{max_ms:.3f}</td><td>{std_ms:.3f}</td><td>{rate}</td></tr>"
+                        html += f"<tr {style}><td>{lib}</td><td>{mean_formatted}</td><td>{min_formatted}</td><td>{max_formatted}</td><td>{std_formatted}</td><td>{rate}</td></tr>"
                 
                 html += "</table>"
         
@@ -376,7 +499,7 @@ class ReportGenerator:
             <h3>📈 Performance Comparison Chart</h3>
             <div id="{chart_id}" style="width:100%;height:500px;"></div>
             <script>
-                var traces = {json.dumps(traces)};
+                var traces = {datason_serialize(traces)};
                 
                 var layout = {{
                     title: 'Serialization Performance by Dataset (Lower is Better)',
@@ -414,6 +537,222 @@ class ReportGenerator:
         """
         
         return chart_html
+    
+    def _generate_sample_data_html(self, dataset_name: str) -> str:
+        """Generate HTML showing sample data structure for a dataset."""
+        
+        # Define sample data structures for each common dataset type
+        sample_data_map = {
+            "api_response": {
+                "description": "REST API response with metadata, pagination, and business objects",
+                "sample": {
+                    "status": "success",
+                    "timestamp": "2024-01-01T12:00:00Z",
+                    "request_id": "12345678-1234-5678-9012-123456789012",
+                    "data": {
+                        "items": [
+                            {
+                                "id": 1,
+                                "name": "Product A",
+                                "price": 19.99,
+                                "created": "2024-01-01T10:00:00Z",
+                                "active": True,
+                                "tags": ["electronics", "featured"]
+                            },
+                            "... 19 more items"
+                        ],
+                        "pagination": {
+                            "total": 1000,
+                            "page": 1,
+                            "per_page": 20
+                        }
+                    }
+                },
+                "key_features": ["UUIDs", "timestamps", "decimal prices", "nested objects", "arrays"]
+            },
+            
+            "simple_objects": {
+                "description": "Basic JSON-compatible data types (strings, numbers, booleans, arrays)",
+                "sample": {
+                    "strings": ["hello", "world", "test"],
+                    "numbers": [1, 42, 100],
+                    "floats": [3.14, 2.71, 1.41],
+                    "booleans": [True, False],
+                    "mixed_array": ["text", 42, True, None]
+                },
+                "key_features": ["primitive types", "mixed arrays", "null values", "Unicode strings"]
+            },
+            
+            "nested_structures": {
+                "description": "Deeply nested objects with complex hierarchies",
+                "sample": {
+                    "config": {
+                        "database": {
+                            "hosts": ["db1.example.com", "db2.example.com"],
+                            "connection": {
+                                "pool_size": 10,
+                                "timeout": 30,
+                                "retry_policy": {
+                                    "max_attempts": 3,
+                                    "backoff": "exponential"
+                                }
+                            }
+                        },
+                        "services": {
+                            "auth": {"enabled": True, "provider": "oauth2"},
+                            "cache": {"ttl": 3600, "type": "redis"}
+                        }
+                    }
+                },
+                "key_features": ["deep nesting", "configuration objects", "mixed data types"]
+            },
+            
+            "datetime_heavy": {
+                "description": "Objects with many datetime fields, timestamps, and UUIDs",
+                "sample": {
+                    "events": [
+                        {
+                            "id": "550e8400-e29b-41d4-a716-446655440000",
+                            "timestamp": "2024-01-01T12:00:00Z",
+                            "event_type": "user_action",
+                            "user_id": "123e4567-e89b-12d3-a456-426614174000",
+                            "metadata": {
+                                "created_at": "2024-01-01T10:00:00Z",
+                                "updated_at": "2024-01-01T11:00:00Z",
+                                "expires_at": "2024-01-02T12:00:00Z"
+                            }
+                        },
+                        "... 14 more events"
+                    ]
+                },
+                "key_features": ["ISO timestamps", "UUID identifiers", "timezone handling", "date arithmetic"]
+            },
+            
+            "basic_types": {
+                "description": "Fundamental data types for core serialization speed testing",
+                "sample": {
+                    "integer": 42,
+                    "float": 3.14159,
+                    "string": "Hello, World!",
+                    "boolean": True,
+                    "null_value": None,
+                    "simple_list": [1, 2, 3],
+                    "simple_dict": {"key": "value"}
+                },
+                "key_features": ["core Python types", "minimal overhead", "baseline performance"]
+            },
+            
+            "datetime_types": {
+                "description": "Date and time handling with various formats",
+                "sample": {
+                    "iso_datetime": "2024-01-01T12:00:00Z",
+                    "unix_timestamp": 1704110400,
+                    "date_only": "2024-01-01",
+                    "time_only": "12:00:00",
+                    "timezone_aware": "2024-01-01T12:00:00+05:00"
+                },
+                "key_features": ["ISO 8601", "Unix timestamps", "timezone handling", "date formats"]
+            },
+            
+            "advanced_types": {
+                "description": "Complex Python types and newer language features",
+                "sample": {
+                    "decimal_numbers": "19.99",  # Decimal precision
+                    "complex_number": "3+4j",
+                    "set_data": [1, 2, 3],  # Set converted to list
+                    "bytes_data": "base64_encoded_string",
+                    "custom_objects": {"serialized": "representation"}
+                },
+                "key_features": ["Decimal precision", "complex numbers", "set types", "custom serialization"]
+            },
+            
+            "decimal_precision": {
+                "description": "Financial/scientific data requiring precise decimal handling",
+                "sample": {
+                    "financial_data": {
+                        "balance": "1234567.89",  # Decimal
+                        "transactions": [
+                            {"amount": "99.99", "currency": "USD"},
+                            {"amount": "149.50", "currency": "EUR"}
+                        ],
+                        "exchange_rates": {
+                            "USD_EUR": "0.85234567",
+                            "EUR_GBP": "0.87654321"
+                        }
+                    }
+                },
+                "key_features": ["exact decimal arithmetic", "financial precision", "currency handling"]
+            },
+            
+            "large_dataset": {
+                "description": "Large collections testing memory efficiency and streaming",
+                "sample": {
+                    "users": [
+                        {
+                            "id": 1,
+                            "email": "user1@example.com",
+                            "profile": {
+                                "name": "User One",
+                                "preferences": {"theme": "dark"},
+                                "activity": "... large activity log"
+                            }
+                        },
+                        "... 999 more users"
+                    ],
+                    "metadata": {
+                        "total_count": 1000,
+                        "generated_at": "2024-01-01T12:00:00Z"
+                    }
+                },
+                "key_features": ["large arrays", "memory pressure", "streaming potential", "bulk data"]
+            },
+            
+            "complex_structure": {
+                "description": "Multi-level nested objects with varied data types",
+                "sample": {
+                    "organization": {
+                        "departments": [
+                            {
+                                "name": "Engineering",
+                                "employees": [
+                                    {
+                                        "id": 1,
+                                        "profile": {
+                                            "skills": ["Python", "JavaScript"],
+                                            "projects": [{"name": "ProjectA", "status": "active"}]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "key_features": ["deep nesting", "object hierarchies", "organizational data"]
+            }
+        }
+        
+        # Get sample data for this dataset
+        if dataset_name not in sample_data_map:
+            return ""
+        
+        sample_info = sample_data_map[dataset_name]
+        
+        # Create collapsible sample data section
+        sample_json = datason_serialize(sample_info["sample"], indent=2)
+        features_list = ", ".join(sample_info["key_features"])
+        
+        html = f"""
+        <div style="background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #007bff;">
+            <p><strong>📝 Dataset Details:</strong> {sample_info["description"]}</p>
+            <p><strong>🔑 Key Features:</strong> {features_list}</p>
+            <details style="margin-top: 10px;">
+                <summary style="cursor: pointer; font-weight: bold;">📄 View Sample Data Structure</summary>
+                <pre style="background: white; padding: 10px; margin: 10px 0; border-radius: 3px; overflow-x: auto; font-size: 12px;"><code>{sample_json}</code></pre>
+            </details>
+        </div>
+        """
+        
+        return html
     
     def _generate_config_html_with_charts(self, config_data: Dict[str, Any]) -> str:
         """Generate HTML with charts for configuration results."""
@@ -483,8 +822,8 @@ class ReportGenerator:
             <div id="{chart_id}" style="width:100%;height:400px;"></div>
             <script>
                 var trace = {{
-                    x: {json.dumps(config_names)},
-                    y: {json.dumps(total_times)},
+                    x: {datason_serialize(config_names)},
+                    y: {datason_serialize(total_times)},
                     type: 'bar',
                     marker: {{
                         color: '#764ba2'
@@ -588,7 +927,7 @@ class ReportGenerator:
             <h3>📊 Performance Evolution Across Versions</h3>
             <div id="{chart_id}" style="width:100%;height:500px;"></div>
             <script>
-                var traces = {json.dumps(traces)};
+                var traces = {datason_serialize(traces)};
                 
                 var layout = {{
                     title: 'DataSON Performance Evolution (Lower is Better)',
