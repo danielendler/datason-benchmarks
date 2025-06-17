@@ -38,7 +38,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        fetch-depth: 0  # Full history for trend analysis
+        fetch-depth: 0
 
     - name: 🐍 Set up Python 3.11
       uses: actions/setup-python@v5
@@ -134,168 +134,12 @@ jobs:
             echo "✅ Created CI result: $ci_filename"
           fi
         done
-        
-        # Tag HTML reports similarly
-        cd ../../docs/results
-        for file in ci_*_report.html; do
-          if [ -f "$file" ]; then
-            echo "✅ CI report ready: $file"
-          fi
-        done
-
-    - name: 📈 Generate trend analysis
-      run: |
-        python -c "
-        import json
-        import os
-        from datetime import datetime
-        from pathlib import Path
-        import glob
-
-        results_dir = Path('data/results')
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        run_id = os.environ.get('GITHUB_RUN_ID', 'unknown')
-        sha = os.environ.get('GITHUB_SHA', 'unknown')
-        
-        # Collect all CI results for trend analysis
-        ci_files = list(results_dir.glob('ci_*_*.json'))
-        
-        trend_data = {
-            'metadata': {
-                'timestamp': datetime.now().isoformat(),
-                'github_sha': sha,
-                'run_id': run_id,
-                'total_ci_results': len(ci_files)
-            },
-            'latest_results': {}
-        }
-        
-        # Load latest results for quick summary
-        for latest_file in results_dir.glob('latest_*.json'):
-            try:
-                with open(latest_file, 'r') as f:
-                    data = json.load(f)
-                    suite_type = latest_file.name.replace('latest_', '').replace('.json', '')
-                    trend_data['latest_results'][suite_type] = {
-                        'suite_type': data.get('suite_type', suite_type),
-                        'timestamp': data.get('metadata', {}).get('timestamp'),
-                        'summary': data.get('summary', {})
-                    }
-            except Exception as e:
-                print(f'Warning: Could not process {latest_file}: {e}')
-        
-        # Save trend metadata
-        trend_file = results_dir / f'ci_{timestamp}_{run_id}_trends.json'
-        with open(trend_file, 'w') as f:
-            json.dump(trend_data, f, indent=2)
-        
-        print(f'📊 Generated trend file: {trend_file}')
-        print(f'📁 Total CI result files: {len(ci_files)}')
-        "
-
-    - name: 🧹 Clean up old CI results (keep last 30 days)
-      run: |
-        # Keep only last 30 days of CI results to prevent repo bloat
-        find data/results -name "ci_*_*.json" -type f -mtime +30 -delete || true
-        find docs/results -name "ci_*_*.html" -type f -mtime +30 -delete || true
-        echo "🧹 Cleaned up old CI results"
 
     - name: 📊 Generate GitHub Pages index
       run: |
-        # Create an index.html for GitHub Pages with latest reports
-        python -c "
-        import json
-        from datetime import datetime
-        from pathlib import Path
-        import glob
-
-        docs_dir = Path('docs/results')
-        docs_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Find latest CI reports
-        reports = list(docs_dir.glob('ci_*_report.html'))
-        reports.sort(reverse=True)  # Latest first
-        
-        # Group by suite type
-        suite_reports = {}
-        for report in reports[:20]:  # Last 20 reports
-            parts = report.name.split('_')
-            if len(parts) >= 4:
-                suite_type = parts[-2]  # Extract suite type
-                if suite_type not in suite_reports:
-                    suite_reports[suite_type] = []
-                suite_reports[suite_type].append({
-                    'filename': report.name,
-                    'timestamp': '_'.join(parts[1:3])  # Extract timestamp
-                })
-        
-        # Generate index.html
-        html = '''<!DOCTYPE html>
-<html>
-<head>
-    <title>DataSON Benchmark Results</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; }
-        .header { text-align: center; margin-bottom: 30px; color: #333; }
-        .suite-section { margin: 30px 0; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
-        .report-list { list-style: none; padding: 0; }
-        .report-item { padding: 10px; margin: 5px 0; background: #f8f9fa; border-radius: 3px; }
-        .report-item a { text-decoration: none; color: #007bff; font-weight: bold; }
-        .report-item a:hover { text-decoration: underline; }
-        .timestamp { color: #666; font-size: 0.9em; }
-        .badge { background: #007bff; color: white; padding: 3px 8px; border-radius: 3px; font-size: 0.8em; }
-    </style>
-</head>
-<body>
-    <div class=\"container\">
-        <div class=\"header\">
-            <h1>📊 DataSON Benchmark Results</h1>
-            <p>Latest benchmark reports generated by CI</p>
-            <p class=\"timestamp\">Last updated: ''' + datetime.now().strftime('%Y-%m-%d %H:%M UTC') + '''</p>
-        </div>
-        '''
-        
-        for suite_type, reports in suite_reports.items():
-            html += f'''
-        <div class=\"suite-section\">
-            <h2><span class=\"badge\">{suite_type}</span> Benchmark Reports</h2>
-            <ul class=\"report-list\">
-            '''
-            for report in reports[:5]:  # Show last 5 per suite
-                html += f'''
-                <li class=\"report-item\">
-                    <a href=\"{report['filename']}\">{suite_type.title()} Report</a>
-                    <span class=\"timestamp\">({report['timestamp']})</span>
-                </li>
-                '''
-            html += '''
-            </ul>
-        </div>
-            '''
-        
-        html += '''
-        <div class=\"suite-section\">
-            <h2>🔗 Repository Links</h2>
-            <ul class=\"report-list\">
-                <li class=\"report-item\">
-                    <a href=\"https://github.com/${{ github.repository }}\">📁 Source Repository</a>
-                </li>
-                <li class=\"report-item\">
-                    <a href=\"https://github.com/${{ github.repository }}/actions\">🔄 CI Actions</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</body>
-</html>
-        '''
-        
-        with open(docs_dir / 'index.html', 'w') as f:
-            f.write(html)
-        
-        print('📄 Generated GitHub Pages index.html')
-        "
+        python scripts/generate_github_pages.py
+      env:
+        GITHUB_REPOSITORY: ${{ github.repository }}
 
     - name: 🌐 Commit CI results to repository
       run: |
@@ -311,9 +155,9 @@ jobs:
         if ! git diff --staged --quiet; then
           commit_msg="📊 CI Benchmark Results - $(date -u '+%Y-%m-%d %H:%M UTC')
 
-Suite: ${{ github.event.inputs.benchmark_type || 'all' }}
-Run ID: ${{ github.run_id }}
-SHA: ${{ github.sha }}"
+        Suite: ${{ github.event.inputs.benchmark_type || 'all' }}
+        Run ID: ${{ github.run_id }}
+        SHA: ${{ github.sha }}"
           
           git commit -m "$commit_msg"
           git push
@@ -332,78 +176,6 @@ SHA: ${{ github.sha }}"
           docs/results/ci_*_*.html
           docs/results/index.html
         retention-days: 90
-
-    - name: 📊 Generate workflow summary
-      run: |
-        python -c "
-        import json
-        import os
-        from pathlib import Path
-
-        results_dir = Path('data/results')
-        
-        # Collect summary info
-        summary_lines = []
-        summary_lines.append('# 📊 CI Benchmark Summary')
-        summary_lines.append('')
-        summary_lines.append(f'**Run ID**: {os.environ.get(\"GITHUB_RUN_ID\", \"unknown\")}')
-        summary_lines.append(f'**Commit**: {os.environ.get(\"GITHUB_SHA\", \"unknown\")[:8]}')
-        summary_lines.append(f'**Suite**: {\"${{ github.event.inputs.benchmark_type || \"all\" }}\"}')
-        summary_lines.append('')
-        
-        # Check which suites ran
-        suites_run = []
-        for latest_file in results_dir.glob('latest_*.json'):
-            suite_type = latest_file.name.replace('latest_', '').replace('.json', '')
-            suites_run.append(suite_type)
-            
-            try:
-                with open(latest_file, 'r') as f:
-                    data = json.load(f)
-                    
-                summary_lines.append(f'## {suite_type.title()} Results')
-                summary_lines.append('')
-                
-                if suite_type == 'competitive':
-                    competitive = data.get('competitive', {})
-                    summary = competitive.get('summary', {})
-                    competitors = summary.get('competitors_tested', [])
-                    if competitors:
-                        summary_lines.append(f'**Competitors tested**: {len(competitors)} libraries')
-                        summary_lines.append(f'**Libraries**: {', '.join(competitors)}')
-                        summary_lines.append('')
-                        
-                elif suite_type == 'versioning':
-                    versioning = data.get('versioning', {})
-                    versions_tested = versioning.get('metadata', {}).get('versions_tested', [])
-                    if versions_tested:
-                        summary_lines.append(f'**DataSON versions tested**: {', '.join(versions_tested)}')
-                        summary_lines.append('')
-                        
-            except Exception as e:
-                summary_lines.append(f'*Could not parse {suite_type} results: {e}*')
-                summary_lines.append('')
-        
-        summary_lines.append(f'## Files Generated')
-        summary_lines.append('')
-        
-        # Count CI files
-        ci_files = list(results_dir.glob('ci_*_*.json'))
-        html_files = list(Path('docs/results').glob('ci_*_*.html'))
-        
-        summary_lines.append(f'- **JSON Results**: {len(ci_files)} files')
-        summary_lines.append(f'- **HTML Reports**: {len(html_files)} files')
-        summary_lines.append('')
-        summary_lines.append('✅ All results committed to repository with CI tags')
-        summary_lines.append('')
-        summary_lines.append('📄 [View Results on GitHub Pages](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/)')
-        
-        # Write to GitHub step summary
-        with open(os.environ['GITHUB_STEP_SUMMARY'], 'w') as f:
-            f.write('\n'.join(summary_lines))
-        
-        print('📋 Generated workflow summary')
-        "
 
     - name: ✅ Benchmark complete
       run: |
