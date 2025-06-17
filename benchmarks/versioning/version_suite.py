@@ -5,6 +5,7 @@ DataSON Version Comparison Suite
 
 Tests different DataSON versions to track performance evolution and feature changes.
 Handles API differences and feature availability across versions.
+FOCUSES ON OPTIMIZATION CONFIGURATIONS AND DEEP API ANALYSIS.
 """
 
 import logging
@@ -30,6 +31,7 @@ class DataSONVersionInfo:
         self.pip_spec = pip_spec or f"datason=={version}"
         self.api_features: Set[str] = set()
         self.config_methods: Set[str] = set()
+        self.optimization_configs: Dict[str, Any] = {}
         self.available = False
         self.module = None
         
@@ -43,7 +45,10 @@ class DataSONVersionInfo:
             'get_performance_config',
             'get_ml_config', 
             'get_strict_config',
-            'get_api_config'
+            'get_api_config',
+            'get_compatibility_config',
+            'get_memory_config',
+            'get_speed_config'
         ]
         
         for method in config_methods:
@@ -68,6 +73,100 @@ class DataSONVersionInfo:
             
         if hasattr(self.module, 'chunked_serialize'):
             self.api_features.add('chunked_serialize')
+            
+        # Check for optimization-specific features
+        optimization_features = [
+            'streaming_serialize',
+            'batch_serialize',
+            'parallel_serialize',
+            'compressed_serialize',
+            'schema_validate',
+            'type_hints_serialize'
+        ]
+        
+        for feature in optimization_features:
+            if hasattr(self.module, feature):
+                self.api_features.add(feature)
+    
+    def analyze_optimization_configs(self):
+        """Deep analysis of DataSON's optimization configurations."""
+        if not self.module:
+            return
+            
+        logger.info(f"  🔍 Analyzing optimization configs for DataSON {self.version}")
+        
+        # Test all available configuration methods
+        for config_method in self.config_methods:
+            try:
+                config_func = getattr(self.module, config_method)
+                config = config_func()
+                
+                # Deep inspection of configuration
+                config_analysis = {
+                    'available': True,
+                    'type': type(config).__name__,
+                    'config_data': {}
+                }
+                
+                if hasattr(config, '__dict__'):
+                    # Configuration object - inspect attributes
+                    config_analysis['config_data'] = {
+                        attr: getattr(config, attr) for attr in dir(config) 
+                        if not attr.startswith('_') and not callable(getattr(config, attr))
+                    }
+                elif isinstance(config, dict):
+                    # Dictionary configuration
+                    config_analysis['config_data'] = config
+                else:
+                    # Other type - convert to string
+                    config_analysis['config_data'] = str(config)
+                
+                self.optimization_configs[config_method] = config_analysis
+                
+            except Exception as e:
+                self.optimization_configs[config_method] = {
+                    'available': True,
+                    'error': str(e)
+                }
+        
+        # Test configuration parameter discovery
+        self._discover_config_parameters()
+    
+    def _discover_config_parameters(self):
+        """Discover available configuration parameters."""
+        if not self.module:
+            return
+            
+        # Test if serialize function accepts config parameters
+        config_params = {}
+        
+        # Common optimization parameters to test
+        test_params = [
+            'use_cache', 'enable_compression', 'parallel_mode',
+            'strict_mode', 'validate_schema', 'optimize_size',
+            'optimize_speed', 'memory_limit', 'chunk_size',
+            'encoding', 'precision', 'date_format'
+        ]
+        
+        for param in test_params:
+            try:
+                # Test with simple data
+                test_data = {"test": "value"}
+                kwargs = {param: True}  # Try boolean first
+                
+                # Attempt serialization with parameter
+                result = self.module.serialize(test_data, **kwargs)
+                config_params[param] = {'supported': True, 'type': 'boolean'}
+                
+            except TypeError as e:
+                if 'unexpected keyword argument' not in str(e):
+                    # Parameter exists but wrong type
+                    config_params[param] = {'supported': True, 'type': 'unknown', 'error': str(e)}
+            except Exception:
+                # Parameter might exist but cause other errors
+                pass
+        
+        self.optimization_configs['discovered_parameters'] = config_params
 
 
 class DataSONVersionManager:
@@ -117,6 +216,7 @@ class DataSONVersionManager:
             version_info.module = datason
             version_info.available = True
             version_info.detect_features()
+            version_info.analyze_optimization_configs()
             
             self.current_version = version_info
             yield version_info
@@ -176,16 +276,16 @@ class DataSONVersionManager:
 
 
 class DataSONVersionBenchmarkSuite:
-    """Benchmarks different DataSON versions."""
+    """Benchmarks different DataSON versions with focus on optimization configs."""
     
     def __init__(self):
         self.version_manager = DataSONVersionManager()
         
-    def create_version_test_data(self) -> Dict[str, Any]:
-        """Create test data suitable for all DataSON versions."""
+    def create_optimization_test_data(self) -> Dict[str, Any]:
+        """Create test data specifically designed to test optimization configs."""
         return {
             "basic_types": {
-                "description": "Basic types supported by all versions",
+                "description": "Basic types - tests core serialization speed",
                 "data": {
                     "string": "hello world",
                     "integer": 42,
@@ -197,133 +297,239 @@ class DataSONVersionBenchmarkSuite:
                 }
             },
             
-            "datetime_types": {
-                "description": "Datetime handling (may vary by version)",
+            "datetime_heavy": {
+                "description": "Datetime handling - tests date optimization configs",
                 "data": {
                     "single_datetime": datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
                     "datetime_list": [
                         datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
-                        datetime(2024, 1, 2, 12, 0, 0, tzinfo=timezone.utc)
-                    ]
+                        datetime(2024, 1, 2, 12, 0, 0, tzinfo=timezone.utc),
+                        datetime(2024, 1, 3, 12, 0, 0, tzinfo=timezone.utc)
+                    ],
+                    "nested_dates": {
+                        "events": [
+                            {"timestamp": datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc), "event": "start"},
+                            {"timestamp": datetime(2024, 1, 1, 12, 30, 0, tzinfo=timezone.utc), "event": "middle"},
+                            {"timestamp": datetime(2024, 1, 1, 13, 0, 0, tzinfo=timezone.utc), "event": "end"}
+                        ]
+                    }
                 }
             },
             
-            "advanced_types": {
-                "description": "Advanced types (newer versions)",
+            "decimal_precision": {
+                "description": "Decimal handling - tests precision optimization configs",
                 "data": {
-                    "decimal": Decimal("19.99"),
-                    "complex_data": {
-                        "items": [
-                            {"id": i, "value": Decimal(f"{i}.99")} 
-                            for i in range(5)
-                        ]
+                    "price": Decimal("19.99"),
+                    "prices": [Decimal(f"{i}.99") for i in range(10)],
+                    "financial_data": {
+                        "transactions": [
+                            {"amount": Decimal("100.50"), "fee": Decimal("2.99")},
+                            {"amount": Decimal("250.00"), "fee": Decimal("5.00")},
+                            {"amount": Decimal("75.25"), "fee": Decimal("1.50")}
+                        ],
+                        "total": Decimal("425.75")
                     }
+                }
+            },
+            
+            "large_dataset": {
+                "description": "Large data - tests memory and compression configs",
+                "data": {
+                    "large_list": list(range(1000)),
+                    "large_dict": {f"key_{i}": f"value_{i}" for i in range(500)},
+                    "nested_large": {
+                        "level1": {
+                            "level2": {
+                                "data": [{"id": i, "value": f"item_{i}"} for i in range(100)]
+                            }
+                        }
+                    }
+                }
+            },
+            
+            "complex_structure": {
+                "description": "Complex nested data - tests structural optimization",
+                "data": {
+                    "users": [
+                        {
+                            "id": i,
+                            "profile": {
+                                "name": f"User {i}",
+                                "created": datetime(2024, 1, 1, tzinfo=timezone.utc),
+                                "balance": Decimal(f"{i * 10}.50"),
+                                "preferences": {
+                                    "theme": "dark" if i % 2 else "light",
+                                    "notifications": True,
+                                    "settings": {
+                                        "auto_save": True,
+                                        "sync_interval": 300
+                                    }
+                                }
+                            }
+                        } for i in range(50)
+                    ]
                 }
             }
         }
     
-    def benchmark_version_serialization(self, version_info: DataSONVersionInfo, 
-                                      test_data: Any, iterations: int = 5) -> Dict[str, Any]:
-        """Benchmark serialization for a specific version."""
+    def benchmark_optimization_configs(self, version_info: DataSONVersionInfo, 
+                                     test_data: Any, dataset_name: str,
+                                     iterations: int = 5) -> Dict[str, Any]:
+        """Benchmark different optimization configurations for a version."""
         if not version_info.available or not version_info.module:
             return {"error": "Version not available"}
             
-        results = {}
+        results = {
+            "version": version_info.version,
+            "dataset": dataset_name,
+            "config_results": {},
+            "optimization_analysis": {}
+        }
         
-        # Test basic serialization
-        if 'serialize' in version_info.api_features:
-            times = []
-            errors = []
+        # Test each available configuration method
+        for config_method in version_info.config_methods:
+            logger.info(f"    Testing config: {config_method}")
             
+            try:
+                config_func = getattr(version_info.module, config_method)
+                config = config_func()
+                
+                # Benchmark with this configuration
+                times = []
+                errors = []
+                
+                for _ in range(iterations):
+                    try:
+                        start = time.perf_counter()
+                        
+                        # Try to use the configuration
+                        if hasattr(config, '__dict__') or isinstance(config, dict):
+                            # Configuration object or dict - try to pass as config
+                            serialized = version_info.module.serialize(test_data, config=config)
+                        else:
+                            # Other type - just use default
+                            serialized = version_info.module.serialize(test_data)
+                        
+                        end = time.perf_counter()
+                        times.append(end - start)
+                    except Exception as e:
+                        errors.append(str(e))
+                
+                if times:
+                    results["config_results"][config_method] = {
+                        "mean_ms": mean(times) * 1000,
+                        "min_ms": min(times) * 1000,
+                        "max_ms": max(times) * 1000,
+                        "std_ms": stdev(times) * 1000 if len(times) > 1 else 0.0,
+                        "successful_runs": len(times),
+                        "error_count": len(errors),
+                        "config_type": type(config).__name__
+                    }
+                else:
+                    results["config_results"][config_method] = {
+                        "error": "All attempts failed",
+                        "errors": errors,
+                        "config_type": type(config).__name__
+                    }
+                    
+            except Exception as e:
+                results["config_results"][config_method] = {
+                    "error": f"Config method failed: {str(e)}"
+                }
+        
+        # Test default configuration for comparison
+        try:
+            times = []
             for _ in range(iterations):
                 try:
                     start = time.perf_counter()
                     serialized = version_info.module.serialize(test_data)
                     end = time.perf_counter()
                     times.append(end - start)
-                except Exception as e:
-                    errors.append(str(e))
+                except Exception:
+                    pass
             
             if times:
-                results['serialize'] = {
+                results["config_results"]["default"] = {
                     "mean_ms": mean(times) * 1000,
                     "min_ms": min(times) * 1000,
                     "max_ms": max(times) * 1000,
                     "std_ms": stdev(times) * 1000 if len(times) > 1 else 0.0,
                     "successful_runs": len(times),
-                    "error_count": len(errors)
+                    "config_type": "default"
                 }
-            else:
-                results['serialize'] = {"error": "All attempts failed", "errors": errors}
+        except Exception:
+            pass
         
-        # Test fast deserialization if available
-        if 'deserialize_fast' in version_info.api_features:
-            try:
-                serialized = version_info.module.serialize(test_data)
-                times = []
-                
-                for _ in range(iterations):
-                    try:
-                        start = time.perf_counter()
-                        result = version_info.module.deserialize_fast(serialized)
-                        end = time.perf_counter()
-                        times.append(end - start)
-                    except Exception:
-                        pass
-                
-                if times:
-                    results['deserialize_fast'] = {
-                        "mean_ms": mean(times) * 1000,
-                        "successful_runs": len(times)
-                    }
-            except Exception:
-                pass
+        # Add optimization analysis
+        results["optimization_analysis"] = {
+            "available_configs": list(version_info.config_methods),
+            "optimization_configs": version_info.optimization_configs,
+            "fastest_config": self._find_fastest_config(results["config_results"]),
+            "performance_variance": self._calculate_config_variance(results["config_results"])
+        }
         
         return results
     
-    def test_configuration_compatibility(self, version_info: DataSONVersionInfo) -> Dict[str, Any]:
-        """Test which configuration methods are available in this version."""
-        config_results = {}
+    def _find_fastest_config(self, config_results: Dict[str, Any]) -> Dict[str, Any]:
+        """Find the fastest configuration from results."""
+        fastest_time = float('inf')
+        fastest_config = None
         
-        for config_method in ['get_performance_config', 'get_ml_config', 'get_strict_config', 'get_api_config']:
-            if config_method in version_info.config_methods:
-                try:
-                    config_func = getattr(version_info.module, config_method)
-                    config = config_func()
-                    config_results[config_method] = {
-                        "available": True,
-                        "config_keys": list(config.keys()) if isinstance(config, dict) else "non-dict"
-                    }
-                except Exception as e:
-                    config_results[config_method] = {
-                        "available": True,
-                        "error": str(e)
-                    }
-            else:
-                config_results[config_method] = {"available": False}
+        for config_name, result in config_results.items():
+            if isinstance(result, dict) and "mean_ms" in result:
+                if result["mean_ms"] < fastest_time:
+                    fastest_time = result["mean_ms"]
+                    fastest_config = config_name
         
-        return config_results
+        return {
+            "config": fastest_config,
+            "time_ms": fastest_time
+        }
     
-    def run_version_comparison(self, versions: Optional[List[str]] = None, 
-                             iterations: int = 5) -> Dict[str, Any]:
-        """Run comprehensive version comparison."""
+    def _calculate_config_variance(self, config_results: Dict[str, Any]) -> Dict[str, Any]:
+        """Calculate variance between different configurations."""
+        times = []
+        
+        for result in config_results.values():
+            if isinstance(result, dict) and "mean_ms" in result:
+                times.append(result["mean_ms"])
+        
+        if len(times) < 2:
+            return {"variance": 0, "range_ms": 0, "analysis": "Insufficient data"}
+        
+        variance = max(times) / min(times) if min(times) > 0 else 0
+        range_ms = max(times) - min(times)
+        
+        return {
+            "variance_ratio": variance,
+            "range_ms": range_ms,
+            "min_ms": min(times),
+            "max_ms": max(times),
+            "analysis": "High variance" if variance > 2.0 else "Low variance"
+        }
+    
+    def run_optimization_focused_comparison(self, versions: Optional[List[str]] = None, 
+                                          iterations: int = 5) -> Dict[str, Any]:
+        """Run optimization-focused version comparison."""
         if versions is None:
             versions = ['latest', '0.11.0', '0.10.0', '0.9.0']
         
         # Filter to available versions
         available_versions = [v for v in versions if v in self.version_manager.versions]
         
-        logger.info(f"Testing DataSON versions: {available_versions}")
+        logger.info(f"Testing DataSON optimization configs across versions: {available_versions}")
         
-        test_datasets = self.create_version_test_data()
+        test_datasets = self.create_optimization_test_data()
         results = {
             "metadata": {
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "versions_tested": available_versions,
-                "python_version": sys.version
+                "python_version": sys.version,
+                "focus": "optimization_configurations"
             },
             "version_results": {},
-            "summary": {}
+            "optimization_summary": {}
         }
         
         for version_name in available_versions:
@@ -335,16 +541,16 @@ class DataSONVersionBenchmarkSuite:
                         "version": version_info.version,
                         "available_features": list(version_info.api_features),
                         "available_configs": list(version_info.config_methods),
-                        "datasets": {},
-                        "configuration_compatibility": self.test_configuration_compatibility(version_info)
+                        "optimization_configs": version_info.optimization_configs,
+                        "datasets": {}
                     }
                     
-                    # Test each dataset
+                    # Test each dataset with optimization focus
                     for dataset_name, dataset_info in test_datasets.items():
-                        logger.info(f"  Testing dataset: {dataset_name}")
+                        logger.info(f"  Testing optimization dataset: {dataset_name}")
                         
-                        dataset_results = self.benchmark_version_serialization(
-                            version_info, dataset_info["data"], iterations
+                        dataset_results = self.benchmark_optimization_configs(
+                            version_info, dataset_info["data"], dataset_name, iterations
                         )
                         
                         version_results["datasets"][dataset_name] = {
@@ -361,43 +567,93 @@ class DataSONVersionBenchmarkSuite:
                     "available": False
                 }
         
-        # Generate summary
-        results["summary"] = self._generate_version_summary(results["version_results"])
+        # Generate optimization-focused summary
+        results["optimization_summary"] = self._generate_optimization_summary(results["version_results"])
         
         return results
     
-    def _generate_version_summary(self, version_results: Dict[str, Any]) -> Dict[str, Any]:
-        """Generate summary of version comparison results."""
+    def _generate_optimization_summary(self, version_results: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate optimization-focused summary."""
         summary = {
-            "performance_evolution": {},
-            "feature_evolution": {},
-            "api_compatibility": {}
+            "config_evolution": {},
+            "performance_by_config": {},
+            "optimization_recommendations": {},
+            "api_changes": {}
         }
         
-        # Track performance changes
-        for dataset_name in ["basic_types", "datetime_types", "advanced_types"]:
-            perf_data = {}
+        # Track configuration method evolution
+        all_configs = set()
+        for version_data in version_results.values():
+            if isinstance(version_data, dict) and "available_configs" in version_data:
+                all_configs.update(version_data["available_configs"])
+        
+        for config in all_configs:
+            config_availability = {}
+            for version_name, version_data in version_results.items():
+                if isinstance(version_data, dict) and "available_configs" in version_data:
+                    config_availability[version_name] = config in version_data["available_configs"]
+            summary["config_evolution"][config] = config_availability
+        
+        # Track performance by configuration across versions
+        for dataset_name in ["basic_types", "datetime_heavy", "decimal_precision", "large_dataset"]:
+            dataset_summary = {}
             
             for version_name, version_data in version_results.items():
                 if isinstance(version_data, dict) and "datasets" in version_data:
-                    dataset_results = version_data["datasets"].get(dataset_name, {}).get("results", {})
-                    if "serialize" in dataset_results and "mean_ms" in dataset_results["serialize"]:
-                        perf_data[version_name] = dataset_results["serialize"]["mean_ms"]
+                    dataset_data = version_data["datasets"].get(dataset_name, {})
+                    results = dataset_data.get("results", {})
+                    config_results = results.get("config_results", {})
+                    
+                    version_perf = {}
+                    for config_name, config_data in config_results.items():
+                        if isinstance(config_data, dict) and "mean_ms" in config_data:
+                            version_perf[config_name] = config_data["mean_ms"]
+                    
+                    if version_perf:
+                        dataset_summary[version_name] = version_perf
             
-            if perf_data:
-                summary["performance_evolution"][dataset_name] = perf_data
+            if dataset_summary:
+                summary["performance_by_config"][dataset_name] = dataset_summary
         
-        # Track feature evolution
-        all_features = set()
-        for version_data in version_results.values():
-            if isinstance(version_data, dict) and "available_features" in version_data:
-                all_features.update(version_data["available_features"])
+        # Generate optimization recommendations
+        summary["optimization_recommendations"] = self._generate_optimization_recommendations(
+            summary["performance_by_config"]
+        )
         
-        for feature in all_features:
-            feature_availability = {}
-            for version_name, version_data in version_results.items():
-                if isinstance(version_data, dict) and "available_features" in version_data:
-                    feature_availability[version_name] = feature in version_data["available_features"]
-            summary["feature_evolution"][feature] = feature_availability
+        return summary
+    
+    def _generate_optimization_recommendations(self, performance_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate optimization recommendations based on performance analysis."""
+        recommendations = {
+            "fastest_configs_by_dataset": {},
+            "most_consistent_configs": {},
+            "version_recommendations": {}
+        }
         
-        return summary 
+        # Find fastest config for each dataset
+        for dataset, version_data in performance_data.items():
+            fastest_overall = float('inf')
+            fastest_config = None
+            fastest_version = None
+            
+            for version, config_perfs in version_data.items():
+                for config, time_ms in config_perfs.items():
+                    if time_ms < fastest_overall:
+                        fastest_overall = time_ms
+                        fastest_config = config
+                        fastest_version = version
+            
+            if fastest_config:
+                recommendations["fastest_configs_by_dataset"][dataset] = {
+                    "config": fastest_config,
+                    "version": fastest_version,
+                    "time_ms": fastest_overall
+                }
+        
+        return recommendations
+    
+    # Keep the original method for backward compatibility
+    def run_version_comparison(self, versions: Optional[List[str]] = None, 
+                             iterations: int = 5) -> Dict[str, Any]:
+        """Run comprehensive version comparison (calls the optimization-focused version)."""
+        return self.run_optimization_focused_comparison(versions, iterations) 

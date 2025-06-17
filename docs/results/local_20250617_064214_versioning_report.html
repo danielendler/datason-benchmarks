@@ -1,0 +1,2913 @@
+
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>DataSON Benchmark Report - versioning</title>
+                <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                <style>
+                    body { 
+                        font-family: 'Segoe UI', Arial, sans-serif; 
+                        margin: 0; 
+                        padding: 20px; 
+                        background-color: #f8f9fa;
+                    }
+                    .container { 
+                        max-width: 1400px; 
+                        margin: 0 auto; 
+                        background: white; 
+                        padding: 30px; 
+                        border-radius: 8px; 
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    }
+                    .header { 
+                        text-align: center; 
+                        margin-bottom: 30px; 
+                        padding-bottom: 20px; 
+                        border-bottom: 2px solid #e9ecef;
+                    }
+                    .summary { 
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                        color: white; 
+                        padding: 25px; 
+                        border-radius: 8px; 
+                        margin: 20px 0; 
+                    }
+                    .chart-container { 
+                        margin: 30px 0; 
+                        padding: 20px; 
+                        border: 1px solid #dee2e6; 
+                        border-radius: 8px; 
+                        background: #ffffff;
+                    }
+                    table { 
+                        border-collapse: collapse; 
+                        width: 100%; 
+                        margin: 20px 0; 
+                        background: white;
+                    }
+                    th, td { 
+                        border: 1px solid #dee2e6; 
+                        padding: 12px; 
+                        text-align: left; 
+                    }
+                    th { 
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                        color: white; 
+                        font-weight: 600;
+                    }
+                    tr:nth-child(even) { 
+                        background-color: #f8f9fa; 
+                    }
+                    .metric { 
+                        display: inline-block; 
+                        margin: 10px 15px; 
+                        padding: 15px; 
+                        background: #e9ecef; 
+                        border-radius: 5px; 
+                        text-align: center;
+                    }
+                    .metric-value { 
+                        font-size: 24px; 
+                        font-weight: bold; 
+                        color: #495057; 
+                    }
+                    .metric-label { 
+                        font-size: 12px; 
+                        color: #6c757d; 
+                        text-transform: uppercase; 
+                    }
+                    .section { 
+                        margin: 40px 0; 
+                        padding: 20px; 
+                        border-left: 4px solid #667eea;
+                    }
+                    .warning { 
+                        background-color: #fff3cd; 
+                        border: 1px solid #ffeeba; 
+                        color: #856404; 
+                        padding: 15px; 
+                        border-radius: 5px; 
+                        margin: 20px 0;
+                    }
+                    .ci-badge { 
+                        background: #28a745; 
+                        color: white; 
+                        padding: 5px 15px; 
+                        border-radius: 20px; 
+                        font-size: 12px; 
+                        text-transform: uppercase; 
+                        font-weight: bold;
+                    }
+                    .local-badge { 
+                        background: #ffc107; 
+                        color: #212529; 
+                        padding: 5px 15px; 
+                        border-radius: 20px; 
+                        font-size: 12px; 
+                        text-transform: uppercase; 
+                        font-weight: bold;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>📊 DataSON Benchmark Report</h1>
+                        <span class="local-badge">
+                            Local Environment
+                        </span>
+                    </div>
+                    
+                    <div class="summary">
+                        <h2>🎯 Execution Summary</h2>
+                        <div class="metric">
+                            <div class="metric-value">Versioning</div>
+                            <div class="metric-label">Suite Type</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">2025-06-17 06:42:14 UTC</div>
+                            <div class="metric-label">Generated</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">Local</div>
+                            <div class="metric-label">Environment</div>
+                        </div>
+                    </div>
+            
+                <div class="warning">
+                    ⚠️ <strong>Warning:</strong> This report was generated in a local environment. 
+                    Results may vary from CI environment and won't be committed to the repository. 
+                    Only CI-generated results are stored for consistency.
+                </div>
+                <div class="section"><h2>📈 DataSON Version Evolution</h2><h3>🔧 Version Compatibility</h3><table><tr><th>Version</th><th>Available Features</th><th>Config Methods</th><th>Status</th></tr><tr><td>latest</td><td>serialize, deserialize</td><td>get_ml_config, get_strict_config, get_performance_config, get_api_config</td><td>✅ Available</td></tr><tr><td>0.11.0</td><td colspan='2'>❌ cannot import name 'load_basic_file' from 'datason.api' (/Users/danielmeierendler/.pyenv/versions/3.12.0/lib/python3.12/site-packages/datason/api.py)</td><td>❌ Failed</td></tr><tr><td>0.10.0</td><td colspan='2'>❌ Command '['/Users/danielmeierendler/.pyenv/versions/3.12.0/bin/python', '-m', 'pip', 'install', 'datason==0.10.0']' returned non-zero exit status 1.</td><td>❌ Failed</td></tr><tr><td>0.9.0</td><td>serialize, deserialize</td><td>get_ml_config, get_strict_config, get_performance_config, get_api_config</td><td>✅ Available</td></tr></table></div>
+                    <div class="section">
+                        <h2>📋 Raw Data</h2>
+                        <details>
+                            <summary>Click to view raw JSON data</summary>
+                            <pre style="background: #f8f9fa; padding: 20px; border-radius: 5px; overflow-x: auto;">
+            {
+  "suite_type": "versioning",
+  "metadata": {
+    "timestamp": "2025-06-17T04:39:18.447874+00:00",
+    "python_version": "3.12.0 (main, Feb 22 2025, 21:43:18) [Clang 16.0.0 (clang-1600.0.26.6)]",
+    "runner_info": {
+      "os": "posix",
+      "github_sha": "local",
+      "github_ref": "local",
+      "ci_run_id": "local"
+    }
+  },
+  "versioning": {
+    "metadata": {
+      "timestamp": "2025-06-17T04:39:18.451636+00:00",
+      "versions_tested": [
+        "latest",
+        "0.11.0",
+        "0.10.0",
+        "0.9.0"
+      ],
+      "python_version": "3.12.0 (main, Feb 22 2025, 21:43:18) [Clang 16.0.0 (clang-1600.0.26.6)]",
+      "focus": "optimization_configurations"
+    },
+    "version_results": {
+      "latest": {
+        "version": "latest",
+        "available_features": [
+          "serialize",
+          "deserialize"
+        ],
+        "available_configs": [
+          "get_ml_config",
+          "get_strict_config",
+          "get_performance_config",
+          "get_api_config"
+        ],
+        "optimization_configs": {
+          "get_ml_config": {
+            "available": true,
+            "type": "SerializationConfig",
+            "config_data": {
+              "audit_trail": false,
+              "auto_detect_types": false,
+              "cache_metrics_enabled": false,
+              "cache_scope": "OPERATION",
+              "cache_size_limit": 1000,
+              "cache_warn_on_limit": true,
+              "check_if_serialized": false,
+              "custom_date_format": null,
+              "custom_serializers": null,
+              "dataframe_orient": "RECORDS",
+              "dataframe_output": "JSON_SAFE",
+              "date_format": "UNIX_MS",
+              "datetime_output": "JSON_SAFE",
+              "ensure_ascii": false,
+              "include_redaction_summary": false,
+              "include_type_hints": true,
+              "max_depth": 50,
+              "max_size": 100000,
+              "max_string_length": 1000000,
+              "nan_handling": "NULL",
+              "numpy_output": "JSON_SAFE",
+              "parse_uuids": true,
+              "preserve_complex": false,
+              "preserve_decimals": false,
+              "redact_fields": null,
+              "redact_large_objects": false,
+              "redact_patterns": null,
+              "redaction_replacement": "<REDACTED>",
+              "series_output": "JSON_SAFE",
+              "sort_keys": true,
+              "type_coercion": "AGGRESSIVE",
+              "uuid_format": "object"
+            }
+          },
+          "get_strict_config": {
+            "available": true,
+            "type": "SerializationConfig",
+            "config_data": {
+              "audit_trail": false,
+              "auto_detect_types": false,
+              "cache_metrics_enabled": false,
+              "cache_scope": "OPERATION",
+              "cache_size_limit": 1000,
+              "cache_warn_on_limit": true,
+              "check_if_serialized": false,
+              "custom_date_format": null,
+              "custom_serializers": null,
+              "dataframe_orient": "RECORDS",
+              "dataframe_output": "JSON_SAFE",
+              "date_format": "ISO",
+              "datetime_output": "JSON_SAFE",
+              "ensure_ascii": false,
+              "include_redaction_summary": false,
+              "include_type_hints": false,
+              "max_depth": 50,
+              "max_size": 100000,
+              "max_string_length": 1000000,
+              "nan_handling": "NULL",
+              "numpy_output": "JSON_SAFE",
+              "parse_uuids": true,
+              "preserve_complex": true,
+              "preserve_decimals": true,
+              "redact_fields": null,
+              "redact_large_objects": false,
+              "redact_patterns": null,
+              "redaction_replacement": "<REDACTED>",
+              "series_output": "JSON_SAFE",
+              "sort_keys": false,
+              "type_coercion": "STRICT",
+              "uuid_format": "object"
+            }
+          },
+          "get_performance_config": {
+            "available": true,
+            "type": "SerializationConfig",
+            "config_data": {
+              "audit_trail": false,
+              "auto_detect_types": false,
+              "cache_metrics_enabled": false,
+              "cache_scope": "OPERATION",
+              "cache_size_limit": 1000,
+              "cache_warn_on_limit": true,
+              "check_if_serialized": false,
+              "custom_date_format": null,
+              "custom_serializers": null,
+              "dataframe_orient": "VALUES",
+              "dataframe_output": "JSON_SAFE",
+              "date_format": "UNIX",
+              "datetime_output": "JSON_SAFE",
+              "ensure_ascii": false,
+              "include_redaction_summary": false,
+              "include_type_hints": false,
+              "max_depth": 50,
+              "max_size": 100000,
+              "max_string_length": 1000000,
+              "nan_handling": "NULL",
+              "numpy_output": "JSON_SAFE",
+              "parse_uuids": true,
+              "preserve_complex": false,
+              "preserve_decimals": false,
+              "redact_fields": null,
+              "redact_large_objects": false,
+              "redact_patterns": null,
+              "redaction_replacement": "<REDACTED>",
+              "series_output": "JSON_SAFE",
+              "sort_keys": false,
+              "type_coercion": "SAFE",
+              "uuid_format": "object"
+            }
+          },
+          "get_api_config": {
+            "available": true,
+            "type": "SerializationConfig",
+            "config_data": {
+              "audit_trail": false,
+              "auto_detect_types": false,
+              "cache_metrics_enabled": false,
+              "cache_scope": "OPERATION",
+              "cache_size_limit": 1000,
+              "cache_warn_on_limit": true,
+              "check_if_serialized": false,
+              "custom_date_format": null,
+              "custom_serializers": null,
+              "dataframe_orient": "RECORDS",
+              "dataframe_output": "JSON_SAFE",
+              "date_format": "ISO",
+              "datetime_output": "JSON_SAFE",
+              "ensure_ascii": true,
+              "include_redaction_summary": false,
+              "include_type_hints": false,
+              "max_depth": 50,
+              "max_size": 100000,
+              "max_string_length": 1000000,
+              "nan_handling": "NULL",
+              "numpy_output": "JSON_SAFE",
+              "parse_uuids": false,
+              "preserve_complex": true,
+              "preserve_decimals": true,
+              "redact_fields": null,
+              "redact_large_objects": false,
+              "redact_patterns": null,
+              "redaction_replacement": "<REDACTED>",
+              "series_output": "JSON_SAFE",
+              "sort_keys": true,
+              "type_coercion": "SAFE",
+              "uuid_format": "string"
+            }
+          },
+          "discovered_parameters": {}
+        },
+        "datasets": {
+          "basic_types": {
+            "description": "Basic types - tests core serialization speed",
+            "results": {
+              "version": "latest",
+              "dataset": "basic_types",
+              "config_results": {
+                "get_ml_config": {
+                  "mean_ms": 0.02900859690271318,
+                  "min_ms": 0.012208998668938875,
+                  "max_ms": 0.08579099085181952,
+                  "std_ms": 0.031890624974610246,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_strict_config": {
+                  "mean_ms": 0.011791603174060583,
+                  "min_ms": 0.01025001984089613,
+                  "max_ms": 0.01420799526385963,
+                  "std_ms": 0.001627906895569919,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_performance_config": {
+                  "mean_ms": 0.010650197509676218,
+                  "min_ms": 0.00999998883344233,
+                  "max_ms": 0.012124975910410285,
+                  "std_ms": 0.0008667942746740093,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_api_config": {
+                  "mean_ms": 0.012091797543689609,
+                  "min_ms": 0.011083990102633834,
+                  "max_ms": 0.015249999705702066,
+                  "std_ms": 0.001782666509585782,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "default": {
+                  "mean_ms": 0.010550004662945867,
+                  "min_ms": 0.008917006198316813,
+                  "max_ms": 0.01329102087765932,
+                  "std_ms": 0.0016788926962487882,
+                  "successful_runs": 5,
+                  "config_type": "default"
+                }
+              },
+              "optimization_analysis": {
+                "available_configs": [
+                  "get_ml_config",
+                  "get_strict_config",
+                  "get_performance_config",
+                  "get_api_config"
+                ],
+                "optimization_configs": {
+                  "get_ml_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "UNIX_MS",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": true,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": false,
+                      "preserve_decimals": false,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": true,
+                      "type_coercion": "AGGRESSIVE",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_strict_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "ISO",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": true,
+                      "preserve_decimals": true,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": false,
+                      "type_coercion": "STRICT",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_performance_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "VALUES",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "UNIX",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": false,
+                      "preserve_decimals": false,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": false,
+                      "type_coercion": "SAFE",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_api_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "ISO",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": true,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": false,
+                      "preserve_complex": true,
+                      "preserve_decimals": true,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": true,
+                      "type_coercion": "SAFE",
+                      "uuid_format": "string"
+                    }
+                  },
+                  "discovered_parameters": {}
+                },
+                "fastest_config": {
+                  "config": "default",
+                  "time_ms": 0.010550004662945867
+                },
+                "performance_variance": {
+                  "variance_ratio": 2.749628822876097,
+                  "range_ms": 0.018458592239767313,
+                  "min_ms": 0.010550004662945867,
+                  "max_ms": 0.02900859690271318,
+                  "analysis": "High variance"
+                }
+              }
+            }
+          },
+          "datetime_heavy": {
+            "description": "Datetime handling - tests date optimization configs",
+            "results": {
+              "version": "latest",
+              "dataset": "datetime_heavy",
+              "config_results": {
+                "get_ml_config": {
+                  "mean_ms": 0.06285000708885491,
+                  "min_ms": 0.03191700670868158,
+                  "max_ms": 0.18004101002588868,
+                  "std_ms": 0.06553580729818498,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_strict_config": {
+                  "mean_ms": 0.04065859830006957,
+                  "min_ms": 0.032374984584748745,
+                  "max_ms": 0.06354201468639076,
+                  "std_ms": 0.012953719996480963,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_performance_config": {
+                  "mean_ms": 0.028099800692871213,
+                  "min_ms": 0.023667002096772194,
+                  "max_ms": 0.03654099418781698,
+                  "std_ms": 0.005351302853298084,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_api_config": {
+                  "mean_ms": 0.038616592064499855,
+                  "min_ms": 0.028624985134229064,
+                  "max_ms": 0.06287498399615288,
+                  "std_ms": 0.014281281638127998,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "default": {
+                  "mean_ms": 0.028541998472064734,
+                  "min_ms": 0.027083995519205928,
+                  "max_ms": 0.030750001315027475,
+                  "std_ms": 0.0019040964363981876,
+                  "successful_runs": 5,
+                  "config_type": "default"
+                }
+              },
+              "optimization_analysis": {
+                "available_configs": [
+                  "get_ml_config",
+                  "get_strict_config",
+                  "get_performance_config",
+                  "get_api_config"
+                ],
+                "optimization_configs": {
+                  "get_ml_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "UNIX_MS",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": true,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": false,
+                      "preserve_decimals": false,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": true,
+                      "type_coercion": "AGGRESSIVE",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_strict_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "ISO",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": true,
+                      "preserve_decimals": true,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": false,
+                      "type_coercion": "STRICT",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_performance_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "VALUES",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "UNIX",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": false,
+                      "preserve_decimals": false,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": false,
+                      "type_coercion": "SAFE",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_api_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "ISO",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": true,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": false,
+                      "preserve_complex": true,
+                      "preserve_decimals": true,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": true,
+                      "type_coercion": "SAFE",
+                      "uuid_format": "string"
+                    }
+                  },
+                  "discovered_parameters": {}
+                },
+                "fastest_config": {
+                  "config": "get_performance_config",
+                  "time_ms": 0.028099800692871213
+                },
+                "performance_variance": {
+                  "variance_ratio": 2.2366709207585114,
+                  "range_ms": 0.034750206395983696,
+                  "min_ms": 0.028099800692871213,
+                  "max_ms": 0.06285000708885491,
+                  "analysis": "High variance"
+                }
+              }
+            }
+          },
+          "decimal_precision": {
+            "description": "Decimal handling - tests precision optimization configs",
+            "results": {
+              "version": "latest",
+              "dataset": "decimal_precision",
+              "config_results": {
+                "get_ml_config": {
+                  "mean_ms": 1092.2291334078182,
+                  "min_ms": 0.14554100926034153,
+                  "max_ms": 5460.540334024699,
+                  "std_ms": 2441.9601978783726,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_strict_config": {
+                  "mean_ms": 0.15635800664313138,
+                  "min_ms": 0.14016602654010057,
+                  "max_ms": 0.17924999701790512,
+                  "std_ms": 0.014851431956660888,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_performance_config": {
+                  "mean_ms": 0.15497540589421988,
+                  "min_ms": 0.14083401765674353,
+                  "max_ms": 0.1706249895505607,
+                  "std_ms": 0.0108708110392788,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_api_config": {
+                  "mean_ms": 0.15720879309810698,
+                  "min_ms": 0.1421670021954924,
+                  "max_ms": 0.17616699915379286,
+                  "std_ms": 0.01298433357782677,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "default": {
+                  "mean_ms": 0.14111659838818014,
+                  "min_ms": 0.13862500782124698,
+                  "max_ms": 0.1452919968869537,
+                  "std_ms": 0.0026218419391133402,
+                  "successful_runs": 5,
+                  "config_type": "default"
+                }
+              },
+              "optimization_analysis": {
+                "available_configs": [
+                  "get_ml_config",
+                  "get_strict_config",
+                  "get_performance_config",
+                  "get_api_config"
+                ],
+                "optimization_configs": {
+                  "get_ml_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "UNIX_MS",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": true,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": false,
+                      "preserve_decimals": false,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": true,
+                      "type_coercion": "AGGRESSIVE",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_strict_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "ISO",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": true,
+                      "preserve_decimals": true,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": false,
+                      "type_coercion": "STRICT",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_performance_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "VALUES",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "UNIX",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": false,
+                      "preserve_decimals": false,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": false,
+                      "type_coercion": "SAFE",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_api_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "ISO",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": true,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": false,
+                      "preserve_complex": true,
+                      "preserve_decimals": true,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": true,
+                      "type_coercion": "SAFE",
+                      "uuid_format": "string"
+                    }
+                  },
+                  "discovered_parameters": {}
+                },
+                "fastest_config": {
+                  "config": "default",
+                  "time_ms": 0.14111659838818014
+                },
+                "performance_variance": {
+                  "variance_ratio": 7739.90548158864,
+                  "range_ms": 1092.08801680943,
+                  "min_ms": 0.14111659838818014,
+                  "max_ms": 1092.2291334078182,
+                  "analysis": "High variance"
+                }
+              }
+            }
+          },
+          "large_dataset": {
+            "description": "Large data - tests memory and compression configs",
+            "results": {
+              "version": "latest",
+              "dataset": "large_dataset",
+              "config_results": {
+                "get_ml_config": {
+                  "mean_ms": 1.2898003973532468,
+                  "min_ms": 1.1844589898828417,
+                  "max_ms": 1.4592920197173953,
+                  "std_ms": 0.13193973660287028,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_strict_config": {
+                  "mean_ms": 0.9776666003745049,
+                  "min_ms": 0.9637500043027103,
+                  "max_ms": 1.0006249940488487,
+                  "std_ms": 0.013757821164958484,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_performance_config": {
+                  "mean_ms": 1.0143163963221014,
+                  "min_ms": 0.9555830038152635,
+                  "max_ms": 1.1394999746698886,
+                  "std_ms": 0.07729146307629334,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_api_config": {
+                  "mean_ms": 1.1027666041627526,
+                  "min_ms": 1.0324169998057187,
+                  "max_ms": 1.2401659914758056,
+                  "std_ms": 0.08801355440283068,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "default": {
+                  "mean_ms": 1.0790997999720275,
+                  "min_ms": 0.9795419755391777,
+                  "max_ms": 1.197790988953784,
+                  "std_ms": 0.08383760064759078,
+                  "successful_runs": 5,
+                  "config_type": "default"
+                }
+              },
+              "optimization_analysis": {
+                "available_configs": [
+                  "get_ml_config",
+                  "get_strict_config",
+                  "get_performance_config",
+                  "get_api_config"
+                ],
+                "optimization_configs": {
+                  "get_ml_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "UNIX_MS",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": true,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": false,
+                      "preserve_decimals": false,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": true,
+                      "type_coercion": "AGGRESSIVE",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_strict_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "ISO",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": true,
+                      "preserve_decimals": true,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": false,
+                      "type_coercion": "STRICT",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_performance_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "VALUES",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "UNIX",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": false,
+                      "preserve_decimals": false,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": false,
+                      "type_coercion": "SAFE",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_api_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "ISO",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": true,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": false,
+                      "preserve_complex": true,
+                      "preserve_decimals": true,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": true,
+                      "type_coercion": "SAFE",
+                      "uuid_format": "string"
+                    }
+                  },
+                  "discovered_parameters": {}
+                },
+                "fastest_config": {
+                  "config": "get_strict_config",
+                  "time_ms": 0.9776666003745049
+                },
+                "performance_variance": {
+                  "variance_ratio": 1.3192640485613152,
+                  "range_ms": 0.3121337969787419,
+                  "min_ms": 0.9776666003745049,
+                  "max_ms": 1.2898003973532468,
+                  "analysis": "Low variance"
+                }
+              }
+            }
+          },
+          "complex_structure": {
+            "description": "Complex nested data - tests structural optimization",
+            "results": {
+              "version": "latest",
+              "dataset": "complex_structure",
+              "config_results": {
+                "get_ml_config": {
+                  "mean_ms": 1.0783917969092727,
+                  "min_ms": 0.991749984677881,
+                  "max_ms": 1.362416980555281,
+                  "std_ms": 0.15933606778055656,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_strict_config": {
+                  "mean_ms": 1.0031332029029727,
+                  "min_ms": 0.9122079936787486,
+                  "max_ms": 1.1851250019390136,
+                  "std_ms": 0.11434715311019619,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_performance_config": {
+                  "mean_ms": 0.9074084053281695,
+                  "min_ms": 0.8610420045442879,
+                  "max_ms": 0.9616660245228559,
+                  "std_ms": 0.03666581324667431,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_api_config": {
+                  "mean_ms": 1.024850195972249,
+                  "min_ms": 0.970416993368417,
+                  "max_ms": 1.1515420046634972,
+                  "std_ms": 0.07979145891387517,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "default": {
+                  "mean_ms": 0.9103250107727945,
+                  "min_ms": 0.8982919971458614,
+                  "max_ms": 0.9220000065397471,
+                  "std_ms": 0.010965206714573239,
+                  "successful_runs": 5,
+                  "config_type": "default"
+                }
+              },
+              "optimization_analysis": {
+                "available_configs": [
+                  "get_ml_config",
+                  "get_strict_config",
+                  "get_performance_config",
+                  "get_api_config"
+                ],
+                "optimization_configs": {
+                  "get_ml_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "UNIX_MS",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": true,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": false,
+                      "preserve_decimals": false,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": true,
+                      "type_coercion": "AGGRESSIVE",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_strict_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "ISO",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": true,
+                      "preserve_decimals": true,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": false,
+                      "type_coercion": "STRICT",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_performance_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "VALUES",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "UNIX",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": false,
+                      "preserve_decimals": false,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": false,
+                      "type_coercion": "SAFE",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_api_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "ISO",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": true,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": false,
+                      "preserve_complex": true,
+                      "preserve_decimals": true,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": true,
+                      "type_coercion": "SAFE",
+                      "uuid_format": "string"
+                    }
+                  },
+                  "discovered_parameters": {}
+                },
+                "fastest_config": {
+                  "config": "get_performance_config",
+                  "time_ms": 0.9074084053281695
+                },
+                "performance_variance": {
+                  "variance_ratio": 1.1884304692100203,
+                  "range_ms": 0.1709833915811032,
+                  "min_ms": 0.9074084053281695,
+                  "max_ms": 1.0783917969092727,
+                  "analysis": "Low variance"
+                }
+              }
+            }
+          }
+        }
+      },
+      "0.11.0": {
+        "error": "cannot import name 'load_basic_file' from 'datason.api' (/Users/danielmeierendler/.pyenv/versions/3.12.0/lib/python3.12/site-packages/datason/api.py)",
+        "available": false
+      },
+      "0.10.0": {
+        "error": "Command '['/Users/danielmeierendler/.pyenv/versions/3.12.0/bin/python', '-m', 'pip', 'install', 'datason==0.10.0']' returned non-zero exit status 1.",
+        "available": false
+      },
+      "0.9.0": {
+        "version": "0.9.0",
+        "available_features": [
+          "serialize",
+          "deserialize"
+        ],
+        "available_configs": [
+          "get_ml_config",
+          "get_strict_config",
+          "get_performance_config",
+          "get_api_config"
+        ],
+        "optimization_configs": {
+          "get_ml_config": {
+            "available": true,
+            "type": "SerializationConfig",
+            "config_data": {
+              "audit_trail": false,
+              "auto_detect_types": false,
+              "cache_metrics_enabled": false,
+              "cache_scope": "OPERATION",
+              "cache_size_limit": 1000,
+              "cache_warn_on_limit": true,
+              "check_if_serialized": false,
+              "custom_date_format": null,
+              "custom_serializers": null,
+              "dataframe_orient": "RECORDS",
+              "dataframe_output": "JSON_SAFE",
+              "date_format": "UNIX_MS",
+              "datetime_output": "JSON_SAFE",
+              "ensure_ascii": false,
+              "include_redaction_summary": false,
+              "include_type_hints": true,
+              "max_depth": 50,
+              "max_size": 100000,
+              "max_string_length": 1000000,
+              "nan_handling": "NULL",
+              "numpy_output": "JSON_SAFE",
+              "parse_uuids": true,
+              "preserve_complex": false,
+              "preserve_decimals": false,
+              "redact_fields": null,
+              "redact_large_objects": false,
+              "redact_patterns": null,
+              "redaction_replacement": "<REDACTED>",
+              "series_output": "JSON_SAFE",
+              "sort_keys": true,
+              "type_coercion": "AGGRESSIVE",
+              "uuid_format": "object"
+            }
+          },
+          "get_strict_config": {
+            "available": true,
+            "type": "SerializationConfig",
+            "config_data": {
+              "audit_trail": false,
+              "auto_detect_types": false,
+              "cache_metrics_enabled": false,
+              "cache_scope": "OPERATION",
+              "cache_size_limit": 1000,
+              "cache_warn_on_limit": true,
+              "check_if_serialized": false,
+              "custom_date_format": null,
+              "custom_serializers": null,
+              "dataframe_orient": "RECORDS",
+              "dataframe_output": "JSON_SAFE",
+              "date_format": "ISO",
+              "datetime_output": "JSON_SAFE",
+              "ensure_ascii": false,
+              "include_redaction_summary": false,
+              "include_type_hints": false,
+              "max_depth": 50,
+              "max_size": 100000,
+              "max_string_length": 1000000,
+              "nan_handling": "NULL",
+              "numpy_output": "JSON_SAFE",
+              "parse_uuids": true,
+              "preserve_complex": true,
+              "preserve_decimals": true,
+              "redact_fields": null,
+              "redact_large_objects": false,
+              "redact_patterns": null,
+              "redaction_replacement": "<REDACTED>",
+              "series_output": "JSON_SAFE",
+              "sort_keys": false,
+              "type_coercion": "STRICT",
+              "uuid_format": "object"
+            }
+          },
+          "get_performance_config": {
+            "available": true,
+            "type": "SerializationConfig",
+            "config_data": {
+              "audit_trail": false,
+              "auto_detect_types": false,
+              "cache_metrics_enabled": false,
+              "cache_scope": "OPERATION",
+              "cache_size_limit": 1000,
+              "cache_warn_on_limit": true,
+              "check_if_serialized": false,
+              "custom_date_format": null,
+              "custom_serializers": null,
+              "dataframe_orient": "VALUES",
+              "dataframe_output": "JSON_SAFE",
+              "date_format": "UNIX",
+              "datetime_output": "JSON_SAFE",
+              "ensure_ascii": false,
+              "include_redaction_summary": false,
+              "include_type_hints": false,
+              "max_depth": 50,
+              "max_size": 100000,
+              "max_string_length": 1000000,
+              "nan_handling": "NULL",
+              "numpy_output": "JSON_SAFE",
+              "parse_uuids": true,
+              "preserve_complex": false,
+              "preserve_decimals": false,
+              "redact_fields": null,
+              "redact_large_objects": false,
+              "redact_patterns": null,
+              "redaction_replacement": "<REDACTED>",
+              "series_output": "JSON_SAFE",
+              "sort_keys": false,
+              "type_coercion": "SAFE",
+              "uuid_format": "object"
+            }
+          },
+          "get_api_config": {
+            "available": true,
+            "type": "SerializationConfig",
+            "config_data": {
+              "audit_trail": false,
+              "auto_detect_types": false,
+              "cache_metrics_enabled": false,
+              "cache_scope": "OPERATION",
+              "cache_size_limit": 1000,
+              "cache_warn_on_limit": true,
+              "check_if_serialized": false,
+              "custom_date_format": null,
+              "custom_serializers": null,
+              "dataframe_orient": "RECORDS",
+              "dataframe_output": "JSON_SAFE",
+              "date_format": "ISO",
+              "datetime_output": "JSON_SAFE",
+              "ensure_ascii": true,
+              "include_redaction_summary": false,
+              "include_type_hints": false,
+              "max_depth": 50,
+              "max_size": 100000,
+              "max_string_length": 1000000,
+              "nan_handling": "NULL",
+              "numpy_output": "JSON_SAFE",
+              "parse_uuids": false,
+              "preserve_complex": true,
+              "preserve_decimals": true,
+              "redact_fields": null,
+              "redact_large_objects": false,
+              "redact_patterns": null,
+              "redaction_replacement": "<REDACTED>",
+              "series_output": "JSON_SAFE",
+              "sort_keys": true,
+              "type_coercion": "SAFE",
+              "uuid_format": "string"
+            }
+          },
+          "discovered_parameters": {}
+        },
+        "datasets": {
+          "basic_types": {
+            "description": "Basic types - tests core serialization speed",
+            "results": {
+              "version": "0.9.0",
+              "dataset": "basic_types",
+              "config_results": {
+                "get_ml_config": {
+                  "mean_ms": 0.020725198555737734,
+                  "min_ms": 0.010457995813339949,
+                  "max_ms": 0.05483400309458375,
+                  "std_ms": 0.019130322324261827,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_strict_config": {
+                  "mean_ms": 0.01221679849550128,
+                  "min_ms": 0.01087499549612403,
+                  "max_ms": 0.014082994312047958,
+                  "std_ms": 0.0011595594196448617,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_performance_config": {
+                  "mean_ms": 0.011933589121326804,
+                  "min_ms": 0.00970897963270545,
+                  "max_ms": 0.014791992725804448,
+                  "std_ms": 0.0019761016590092535,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_api_config": {
+                  "mean_ms": 0.014066603034734726,
+                  "min_ms": 0.01329102087765932,
+                  "max_ms": 0.01604200224392116,
+                  "std_ms": 0.0011381454901339555,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "default": {
+                  "mean_ms": 0.009091402171179652,
+                  "min_ms": 0.008540984708815813,
+                  "max_ms": 0.011124997399747372,
+                  "std_ms": 0.0011375900317412962,
+                  "successful_runs": 5,
+                  "config_type": "default"
+                }
+              },
+              "optimization_analysis": {
+                "available_configs": [
+                  "get_ml_config",
+                  "get_strict_config",
+                  "get_performance_config",
+                  "get_api_config"
+                ],
+                "optimization_configs": {
+                  "get_ml_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "UNIX_MS",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": true,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": false,
+                      "preserve_decimals": false,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": true,
+                      "type_coercion": "AGGRESSIVE",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_strict_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "ISO",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": true,
+                      "preserve_decimals": true,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": false,
+                      "type_coercion": "STRICT",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_performance_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "VALUES",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "UNIX",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": false,
+                      "preserve_decimals": false,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": false,
+                      "type_coercion": "SAFE",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_api_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "ISO",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": true,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": false,
+                      "preserve_complex": true,
+                      "preserve_decimals": true,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": true,
+                      "type_coercion": "SAFE",
+                      "uuid_format": "string"
+                    }
+                  },
+                  "discovered_parameters": {}
+                },
+                "fastest_config": {
+                  "config": "default",
+                  "time_ms": 0.009091402171179652
+                },
+                "performance_variance": {
+                  "variance_ratio": 2.2796481956807484,
+                  "range_ms": 0.011633796384558082,
+                  "min_ms": 0.009091402171179652,
+                  "max_ms": 0.020725198555737734,
+                  "analysis": "High variance"
+                }
+              }
+            }
+          },
+          "datetime_heavy": {
+            "description": "Datetime handling - tests date optimization configs",
+            "results": {
+              "version": "0.9.0",
+              "dataset": "datetime_heavy",
+              "config_results": {
+                "get_ml_config": {
+                  "mean_ms": 0.04166641156189144,
+                  "min_ms": 0.027750007575377822,
+                  "max_ms": 0.09329101885668933,
+                  "std_ms": 0.028890569926620622,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_strict_config": {
+                  "mean_ms": 0.03250839654356241,
+                  "min_ms": 0.026541994884610176,
+                  "max_ms": 0.042625004425644875,
+                  "std_ms": 0.007177913895634861,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_performance_config": {
+                  "mean_ms": 0.030558404978364706,
+                  "min_ms": 0.02804200630635023,
+                  "max_ms": 0.033958989661186934,
+                  "std_ms": 0.0024347730911032997,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_api_config": {
+                  "mean_ms": 0.033791596069931984,
+                  "min_ms": 0.028583017410710454,
+                  "max_ms": 0.0424169993493706,
+                  "std_ms": 0.006495429474674685,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "default": {
+                  "mean_ms": 0.027750007575377822,
+                  "min_ms": 0.02641702303662896,
+                  "max_ms": 0.029791000997647643,
+                  "std_ms": 0.0014640122844380348,
+                  "successful_runs": 5,
+                  "config_type": "default"
+                }
+              },
+              "optimization_analysis": {
+                "available_configs": [
+                  "get_ml_config",
+                  "get_strict_config",
+                  "get_performance_config",
+                  "get_api_config"
+                ],
+                "optimization_configs": {
+                  "get_ml_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "UNIX_MS",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": true,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": false,
+                      "preserve_decimals": false,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": true,
+                      "type_coercion": "AGGRESSIVE",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_strict_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "ISO",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": true,
+                      "preserve_decimals": true,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": false,
+                      "type_coercion": "STRICT",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_performance_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "VALUES",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "UNIX",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": false,
+                      "preserve_decimals": false,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": false,
+                      "type_coercion": "SAFE",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_api_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "ISO",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": true,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": false,
+                      "preserve_complex": true,
+                      "preserve_decimals": true,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": true,
+                      "type_coercion": "SAFE",
+                      "uuid_format": "string"
+                    }
+                  },
+                  "discovered_parameters": {}
+                },
+                "fastest_config": {
+                  "config": "default",
+                  "time_ms": 0.027750007575377822
+                },
+                "performance_variance": {
+                  "variance_ratio": 1.5014918986494779,
+                  "range_ms": 0.013916403986513615,
+                  "min_ms": 0.027750007575377822,
+                  "max_ms": 0.04166641156189144,
+                  "analysis": "Low variance"
+                }
+              }
+            }
+          },
+          "decimal_precision": {
+            "description": "Decimal handling - tests precision optimization configs",
+            "results": {
+              "version": "0.9.0",
+              "dataset": "decimal_precision",
+              "config_results": {
+                "get_ml_config": {
+                  "mean_ms": 0.16524160164408386,
+                  "min_ms": 0.14466600259765983,
+                  "max_ms": 0.24374999338760972,
+                  "std_ms": 0.04390083999778272,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_strict_config": {
+                  "mean_ms": 0.14590820064768195,
+                  "min_ms": 0.14012499013915658,
+                  "max_ms": 0.16666698502376676,
+                  "std_ms": 0.011638299065471813,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_performance_config": {
+                  "mean_ms": 0.14901680406183004,
+                  "min_ms": 0.14024999109096825,
+                  "max_ms": 0.1630839833524078,
+                  "std_ms": 0.009563221305342042,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_api_config": {
+                  "mean_ms": 0.16843319754116237,
+                  "min_ms": 0.1467500114813447,
+                  "max_ms": 0.21749999723397195,
+                  "std_ms": 0.02971597743426943,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "default": {
+                  "mean_ms": 0.1520163961686194,
+                  "min_ms": 0.14099999680183828,
+                  "max_ms": 0.16900000628083944,
+                  "std_ms": 0.011280176428254601,
+                  "successful_runs": 5,
+                  "config_type": "default"
+                }
+              },
+              "optimization_analysis": {
+                "available_configs": [
+                  "get_ml_config",
+                  "get_strict_config",
+                  "get_performance_config",
+                  "get_api_config"
+                ],
+                "optimization_configs": {
+                  "get_ml_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "UNIX_MS",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": true,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": false,
+                      "preserve_decimals": false,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": true,
+                      "type_coercion": "AGGRESSIVE",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_strict_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "ISO",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": true,
+                      "preserve_decimals": true,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": false,
+                      "type_coercion": "STRICT",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_performance_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "VALUES",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "UNIX",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": false,
+                      "preserve_decimals": false,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": false,
+                      "type_coercion": "SAFE",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_api_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "ISO",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": true,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": false,
+                      "preserve_complex": true,
+                      "preserve_decimals": true,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": true,
+                      "type_coercion": "SAFE",
+                      "uuid_format": "string"
+                    }
+                  },
+                  "discovered_parameters": {}
+                },
+                "fastest_config": {
+                  "config": "get_strict_config",
+                  "time_ms": 0.14590820064768195
+                },
+                "performance_variance": {
+                  "variance_ratio": 1.1543778676831917,
+                  "range_ms": 0.02252499689348042,
+                  "min_ms": 0.14590820064768195,
+                  "max_ms": 0.16843319754116237,
+                  "analysis": "Low variance"
+                }
+              }
+            }
+          },
+          "large_dataset": {
+            "description": "Large data - tests memory and compression configs",
+            "results": {
+              "version": "0.9.0",
+              "dataset": "large_dataset",
+              "config_results": {
+                "get_ml_config": {
+                  "mean_ms": 1.2529081956017762,
+                  "min_ms": 1.1702080082613975,
+                  "max_ms": 1.3580829836428165,
+                  "std_ms": 0.07695156907177444,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_strict_config": {
+                  "mean_ms": 1.0640746040735394,
+                  "min_ms": 1.044958014972508,
+                  "max_ms": 1.101166009902954,
+                  "std_ms": 0.02198535035735788,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_performance_config": {
+                  "mean_ms": 1.04342499980703,
+                  "min_ms": 0.966791994869709,
+                  "max_ms": 1.176042016595602,
+                  "std_ms": 0.08922261834773301,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_api_config": {
+                  "mean_ms": 1.0736915981397033,
+                  "min_ms": 1.0173750051762909,
+                  "max_ms": 1.2529999949038029,
+                  "std_ms": 0.10169823560173079,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "default": {
+                  "mean_ms": 1.0411917988676578,
+                  "min_ms": 0.9816669917199761,
+                  "max_ms": 1.1208340001758188,
+                  "std_ms": 0.06314965496641851,
+                  "successful_runs": 5,
+                  "config_type": "default"
+                }
+              },
+              "optimization_analysis": {
+                "available_configs": [
+                  "get_ml_config",
+                  "get_strict_config",
+                  "get_performance_config",
+                  "get_api_config"
+                ],
+                "optimization_configs": {
+                  "get_ml_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "UNIX_MS",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": true,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": false,
+                      "preserve_decimals": false,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": true,
+                      "type_coercion": "AGGRESSIVE",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_strict_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "ISO",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": true,
+                      "preserve_decimals": true,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": false,
+                      "type_coercion": "STRICT",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_performance_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "VALUES",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "UNIX",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": false,
+                      "preserve_decimals": false,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": false,
+                      "type_coercion": "SAFE",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_api_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "ISO",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": true,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": false,
+                      "preserve_complex": true,
+                      "preserve_decimals": true,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": true,
+                      "type_coercion": "SAFE",
+                      "uuid_format": "string"
+                    }
+                  },
+                  "discovered_parameters": {}
+                },
+                "fastest_config": {
+                  "config": "default",
+                  "time_ms": 1.0411917988676578
+                },
+                "performance_variance": {
+                  "variance_ratio": 1.2033404382980826,
+                  "range_ms": 0.21171639673411846,
+                  "min_ms": 1.0411917988676578,
+                  "max_ms": 1.2529081956017762,
+                  "analysis": "Low variance"
+                }
+              }
+            }
+          },
+          "complex_structure": {
+            "description": "Complex nested data - tests structural optimization",
+            "results": {
+              "version": "0.9.0",
+              "dataset": "complex_structure",
+              "config_results": {
+                "get_ml_config": {
+                  "mean_ms": 1.0217583971098065,
+                  "min_ms": 0.9934169938787818,
+                  "max_ms": 1.0660419939085841,
+                  "std_ms": 0.02778596827453546,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_strict_config": {
+                  "mean_ms": 1.034074800554663,
+                  "min_ms": 0.9550420218147337,
+                  "max_ms": 1.2094159901607782,
+                  "std_ms": 0.10416676695442714,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_performance_config": {
+                  "mean_ms": 0.9402417985256761,
+                  "min_ms": 0.8922910201363266,
+                  "max_ms": 1.0321250010747463,
+                  "std_ms": 0.059809522353444174,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "get_api_config": {
+                  "mean_ms": 1.0464171995408833,
+                  "min_ms": 0.9903749742079526,
+                  "max_ms": 1.1207089992240071,
+                  "std_ms": 0.05319044672106492,
+                  "successful_runs": 5,
+                  "error_count": 0,
+                  "config_type": "SerializationConfig"
+                },
+                "default": {
+                  "mean_ms": 0.983191403793171,
+                  "min_ms": 0.9174580045510083,
+                  "max_ms": 1.1259580205660313,
+                  "std_ms": 0.08405637411895725,
+                  "successful_runs": 5,
+                  "config_type": "default"
+                }
+              },
+              "optimization_analysis": {
+                "available_configs": [
+                  "get_ml_config",
+                  "get_strict_config",
+                  "get_performance_config",
+                  "get_api_config"
+                ],
+                "optimization_configs": {
+                  "get_ml_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "UNIX_MS",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": true,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": false,
+                      "preserve_decimals": false,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": true,
+                      "type_coercion": "AGGRESSIVE",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_strict_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "ISO",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": true,
+                      "preserve_decimals": true,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": false,
+                      "type_coercion": "STRICT",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_performance_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "VALUES",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "UNIX",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": false,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": true,
+                      "preserve_complex": false,
+                      "preserve_decimals": false,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": false,
+                      "type_coercion": "SAFE",
+                      "uuid_format": "object"
+                    }
+                  },
+                  "get_api_config": {
+                    "available": true,
+                    "type": "SerializationConfig",
+                    "config_data": {
+                      "audit_trail": false,
+                      "auto_detect_types": false,
+                      "cache_metrics_enabled": false,
+                      "cache_scope": "OPERATION",
+                      "cache_size_limit": 1000,
+                      "cache_warn_on_limit": true,
+                      "check_if_serialized": false,
+                      "custom_date_format": null,
+                      "custom_serializers": null,
+                      "dataframe_orient": "RECORDS",
+                      "dataframe_output": "JSON_SAFE",
+                      "date_format": "ISO",
+                      "datetime_output": "JSON_SAFE",
+                      "ensure_ascii": true,
+                      "include_redaction_summary": false,
+                      "include_type_hints": false,
+                      "max_depth": 50,
+                      "max_size": 100000,
+                      "max_string_length": 1000000,
+                      "nan_handling": "NULL",
+                      "numpy_output": "JSON_SAFE",
+                      "parse_uuids": false,
+                      "preserve_complex": true,
+                      "preserve_decimals": true,
+                      "redact_fields": null,
+                      "redact_large_objects": false,
+                      "redact_patterns": null,
+                      "redaction_replacement": "<REDACTED>",
+                      "series_output": "JSON_SAFE",
+                      "sort_keys": true,
+                      "type_coercion": "SAFE",
+                      "uuid_format": "string"
+                    }
+                  },
+                  "discovered_parameters": {}
+                },
+                "fastest_config": {
+                  "config": "get_performance_config",
+                  "time_ms": 0.9402417985256761
+                },
+                "performance_variance": {
+                  "variance_ratio": 1.1129235066784873,
+                  "range_ms": 0.10617540101520717,
+                  "min_ms": 0.9402417985256761,
+                  "max_ms": 1.0464171995408833,
+                  "analysis": "Low variance"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "optimization_summary": {
+      "config_evolution": {
+        "get_ml_config": {
+          "latest": true,
+          "0.9.0": true
+        },
+        "get_strict_config": {
+          "latest": true,
+          "0.9.0": true
+        },
+        "get_performance_config": {
+          "latest": true,
+          "0.9.0": true
+        },
+        "get_api_config": {
+          "latest": true,
+          "0.9.0": true
+        }
+      },
+      "performance_by_config": {
+        "basic_types": {
+          "latest": {
+            "get_ml_config": 0.02900859690271318,
+            "get_strict_config": 0.011791603174060583,
+            "get_performance_config": 0.010650197509676218,
+            "get_api_config": 0.012091797543689609,
+            "default": 0.010550004662945867
+          },
+          "0.9.0": {
+            "get_ml_config": 0.020725198555737734,
+            "get_strict_config": 0.01221679849550128,
+            "get_performance_config": 0.011933589121326804,
+            "get_api_config": 0.014066603034734726,
+            "default": 0.009091402171179652
+          }
+        },
+        "datetime_heavy": {
+          "latest": {
+            "get_ml_config": 0.06285000708885491,
+            "get_strict_config": 0.04065859830006957,
+            "get_performance_config": 0.028099800692871213,
+            "get_api_config": 0.038616592064499855,
+            "default": 0.028541998472064734
+          },
+          "0.9.0": {
+            "get_ml_config": 0.04166641156189144,
+            "get_strict_config": 0.03250839654356241,
+            "get_performance_config": 0.030558404978364706,
+            "get_api_config": 0.033791596069931984,
+            "default": 0.027750007575377822
+          }
+        },
+        "decimal_precision": {
+          "latest": {
+            "get_ml_config": 1092.2291334078182,
+            "get_strict_config": 0.15635800664313138,
+            "get_performance_config": 0.15497540589421988,
+            "get_api_config": 0.15720879309810698,
+            "default": 0.14111659838818014
+          },
+          "0.9.0": {
+            "get_ml_config": 0.16524160164408386,
+            "get_strict_config": 0.14590820064768195,
+            "get_performance_config": 0.14901680406183004,
+            "get_api_config": 0.16843319754116237,
+            "default": 0.1520163961686194
+          }
+        },
+        "large_dataset": {
+          "latest": {
+            "get_ml_config": 1.2898003973532468,
+            "get_strict_config": 0.9776666003745049,
+            "get_performance_config": 1.0143163963221014,
+            "get_api_config": 1.1027666041627526,
+            "default": 1.0790997999720275
+          },
+          "0.9.0": {
+            "get_ml_config": 1.2529081956017762,
+            "get_strict_config": 1.0640746040735394,
+            "get_performance_config": 1.04342499980703,
+            "get_api_config": 1.0736915981397033,
+            "default": 1.0411917988676578
+          }
+        }
+      },
+      "optimization_recommendations": {
+        "fastest_configs_by_dataset": {
+          "basic_types": {
+            "config": "default",
+            "version": "0.9.0",
+            "time_ms": 0.009091402171179652
+          },
+          "datetime_heavy": {
+            "config": "default",
+            "version": "0.9.0",
+            "time_ms": 0.027750007575377822
+          },
+          "decimal_precision": {
+            "config": "default",
+            "version": "latest",
+            "time_ms": 0.14111659838818014
+          },
+          "large_dataset": {
+            "config": "get_strict_config",
+            "version": "latest",
+            "time_ms": 0.9776666003745049
+          }
+        },
+        "most_consistent_configs": {},
+        "version_recommendations": {}
+      },
+      "api_changes": {}
+    }
+  }
+}
+                            </pre>
+                        </details>
+                    </div>
+                </div>
+            </body>
+            </html>
+            

@@ -9,6 +9,7 @@ Generates HTML and markdown reports with interactive charts from benchmark resul
 import json
 import logging
 import os
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
@@ -23,6 +24,24 @@ class ReportGenerator:
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.is_ci = self._is_ci_environment()
+    
+    def _clean_data_for_json(self, data: Any) -> Any:
+        """Clean data for JSON serialization by converting enum strings."""
+        if isinstance(data, dict):
+            return {k: self._clean_data_for_json(v) for k, v in data.items()}
+        elif isinstance(data, list):
+            return [self._clean_data_for_json(item) for item in data]
+        elif isinstance(data, str):
+            # Convert enum-like strings to just the name
+            if "." in data and (data.startswith("CacheScope.") or 
+                               data.startswith("DataFrameOrient.") or 
+                               data.startswith("OutputType.") or 
+                               data.startswith("DateFormat.") or 
+                               data.startswith("NanHandling.") or 
+                               data.startswith("TypeCoercion.")):
+                return data.split(".")[-1]
+            return data
+        return data
     
     def _is_ci_environment(self) -> bool:
         """Check if running in CI environment."""

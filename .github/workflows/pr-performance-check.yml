@@ -16,11 +16,13 @@ permissions:
 
 env:
   PYTHONUNBUFFERED: 1
+  CI: true
+  GITHUB_ACTIONS: true
 
 jobs:
   quick-benchmark:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
     - name: 📥 Checkout code
@@ -31,28 +33,61 @@ jobs:
       with:
         python-version: "3.11"
 
-    - name: 💾 Cache dependencies
+    - name: 💾 Cache Python dependencies
       uses: actions/cache@v4
       with:
-        path: ~/.cache/pip
-        key: benchmark-${{ runner.os }}-py3.11-${{ hashFiles('requirements.txt') }}
+        path: |
+          ~/.cache/pip
+          ~/.cache/pypoetry
+        key: pr-deps-${{ runner.os }}-py3.11-${{ hashFiles('requirements.txt') }}-${{ github.run_id }}
         restore-keys: |
-          benchmark-${{ runner.os }}-py3.11-
+          pr-deps-${{ runner.os }}-py3.11-${{ hashFiles('requirements.txt') }}-
+          pr-deps-${{ runner.os }}-py3.11-
+          benchmark-deps-${{ runner.os }}-py3.11-
+
+    - name: 💾 Cache competitor libraries
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cache/pip/http
+          ~/.cache/pip/wheels
+        key: pr-competitors-${{ runner.os }}-${{ hashFiles('requirements.txt') }}-${{ github.run_id }}
+        restore-keys: |
+          pr-competitors-${{ runner.os }}-${{ hashFiles('requirements.txt') }}-
+          pr-competitors-${{ runner.os }}-
+          competitors-${{ runner.os }}-
 
     - name: 📦 Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        
+        # Verify all competitive libraries are available
+        python -c "
+        import sys
+        try:
+            import datason, orjson, ujson, json, pickle, jsonpickle, msgpack
+            print('✅ All competitive libraries installed successfully')
+        except ImportError as e:
+            print(f'❌ Missing library: {e}')
+            sys.exit(1)
+        "
 
-    - name: 🚀 Run quick benchmark
+    - name: 🚀 Run PR benchmark suite
       run: |
-        python scripts/run_benchmarks.py --quick
+        echo "🚀 Running PR performance check..."
+        
+        # Ensure results directory exists
+        mkdir -p data/results docs/results
+        
+        # Run quick benchmark with report generation
+        python scripts/run_benchmarks.py --quick --generate-report
       env:
         GITHUB_SHA: ${{ github.sha }}
         GITHUB_REF: ${{ github.ref }}
         GITHUB_RUN_ID: ${{ github.run_id }}
 
-    - name: 📊 Generate PR comment
+    - name: 📊 Generate enhanced PR comment
       if: github.event_name == 'pull_request'
       run: |
         python -c "
@@ -68,21 +103,32 @@ jobs:
             with open(latest_file, 'r') as f:
                 results = json.load(f)
 
-            # Generate markdown report
+            # Generate enhanced markdown report
             report = []
-            report.append('# 🚀 Quick Performance Check Results')
+            report.append('# 🚀 PR Performance Check Results')
             report.append('')
-            report.append('> **Note**: This is a quick competitive benchmark to check for major performance changes.')
+            report.append('> **CI Environment**: This benchmark was run in GitHub Actions for consistent results.')
+            report.append('')
+            
+            # Metadata
+            metadata = results.get('metadata', {})
+            report.append('## 📋 Test Environment')
+            report.append('')
+            report.append(f'- **Run ID**: {os.environ.get(\"GITHUB_RUN_ID\", \"unknown\")}')
+            report.append(f'- **Commit**: {os.environ.get(\"GITHUB_SHA\", \"unknown\")[:8]}')
+            report.append(f'- **Python**: {metadata.get(\"python_version\", \"unknown\").split()[0]}')
             report.append('')
 
             if 'competitive' in results:
                 competitive = results['competitive']
                 
-                # Summary table
-                report.append('## 📊 Performance Summary')
+                # Performance regression check
+                report.append('## 🎯 Performance Analysis')
                 report.append('')
-                report.append('| Dataset | DataSON (ms) | Fastest Competitor | Ratio |')
-                report.append('|---------|--------------|-------------------|-------|')
+                
+                regression_found = False
+                good_performance = []
+                concerning_performance = []
                 
                 for dataset, data in competitive.items():
                     if dataset == 'summary':
@@ -103,17 +149,81 @@ jobs:
                                     fastest_lib = lib
                         
                         ratio = datason_time / fastest_time if fastest_time != float('inf') else 1.0
-                        status = '✅' if ratio < 2.0 else '⚠️' if ratio < 5.0 else '❌'
                         
-                        report.append(f'| {dataset} | {datason_time:.2f} | {fastest_lib} ({fastest_time:.2f}) | {ratio:.2f}x {status} |')
+                        if ratio > 5.0:
+                            concerning_performance.append((dataset, datason_time, fastest_lib, fastest_time, ratio))
+                            regression_found = True
+                        elif ratio < 2.0:
+                            good_performance.append((dataset, datason_time, fastest_lib, fastest_time, ratio))
+                
+                # Summary verdict
+                if regression_found:
+                    report.append('### ⚠️ Performance Concerns Detected')
+                    report.append('')
+                    for dataset, ds_time, fast_lib, fast_time, ratio in concerning_performance:
+                        report.append(f'- **{dataset}**: DataSON ({ds_time:.2f}ms) is {ratio:.2f}x slower than {fast_lib} ({fast_time:.2f}ms)')
+                    report.append('')
+                else:
+                    report.append('### ✅ Performance Within Expected Range')
+                    report.append('')
+                    report.append('No significant performance regressions detected.')
+                    report.append('')
+                
+                # Summary table
+                report.append('## 📊 Detailed Performance Comparison')
+                report.append('')
+                report.append('| Dataset | DataSON (ms) | Fastest Competitor | Performance Ratio | Status |')
+                report.append('|---------|--------------|-------------------|------------------|--------|')
+                
+                for dataset, data in competitive.items():
+                    if dataset == 'summary':
+                        continue
+                    
+                    ser_results = data.get('serialization', {})
+                    if 'datason' in ser_results:
+                        datason_time = ser_results['datason'].get('mean_ms', 0)
+                        
+                        # Find fastest competitor
+                        fastest_time = float('inf')
+                        fastest_lib = 'none'
+                        for lib, metrics in ser_results.items():
+                            if lib != 'datason' and isinstance(metrics, dict):
+                                time_ms = metrics.get('mean_ms', float('inf'))
+                                if time_ms < fastest_time:
+                                    fastest_time = time_ms
+                                    fastest_lib = lib
+                        
+                        ratio = datason_time / fastest_time if fastest_time != float('inf') else 1.0
+                        
+                        if ratio < 1.5:
+                            status = '🚀 Excellent'
+                        elif ratio < 2.0:
+                            status = '✅ Good'
+                        elif ratio < 5.0:
+                            status = '⚠️ Acceptable'
+                        else:
+                            status = '❌ Concerning'
+                        
+                        report.append(f'| {dataset} | {datason_time:.3f} | {fastest_lib} ({fastest_time:.3f}) | {ratio:.2f}x | {status} |')
                 
                 report.append('')
-                report.append('**Legend**: ✅ Good (<2x slower) ⚠️ Okay (2-5x slower) ❌ Concerning (>5x slower)')
+                report.append('**Performance Guide**:')
+                report.append('- 🚀 **Excellent**: <1.5x slower than fastest')
+                report.append('- ✅ **Good**: 1.5-2x slower')  
+                report.append('- ⚠️ **Acceptable**: 2-5x slower')
+                report.append('- ❌ **Concerning**: >5x slower')
+                report.append('')
+                
+                # Interactive report link
+                report.append('## 📈 Interactive Report')
+                report.append('')
+                report.append('An interactive HTML report with charts has been generated. ')
+                report.append('Download the artifacts to view detailed performance visualizations.')
                 report.append('')
                 
                 # Detailed results
                 report.append('<details>')
-                report.append('<summary>📋 Detailed Results</summary>')
+                report.append('<summary>📋 Raw Performance Data</summary>')
                 report.append('')
                 
                 for dataset, data in competitive.items():
@@ -121,18 +231,24 @@ jobs:
                         continue
                     
                     report.append(f'### {dataset}')
+                    if 'description' in data:
+                        report.append(f'*{data[\"description\"]}*')
                     report.append('')
-                    report.append('| Library | Serialization (ms) | Success Rate |')
-                    report.append('|---------|-------------------|--------------|')
+                    report.append('| Library | Mean (ms) | Min (ms) | Max (ms) | Std Dev (ms) | Success Rate |')
+                    report.append('|---------|-----------|----------|----------|--------------|--------------|')
                     
                     ser_results = data.get('serialization', {})
                     for lib, metrics in ser_results.items():
                         if isinstance(metrics, dict):
-                            time_ms = metrics.get('mean_ms', 0)
+                            mean_ms = metrics.get('mean_ms', 0)
+                            min_ms = metrics.get('min_ms', 0)
+                            max_ms = metrics.get('max_ms', 0)
+                            std_ms = metrics.get('std_ms', 0)
                             success = metrics.get('successful_runs', 0)
                             total = success + metrics.get('error_count', 0)
                             rate = f'{success}/{total}' if total > 0 else 'N/A'
-                            report.append(f'| {lib} | {time_ms:.2f} | {rate} |')
+                            
+                            report.append(f'| {lib} | {mean_ms:.3f} | {min_ms:.3f} | {max_ms:.3f} | {std_ms:.3f} | {rate} |')
                     
                     report.append('')
                 
@@ -140,11 +256,15 @@ jobs:
 
             # Save to GitHub step summary
             with open(os.environ['GITHUB_STEP_SUMMARY'], 'w') as f:
-                f.write('\n'.join(report))
+                f.write('\\n'.join(report))
 
             # Save for PR comment
             with open('pr_comment.md', 'w') as f:
-                f.write('\n'.join(report))
+                f.write('\\n'.join(report))
+                
+            print('📊 Generated enhanced PR comment')
+        else:
+            print('⚠️ No benchmark results found')
         "
 
     - name: 💬 Comment on PR
@@ -157,26 +277,55 @@ jobs:
           try {
             const comment = fs.readFileSync('pr_comment.md', 'utf8');
             
-            await github.rest.issues.createComment({
+            // Check if we already commented on this PR
+            const { data: comments } = await github.rest.issues.listComments({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: comment
             });
+            
+            const existingComment = comments.find(comment => 
+              comment.user.login === 'github-actions[bot]' && 
+              comment.body.includes('🚀 PR Performance Check Results')
+            );
+            
+            if (existingComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                comment_id: existingComment.id,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+              console.log('Updated existing PR comment');
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+              console.log('Created new PR comment');
+            }
           } catch (error) {
-            console.log('Could not create PR comment:', error.message);
+            console.log('Could not create/update PR comment:', error.message);
           }
 
-    - name: 📤 Upload results
+    - name: 📤 Upload enhanced artifacts
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: pr-benchmark-results-${{ github.run_id }}
+        name: pr-performance-check-${{ github.run_id }}
         path: |
-          data/results/*.json
+          data/results/latest_*.json
+          data/results/*_benchmark_*.json
+          docs/results/*_report.html
+          pr_comment.md
         retention-days: 30
 
     - name: ✅ Performance check complete
       run: |
-        echo "✅ Quick performance check completed"
-        echo "Results available in artifacts and PR comment" 
+        echo "✅ PR performance check completed"
+        echo "📊 Interactive report and detailed analysis available in artifacts"
+        echo "💬 PR comment posted with performance analysis" 
