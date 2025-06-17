@@ -159,7 +159,14 @@ class ReportGenerator:
         elif unit == "(ms)":
             return f"{time_ms:.3f}"
         elif unit == "(μs)":
-            return f"{time_ms * 1000:.1f}"
+            # Use more precision for microseconds to avoid rounding small values to 0
+            converted_val = time_ms * 1000
+            if converted_val < 0.01:
+                return f"{converted_val:.3f}"  # Use 3 decimal places for very small values
+            elif converted_val < 1:
+                return f"{converted_val:.2f}"  # Use 2 decimal places for small values
+            else:
+                return f"{converted_val:.1f}"  # Use 1 decimal place for larger values
         elif unit == "(ns)":
             return f"{time_ms * 1_000_000:.0f}"
         else:
@@ -407,9 +414,10 @@ class ReportGenerator:
                 for lib, metrics in dataset_data["serialization"].items():
                     if isinstance(metrics, dict) and "mean_ms" in metrics:
                         mean_ms = metrics["mean_ms"]
-                        min_ms = metrics.get("min_ms", 0)
-                        max_ms = metrics.get("max_ms", 0)
-                        std_ms = metrics.get("std_ms", 0)
+                        # Convert raw values (in seconds) to milliseconds
+                        min_ms = metrics.get("min", 0) * 1000 if "min" in metrics else 0
+                        max_ms = metrics.get("max", 0) * 1000 if "max" in metrics else 0
+                        std_ms = metrics.get("std", 0) * 1000 if "std" in metrics else 0
                         success = metrics.get("successful_runs", 0)
                         errors = metrics.get("error_count", 0)
                         total = success + errors
