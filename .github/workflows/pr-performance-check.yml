@@ -1,0 +1,182 @@
+name: 🚀 PR Performance Check
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'scripts/**'
+      - 'benchmarks/**'
+      - 'competitors/**'
+      - 'requirements.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  PYTHONUNBUFFERED: 1
+
+jobs:
+  quick-benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🐍 Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: 💾 Cache dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: benchmark-${{ runner.os }}-py3.11-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          benchmark-${{ runner.os }}-py3.11-
+
+    - name: 📦 Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: 🚀 Run quick benchmark
+      run: |
+        python scripts/run_benchmarks.py --quick
+      env:
+        GITHUB_SHA: ${{ github.sha }}
+        GITHUB_REF: ${{ github.ref }}
+        GITHUB_RUN_ID: ${{ github.run_id }}
+
+    - name: 📊 Generate PR comment
+      if: github.event_name == 'pull_request'
+      run: |
+        python -c "
+        import json
+        import os
+        from pathlib import Path
+
+        # Look for latest results
+        results_dir = Path('data/results')
+        latest_file = results_dir / 'latest_quick.json'
+
+        if latest_file.exists():
+            with open(latest_file, 'r') as f:
+                results = json.load(f)
+
+            # Generate markdown report
+            report = []
+            report.append('# 🚀 Quick Performance Check Results')
+            report.append('')
+            report.append('> **Note**: This is a quick competitive benchmark to check for major performance changes.')
+            report.append('')
+
+            if 'competitive' in results:
+                competitive = results['competitive']
+                
+                # Summary table
+                report.append('## 📊 Performance Summary')
+                report.append('')
+                report.append('| Dataset | DataSON (ms) | Fastest Competitor | Ratio |')
+                report.append('|---------|--------------|-------------------|-------|')
+                
+                for dataset, data in competitive.items():
+                    if dataset == 'summary':
+                        continue
+                    
+                    ser_results = data.get('serialization', {})
+                    if 'datason' in ser_results:
+                        datason_time = ser_results['datason'].get('mean_ms', 0)
+                        
+                        # Find fastest competitor
+                        fastest_time = float('inf')
+                        fastest_lib = 'none'
+                        for lib, metrics in ser_results.items():
+                            if lib != 'datason' and isinstance(metrics, dict):
+                                time_ms = metrics.get('mean_ms', float('inf'))
+                                if time_ms < fastest_time:
+                                    fastest_time = time_ms
+                                    fastest_lib = lib
+                        
+                        ratio = datason_time / fastest_time if fastest_time != float('inf') else 1.0
+                        status = '✅' if ratio < 2.0 else '⚠️' if ratio < 5.0 else '❌'
+                        
+                        report.append(f'| {dataset} | {datason_time:.2f} | {fastest_lib} ({fastest_time:.2f}) | {ratio:.2f}x {status} |')
+                
+                report.append('')
+                report.append('**Legend**: ✅ Good (<2x slower) ⚠️ Okay (2-5x slower) ❌ Concerning (>5x slower)')
+                report.append('')
+                
+                # Detailed results
+                report.append('<details>')
+                report.append('<summary>📋 Detailed Results</summary>')
+                report.append('')
+                
+                for dataset, data in competitive.items():
+                    if dataset == 'summary':
+                        continue
+                    
+                    report.append(f'### {dataset}')
+                    report.append('')
+                    report.append('| Library | Serialization (ms) | Success Rate |')
+                    report.append('|---------|-------------------|--------------|')
+                    
+                    ser_results = data.get('serialization', {})
+                    for lib, metrics in ser_results.items():
+                        if isinstance(metrics, dict):
+                            time_ms = metrics.get('mean_ms', 0)
+                            success = metrics.get('successful_runs', 0)
+                            total = success + metrics.get('error_count', 0)
+                            rate = f'{success}/{total}' if total > 0 else 'N/A'
+                            report.append(f'| {lib} | {time_ms:.2f} | {rate} |')
+                    
+                    report.append('')
+                
+                report.append('</details>')
+
+            # Save to GitHub step summary
+            with open(os.environ['GITHUB_STEP_SUMMARY'], 'w') as f:
+                f.write('\n'.join(report))
+
+            # Save for PR comment
+            with open('pr_comment.md', 'w') as f:
+                f.write('\n'.join(report))
+        "
+
+    - name: 💬 Comment on PR
+      if: github.event_name == 'pull_request' && hashFiles('pr_comment.md') != ''
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          
+          try {
+            const comment = fs.readFileSync('pr_comment.md', 'utf8');
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+          } catch (error) {
+            console.log('Could not create PR comment:', error.message);
+          }
+
+    - name: 📤 Upload results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: pr-benchmark-results-${{ github.run_id }}
+        path: |
+          data/results/*.json
+        retention-days: 30
+
+    - name: ✅ Performance check complete
+      run: |
+        echo "✅ Quick performance check completed"
+        echo "Results available in artifacts and PR comment" 

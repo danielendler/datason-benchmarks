@@ -1,0 +1,242 @@
+name: 📊 Daily Benchmarks
+
+on:
+  schedule:
+    # Run every day at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      benchmark_type:
+        description: 'Type of benchmark to run'
+        required: false
+        default: 'competitive'
+        type: choice
+        options:
+          - 'quick'
+          - 'competitive'
+          - 'configurations'
+          - 'all'
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+env:
+  PYTHONUNBUFFERED: 1
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 🐍 Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: 💾 Cache dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: benchmark-${{ runner.os }}-py3.11-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          benchmark-${{ runner.os }}-py3.11-
+
+    - name: 📦 Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: 📊 Run benchmarks
+      run: |
+        BENCHMARK_TYPE="${{ github.event.inputs.benchmark_type || 'competitive' }}"
+        echo "Running benchmark type: $BENCHMARK_TYPE"
+        
+        case $BENCHMARK_TYPE in
+          "quick")
+            python scripts/run_benchmarks.py --quick --generate-report
+            ;;
+          "competitive")
+            python scripts/run_benchmarks.py --competitive --generate-report
+            ;;
+          "configurations")
+            python scripts/run_benchmarks.py --configurations --generate-report
+            ;;
+          "all")
+            python scripts/run_benchmarks.py --all --generate-report
+            ;;
+          *)
+            echo "Unknown benchmark type: $BENCHMARK_TYPE"
+            python scripts/run_benchmarks.py --competitive --generate-report
+            ;;
+        esac
+      env:
+        GITHUB_SHA: ${{ github.sha }}
+        GITHUB_REF: ${{ github.ref }}
+        GITHUB_RUN_ID: ${{ github.run_id }}
+
+    - name: 📈 Generate performance trends
+      run: |
+        python -c "
+        import json
+        import os
+        from datetime import datetime
+        from pathlib import Path
+
+        # Load latest results
+        results_dir = Path('data/results')
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        
+        # Create trend analysis
+        trend_data = {
+            'timestamp': datetime.now().isoformat(),
+            'github_sha': os.environ.get('GITHUB_SHA', 'unknown'),
+            'run_id': os.environ.get('GITHUB_RUN_ID', 'unknown'),
+            'benchmark_files': []
+        }
+        
+        # List all result files
+        if results_dir.exists():
+            for file in results_dir.glob('latest_*.json'):
+                trend_data['benchmark_files'].append(str(file.name))
+        
+        # Save trend metadata
+        trend_file = results_dir / f'trend_{timestamp}.json'
+        with open(trend_file, 'w') as f:
+            json.dump(trend_data, f, indent=2)
+        
+        print(f'Generated trend file: {trend_file}')
+        "
+
+    - name: 🌐 Commit results to history
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        # Add results to git
+        git add data/results/*.json
+        
+        # Commit if there are changes
+        if ! git diff --staged --quiet; then
+          git commit -m "📊 Daily benchmark results - $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git push
+          echo "✅ Results committed to repository"
+        else
+          echo "ℹ️ No changes to commit"
+        fi
+
+    - name: 📤 Upload results artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: daily-benchmark-results-${{ github.run_id }}
+        path: |
+          data/results/*.json
+          docs/results/*.html
+        retention-days: 90
+
+    - name: 📊 Generate summary report
+      run: |
+        python -c "
+        import json
+        import os
+        from pathlib import Path
+
+        results_dir = Path('data/results')
+        
+        # Find latest competitive results
+        competitive_file = results_dir / 'latest_competitive.json'
+        config_file = results_dir / 'latest_configuration.json'
+        
+        report = []
+        report.append('# 📊 Daily Benchmark Summary')
+        report.append('')
+        report.append(f'**Run Date**: {os.environ.get(\"GITHUB_RUN_ID\", \"unknown\")}')
+        report.append(f'**Commit**: {os.environ.get(\"GITHUB_SHA\", \"unknown\")[:8]}')
+        report.append('')
+        
+        # Competitive summary
+        if competitive_file.exists():
+            with open(competitive_file, 'r') as f:
+                results = json.load(f)
+            
+            if 'competitive' in results:
+                competitive = results['competitive']
+                summary = competitive.get('summary', {})
+                
+                report.append('## 🏆 Competitive Analysis')
+                report.append('')
+                
+                competitors = summary.get('competitors_tested', [])
+                report.append(f'**Tested against**: {len(competitors)} competitors: {', '.join(competitors)}')
+                report.append('')
+                
+                # DataSON performance overview
+                datason_perf = summary.get('datason_performance', {})
+                if datason_perf:
+                    report.append('### DataSON Performance')
+                    report.append('')
+                    report.append('| Dataset | Serialization (ms) | Deserialization (ms) |')
+                    report.append('|---------|-------------------|---------------------|')
+                    
+                    for dataset, perf in datason_perf.items():
+                        ser_ms = perf.get('serialization_ms', 0)
+                        deser_ms = perf.get('deserialization_ms', 0)
+                        report.append(f'| {dataset} | {ser_ms:.2f} | {deser_ms:.2f} |')
+                    
+                    report.append('')
+                
+                # Fastest performers
+                fastest_ser = summary.get('fastest_serialization', {})
+                if fastest_ser:
+                    report.append('### Fastest Serialization by Dataset')
+                    report.append('')
+                    for dataset, info in fastest_ser.items():
+                        lib = info.get('library', 'unknown')
+                        time_ms = info.get('time_ms', 0)
+                        report.append(f'- **{dataset}**: {lib} ({time_ms:.2f}ms)')
+                    report.append('')
+        
+        # Configuration summary
+        if config_file.exists():
+            with open(config_file, 'r') as f:
+                config_results = json.load(f)
+            
+            if 'configurations' in config_results:
+                report.append('## ⚙️ Configuration Testing')
+                report.append('')
+                
+                configs = config_results['configurations']
+                summary = configs.get('summary', {})
+                
+                best_use_case = summary.get('best_for_use_case', {})
+                if best_use_case:
+                    report.append('### Recommended Configurations')
+                    report.append('')
+                    for use_case, config in best_use_case.items():
+                        report.append(f'- **{use_case.replace(\"_\", \" \").title()}**: {config}')
+                    report.append('')
+        
+        # Add links
+        report.append('## 📋 Detailed Results')
+        report.append('')
+        report.append('- [Download artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})')
+        report.append('- [View commit](https://github.com/${{ github.repository }}/commit/${{ github.sha }})')
+        
+        # Save to GitHub step summary
+        with open(os.environ['GITHUB_STEP_SUMMARY'], 'w') as f:
+            f.write('\n'.join(report))
+        "
+
+    - name: ✅ Benchmark complete
+      run: |
+        echo "✅ Daily benchmark completed successfully"
+        echo "📊 Results saved to repository and artifacts"
+        echo "🌐 Summary available in job summary" 
