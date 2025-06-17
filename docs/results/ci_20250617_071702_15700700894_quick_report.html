@@ -1,0 +1,669 @@
+
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>DataSON Benchmark Report - quick</title>
+                <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                <style>
+                    body { 
+                        font-family: 'Segoe UI', Arial, sans-serif; 
+                        margin: 0; 
+                        padding: 20px; 
+                        background-color: #f8f9fa;
+                    }
+                    .container { 
+                        max-width: 1400px; 
+                        margin: 0 auto; 
+                        background: white; 
+                        padding: 30px; 
+                        border-radius: 8px; 
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    }
+                    .header { 
+                        text-align: center; 
+                        margin-bottom: 30px; 
+                        padding-bottom: 20px; 
+                        border-bottom: 2px solid #e9ecef;
+                    }
+                    .summary { 
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                        color: white; 
+                        padding: 25px; 
+                        border-radius: 8px; 
+                        margin: 20px 0; 
+                    }
+                    .chart-container { 
+                        margin: 30px 0; 
+                        padding: 20px; 
+                        border: 1px solid #dee2e6; 
+                        border-radius: 8px; 
+                        background: #ffffff;
+                    }
+                    table { 
+                        border-collapse: collapse; 
+                        width: 100%; 
+                        margin: 20px 0; 
+                        background: white;
+                    }
+                    th, td { 
+                        border: 1px solid #dee2e6; 
+                        padding: 12px; 
+                        text-align: left; 
+                    }
+                    th { 
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                        color: white; 
+                        font-weight: 600;
+                    }
+                    tr:nth-child(even) { 
+                        background-color: #f8f9fa; 
+                    }
+                    .metric { 
+                        display: inline-block; 
+                        margin: 10px 15px; 
+                        padding: 15px; 
+                        background: #e9ecef; 
+                        border-radius: 5px; 
+                        text-align: center;
+                    }
+                    .metric-value { 
+                        font-size: 24px; 
+                        font-weight: bold; 
+                        color: #495057; 
+                    }
+                    .metric-label { 
+                        font-size: 12px; 
+                        color: #6c757d; 
+                        text-transform: uppercase; 
+                    }
+                    .section { 
+                        margin: 40px 0; 
+                        padding: 20px; 
+                        border-left: 4px solid #667eea;
+                    }
+                    .warning { 
+                        background-color: #fff3cd; 
+                        border: 1px solid #ffeeba; 
+                        color: #856404; 
+                        padding: 15px; 
+                        border-radius: 5px; 
+                        margin: 20px 0;
+                    }
+                    .ci-badge { 
+                        background: #28a745; 
+                        color: white; 
+                        padding: 5px 15px; 
+                        border-radius: 20px; 
+                        font-size: 12px; 
+                        text-transform: uppercase; 
+                        font-weight: bold;
+                    }
+                    .local-badge { 
+                        background: #ffc107; 
+                        color: #212529; 
+                        padding: 5px 15px; 
+                        border-radius: 20px; 
+                        font-size: 12px; 
+                        text-transform: uppercase; 
+                        font-weight: bold;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>📊 DataSON Benchmark Report</h1>
+                        <span class="ci-badge">
+                            CI Environment
+                        </span>
+                    </div>
+                    
+                    <div class="summary">
+                        <h2>🎯 Execution Summary</h2>
+                        <div class="metric">
+                            <div class="metric-value">Quick</div>
+                            <div class="metric-label">Suite Type</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">2025-06-17 07:17:02 UTC</div>
+                            <div class="metric-label">Generated</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">CI</div>
+                            <div class="metric-label">Environment</div>
+                        </div>
+                    </div>
+            <div class="section"><h2>🏆 Competitive Analysis</h2><p><strong>Tested Competitors:</strong> datason, orjson, ujson, json</p>
+        <div class="chart-container">
+            <h3>📈 Performance Comparison Chart</h3>
+            <div id="perf_chart_3122702018306487348" style="width:100%;height:500px;"></div>
+            <script>
+                var traces = [{"x": ["api_response", "simple_objects", "nested_structures", "datetime_heavy"], "y": [0.9119851999685125, 0.047071800008779974, 0.09170700002414378, 0.38683519999267446], "name": "datason", "type": "bar", "marker": {"color": "#667eea"}}, {"x": ["api_response", "simple_objects", "nested_structures", "datetime_heavy"], "y": [0.08353399998668465, 0.00660619998598122, 0.014032200033398112, 0.10809559996687312], "name": "json", "type": "bar", "marker": {}}, {"x": ["simple_objects", "nested_structures", "datetime_heavy"], "y": [0.0009618000149202999, 0.001358600002276944, 0.009262999992643017], "name": "orjson", "type": "bar", "marker": {}}, {"x": ["simple_objects", "nested_structures"], "y": [0.002763199995570176, 0.005652400045619288], "name": "ujson", "type": "bar", "marker": {}}];
+                
+                var layout = {
+                    title: 'Serialization Performance by Dataset (Lower is Better)',
+                    xaxis: {
+                        title: 'Dataset',
+                        tickangle: -45
+                    },
+                    yaxis: {
+                        title: 'Time (milliseconds)',
+                        type: 'log'
+                    },
+                    barmode: 'group',
+                    showlegend: true,
+                    legend: {
+                        x: 1.02,
+                        y: 1
+                    },
+                    margin: {
+                        l: 60,
+                        r: 120,
+                        t: 80,
+                        b: 120
+                    }
+                };
+                
+                var config = {
+                    responsive: true,
+                    displayModeBar: true,
+                    modeBarButtonsToAdd: ['pan2d', 'select2d', 'lasso2d']
+                };
+                
+                Plotly.newPlot('perf_chart_3122702018306487348', traces, layout, config);
+            </script>
+        </div>
+        <h3>📋 api_response - Detailed Results</h3><p><em>Typical API response with metadata</em></p><h4>Serialization Performance</h4><table><tr><th>Library</th><th>Mean (ms)</th><th>Min (ms)</th><th>Max (ms)</th><th>Std Dev (ms)</th><th>Success Rate</th></tr><tr style='background-color: #e3f2fd; font-weight: bold;'><td>datason</td><td>0.912</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr><tr ><td>json</td><td>0.084</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr></table><h3>📋 simple_objects - Detailed Results</h3><p><em>Simple data types common in APIs</em></p><h4>Serialization Performance</h4><table><tr><th>Library</th><th>Mean (ms)</th><th>Min (ms)</th><th>Max (ms)</th><th>Std Dev (ms)</th><th>Success Rate</th></tr><tr style='background-color: #e3f2fd; font-weight: bold;'><td>datason</td><td>0.047</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr><tr ><td>orjson</td><td>0.001</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr><tr ><td>ujson</td><td>0.003</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr><tr ><td>json</td><td>0.007</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr></table><h3>📋 nested_structures - Detailed Results</h3><p><em>Deeply nested data structures</em></p><h4>Serialization Performance</h4><table><tr><th>Library</th><th>Mean (ms)</th><th>Min (ms)</th><th>Max (ms)</th><th>Std Dev (ms)</th><th>Success Rate</th></tr><tr style='background-color: #e3f2fd; font-weight: bold;'><td>datason</td><td>0.092</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr><tr ><td>orjson</td><td>0.001</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr><tr ><td>ujson</td><td>0.006</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr><tr ><td>json</td><td>0.014</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr></table><h3>📋 datetime_heavy - Detailed Results</h3><p><em>Data with many datetime and UUID objects</em></p><h4>Serialization Performance</h4><table><tr><th>Library</th><th>Mean (ms)</th><th>Min (ms)</th><th>Max (ms)</th><th>Std Dev (ms)</th><th>Success Rate</th></tr><tr style='background-color: #e3f2fd; font-weight: bold;'><td>datason</td><td>0.387</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr><tr ><td>orjson</td><td>0.009</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr><tr ><td>json</td><td>0.108</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr></table></div>
+                    <div class="section">
+                        <h2>📋 Raw Data</h2>
+                        <details>
+                            <summary>Click to view raw JSON data</summary>
+                            <pre style="background: #f8f9fa; padding: 20px; border-radius: 5px; overflow-x: auto;">
+            {
+  "suite_type": "quick",
+  "metadata": {
+    "timestamp": "2025-06-17T07:17:02.272175+00:00",
+    "python_version": "3.11.12 (main, Apr  8 2025, 21:35:04) [GCC 13.3.0]",
+    "runner_info": {
+      "os": "posix",
+      "github_sha": "957745fb194516406ba7c28e8132cf8e97f575b6",
+      "github_ref": "refs/heads/main",
+      "ci_run_id": "15700700894"
+    }
+  },
+  "competitive": {
+    "api_response": {
+      "description": "Typical API response with metadata",
+      "serialization": {
+        "datason": {
+          "mean": 0.0009119851999685125,
+          "min": 0.0009015219999355395,
+          "max": 0.0009247750000440647,
+          "std": 1.1201548232836857e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.9119851999685125
+        },
+        "orjson": {
+          "error": "All serialization attempts failed",
+          "error_count": 5
+        },
+        "ujson": {
+          "error": "All serialization attempts failed",
+          "error_count": 5
+        },
+        "json": {
+          "mean": 8.353399998668465e-05,
+          "min": 7.677400003558432e-05,
+          "max": 9.765200002220809e-05,
+          "std": 8.489744974047648e-06,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.08353399998668465
+        }
+      },
+      "deserialization": {
+        "datason": {
+          "mean": 0.046016347199997656,
+          "min": 0.042635515000029045,
+          "max": 0.05823740499999985,
+          "std": 0.006838687903983385,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 46.016347199997654
+        },
+        "json": {
+          "mean": 2.016739995269745e-05,
+          "min": 1.8744999920272676e-05,
+          "max": 2.2742000055586686e-05,
+          "std": 1.7356034920238797e-06,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.02016739995269745
+        }
+      },
+      "output_size": {
+        "datason": {
+          "size": 2720,
+          "size_type": "string chars",
+          "supports_binary": false
+        },
+        "orjson": {
+          "error": "Type is not JSON serializable: decimal.Decimal"
+        },
+        "ujson": {
+          "error": "datetime.datetime(2024, 1, 1, 12, 0, tzinfo=datetime.timezone.utc) is not JSON serializable"
+        },
+        "json": {
+          "size": 2760,
+          "size_type": "utf-8 bytes",
+          "supports_binary": false
+        }
+      },
+      "competitors_tested": [
+        "datason",
+        "orjson",
+        "ujson",
+        "json"
+      ]
+    },
+    "simple_objects": {
+      "description": "Simple data types common in APIs",
+      "serialization": {
+        "datason": {
+          "mean": 4.7071800008779976e-05,
+          "min": 4.171800003405224e-05,
+          "max": 5.854900007307151e-05,
+          "std": 6.76539560251776e-06,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.047071800008779974
+        },
+        "orjson": {
+          "mean": 9.618000149203e-07,
+          "min": 7.310000000870787e-07,
+          "max": 1.3029999763602973e-06,
+          "std": 2.3617937330508575e-07,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.0009618000149202999
+        },
+        "ujson": {
+          "mean": 2.7631999955701757e-06,
+          "min": 2.6249999791616574e-06,
+          "max": 3.0559999686374795e-06,
+          "std": 1.797670624215349e-07,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.002763199995570176
+        },
+        "json": {
+          "mean": 6.6061999859812205e-06,
+          "min": 5.9509999346119e-06,
+          "max": 7.674000016777427e-06,
+          "std": 6.553046818627894e-07,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.00660619998598122
+        }
+      },
+      "deserialization": {
+        "datason": {
+          "mean": 0.004772546800018063,
+          "min": 0.004751638000016101,
+          "max": 0.004808083000057195,
+          "std": 2.192539634994424e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 4.772546800018063
+        },
+        "orjson": {
+          "mean": 1.6685999980836642e-06,
+          "min": 1.3620000345326844e-06,
+          "max": 2.243999915663153e-06,
+          "std": 3.600094067541442e-07,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.001668599998083664
+        },
+        "ujson": {
+          "mean": 2.5907999770424796e-06,
+          "min": 2.3439999949914636e-06,
+          "max": 3.1359999184132903e-06,
+          "std": 3.3385428589798417e-07,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.0025907999770424794
+        },
+        "json": {
+          "mean": 3.638599991973024e-06,
+          "min": 3.2060000876299455e-06,
+          "max": 4.4779999370803125e-06,
+          "std": 5.09718307231229e-07,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.003638599991973024
+        }
+      },
+      "output_size": {
+        "datason": {
+          "size": 225,
+          "size_type": "string chars",
+          "supports_binary": false
+        },
+        "orjson": {
+          "size": 197,
+          "size_type": "bytes",
+          "supports_binary": true
+        },
+        "ujson": {
+          "size": 197,
+          "size_type": "utf-8 bytes",
+          "supports_binary": false
+        },
+        "json": {
+          "size": 225,
+          "size_type": "utf-8 bytes",
+          "supports_binary": false
+        }
+      },
+      "competitors_tested": [
+        "datason",
+        "orjson",
+        "ujson",
+        "json"
+      ]
+    },
+    "nested_structures": {
+      "description": "Deeply nested data structures",
+      "serialization": {
+        "datason": {
+          "mean": 9.170700002414378e-05,
+          "min": 8.912600003441185e-05,
+          "max": 9.463700007472653e-05,
+          "std": 2.3934906355669823e-06,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.09170700002414378
+        },
+        "orjson": {
+          "mean": 1.358600002276944e-06,
+          "min": 1.0620000239214278e-06,
+          "max": 2.1939999896858353e-06,
+          "std": 4.7487028761337515e-07,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.001358600002276944
+        },
+        "ujson": {
+          "mean": 5.652400045619288e-06,
+          "min": 5.379000072025519e-06,
+          "max": 6.101000053604366e-06,
+          "std": 2.7589635834536487e-07,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.005652400045619288
+        },
+        "json": {
+          "mean": 1.4032200033398112e-05,
+          "min": 1.3295000030666415e-05,
+          "max": 1.507800004674209e-05,
+          "std": 8.240441091016208e-07,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.014032200033398112
+        }
+      },
+      "deserialization": {
+        "datason": {
+          "mean": 0.01796288719999666,
+          "min": 0.017811231999985466,
+          "max": 0.018157858999984455,
+          "std": 0.00014693110352834935,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 17.962887199996658
+        },
+        "orjson": {
+          "mean": 3.2262000559057925e-06,
+          "min": 2.805000008265779e-06,
+          "max": 4.23800008775288e-06,
+          "std": 5.822123534412806e-07,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.0032262000559057924
+        },
+        "ujson": {
+          "mean": 5.5783999641789705e-06,
+          "min": 5.048999923928932e-06,
+          "max": 6.741999982295965e-06,
+          "std": 6.887911936011962e-07,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.0055783999641789705
+        },
+        "json": {
+          "mean": 7.1288000071945135e-06,
+          "min": 6.692000056318648e-06,
+          "max": 7.743999958620407e-06,
+          "std": 4.3680505343167436e-07,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.0071288000071945135
+        }
+      },
+      "output_size": {
+        "datason": {
+          "size": 518,
+          "size_type": "string chars",
+          "supports_binary": false
+        },
+        "orjson": {
+          "size": 454,
+          "size_type": "bytes",
+          "supports_binary": true
+        },
+        "ujson": {
+          "size": 454,
+          "size_type": "utf-8 bytes",
+          "supports_binary": false
+        },
+        "json": {
+          "size": 518,
+          "size_type": "utf-8 bytes",
+          "supports_binary": false
+        }
+      },
+      "competitors_tested": [
+        "datason",
+        "orjson",
+        "ujson",
+        "json"
+      ]
+    },
+    "datetime_heavy": {
+      "description": "Data with many datetime and UUID objects",
+      "serialization": {
+        "datason": {
+          "mean": 0.00038683519999267447,
+          "min": 0.0003774229999180534,
+          "max": 0.00039885399996819615,
+          "std": 7.858950366837525e-06,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.38683519999267446
+        },
+        "orjson": {
+          "mean": 9.262999992643017e-06,
+          "min": 8.716000024833193e-06,
+          "max": 1.0459999998602143e-05,
+          "std": 7.268136005559869e-07,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.009262999992643017
+        },
+        "ujson": {
+          "error": "All serialization attempts failed",
+          "error_count": 5
+        },
+        "json": {
+          "mean": 0.00010809559996687313,
+          "min": 0.0001039239999727215,
+          "max": 0.00011923299996396963,
+          "std": 6.2978797437057175e-06,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.10809559996687312
+        }
+      },
+      "deserialization": {
+        "datason": {
+          "mean": 0.02517282139999679,
+          "min": 0.025042681999934757,
+          "max": 0.025280355999939275,
+          "std": 9.578496570332021e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 25.172821399996792
+        },
+        "orjson": {
+          "mean": 6.984600031501032e-06,
+          "min": 6.4609999981257715e-06,
+          "max": 7.914000093478535e-06,
+          "std": 5.958047762138996e-07,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.0069846000315010315
+        },
+        "json": {
+          "mean": 1.296580003327108e-05,
+          "min": 1.2473000083446095e-05,
+          "max": 1.3865000028090435e-05,
+          "std": 5.716617895554581e-07,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.01296580003327108
+        }
+      },
+      "output_size": {
+        "datason": {
+          "size": 3102,
+          "size_type": "string chars",
+          "supports_binary": false
+        },
+        "orjson": {
+          "size": 2937,
+          "size_type": "bytes",
+          "supports_binary": true
+        },
+        "ujson": {
+          "error": "datetime.datetime(2024, 1, 1, 12, 0, tzinfo=datetime.timezone.utc) is not JSON serializable"
+        },
+        "json": {
+          "size": 3102,
+          "size_type": "utf-8 bytes",
+          "supports_binary": false
+        }
+      },
+      "competitors_tested": [
+        "datason",
+        "orjson",
+        "ujson",
+        "json"
+      ]
+    },
+    "summary": {
+      "competitors_tested": [
+        "datason",
+        "orjson",
+        "ujson",
+        "json"
+      ],
+      "datasets_tested": [
+        "api_response",
+        "simple_objects",
+        "nested_structures",
+        "datetime_heavy"
+      ],
+      "fastest_serialization": {
+        "api_response": {
+          "library": "json",
+          "time_ms": 0.08353399998668465
+        },
+        "simple_objects": {
+          "library": "orjson",
+          "time_ms": 0.0009618000149202999
+        },
+        "nested_structures": {
+          "library": "orjson",
+          "time_ms": 0.001358600002276944
+        },
+        "datetime_heavy": {
+          "library": "orjson",
+          "time_ms": 0.009262999992643017
+        }
+      },
+      "fastest_deserialization": {
+        "api_response": {
+          "library": "json",
+          "time_ms": 0.02016739995269745
+        },
+        "simple_objects": {
+          "library": "orjson",
+          "time_ms": 0.001668599998083664
+        },
+        "nested_structures": {
+          "library": "orjson",
+          "time_ms": 0.0032262000559057924
+        },
+        "datetime_heavy": {
+          "library": "orjson",
+          "time_ms": 0.0069846000315010315
+        }
+      },
+      "smallest_output": {
+        "api_response": {
+          "library": "datason",
+          "size_bytes": 2720
+        },
+        "simple_objects": {
+          "library": "orjson",
+          "size_bytes": 197
+        },
+        "nested_structures": {
+          "library": "orjson",
+          "size_bytes": 454
+        },
+        "datetime_heavy": {
+          "library": "orjson",
+          "size_bytes": 2937
+        }
+      },
+      "datason_performance": {
+        "api_response": {
+          "serialization_ms": 0.9119851999685125,
+          "deserialization_ms": 46.016347199997654
+        },
+        "simple_objects": {
+          "serialization_ms": 0.047071800008779974,
+          "deserialization_ms": 4.772546800018063
+        },
+        "nested_structures": {
+          "serialization_ms": 0.09170700002414378,
+          "deserialization_ms": 17.962887199996658
+        },
+        "datetime_heavy": {
+          "serialization_ms": 0.38683519999267446,
+          "deserialization_ms": 25.172821399996792
+        }
+      }
+    }
+  }
+}
+                            </pre>
+                        </details>
+                    </div>
+                </div>
+            </body>
+            </html>
+            
