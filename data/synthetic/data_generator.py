@@ -2,7 +2,7 @@
 Automated synthetic data generation for DataSON benchmarks.
 Creates realistic test datasets for various scenarios.
 """
-import json
+import datason
 import random
 import string
 import datetime
@@ -207,7 +207,7 @@ class SyntheticDataGenerator:
             timestamps = pd.date_range(
                 start=fake.date_time(),
                 periods=n_points,
-                freq='1H'
+                freq='1h'
             )
             
             return {
@@ -484,7 +484,7 @@ class SyntheticDataGenerator:
                 },
                 'temporal': {
                     'datetime': fake.date_time().isoformat(),
-                    'date': fake.date().isoformat(),
+                    'date': fake.date_time().date().isoformat(),
                     'timestamp': fake.unix_time(),
                 },
                 'identifiers': {
@@ -521,7 +521,7 @@ class SyntheticDataGenerator:
                     'large_string': large_string,
                     'large_list': large_list,
                     'large_dict': {f'key_{i}': f'value_{i}' for i in range(target_size // 200)},
-                    'repeated_pattern': {'pattern': 'repeat'} * (target_size // 100),
+                    'repeated_pattern': [{'pattern': 'repeat'} for _ in range(target_size // 100)],
                 }
         
         elif edge_type == 'special_values':
@@ -579,7 +579,8 @@ class SyntheticDataGenerator:
                     'nested': create_deep_nesting(depth - 1)
                 }
             
-            max_depth = min(50, target_size // 100)  # Reasonable depth limit
+            # Keep depth well under DataSON's 50 limit to account for metadata wrappers
+            max_depth = min(35, target_size // 100)  # Safe depth limit for DataSON
             return {
                 'deep_dict': create_deep_nesting(max_depth),
                 'deep_list': self._create_deep_list(max_depth),
@@ -676,16 +677,20 @@ class SyntheticDataGenerator:
         
         data = self.generate_scenario_data(scenario_name)
         
-        # Save as JSON
+        # Save as JSON using DataSON for dogfooding
         output_file = os.path.join(output_dir, f'{scenario_name}_data.json')
         with open(output_file, 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
+            # DataSON dumps returns a JSON string like json.dumps
+            json_string = datason.dumps(data)
+            f.write(json_string)
         
         print(f"Saved {len(data)} samples for scenario '{scenario_name}' to {output_file}")
         return output_file
     
     def save_all_scenarios(self, output_dir: str = 'data/synthetic'):
         """Save all scenario data to files"""
+        import os
+        
         generated_files = []
         
         for scenario_name in self.scenarios:
@@ -704,7 +709,9 @@ class SyntheticDataGenerator:
         
         summary_file = os.path.join(output_dir, 'generation_summary.json')
         with open(summary_file, 'w', encoding='utf-8') as f:
-            json.dump(summary, f, indent=2)
+            # DataSON dumps returns a JSON string like json.dumps
+            json_string = datason.dumps(summary)
+            f.write(json_string)
         
         print(f"Generated {len(generated_files)} scenario files")
         print(f"Summary saved to {summary_file}")
