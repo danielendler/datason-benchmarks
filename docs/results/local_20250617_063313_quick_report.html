@@ -1,4 +1,191 @@
-{
+
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>DataSON Benchmark Report - quick</title>
+                <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                <style>
+                    body { 
+                        font-family: 'Segoe UI', Arial, sans-serif; 
+                        margin: 0; 
+                        padding: 20px; 
+                        background-color: #f8f9fa;
+                    }
+                    .container { 
+                        max-width: 1400px; 
+                        margin: 0 auto; 
+                        background: white; 
+                        padding: 30px; 
+                        border-radius: 8px; 
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    }
+                    .header { 
+                        text-align: center; 
+                        margin-bottom: 30px; 
+                        padding-bottom: 20px; 
+                        border-bottom: 2px solid #e9ecef;
+                    }
+                    .summary { 
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                        color: white; 
+                        padding: 25px; 
+                        border-radius: 8px; 
+                        margin: 20px 0; 
+                    }
+                    .chart-container { 
+                        margin: 30px 0; 
+                        padding: 20px; 
+                        border: 1px solid #dee2e6; 
+                        border-radius: 8px; 
+                        background: #ffffff;
+                    }
+                    table { 
+                        border-collapse: collapse; 
+                        width: 100%; 
+                        margin: 20px 0; 
+                        background: white;
+                    }
+                    th, td { 
+                        border: 1px solid #dee2e6; 
+                        padding: 12px; 
+                        text-align: left; 
+                    }
+                    th { 
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                        color: white; 
+                        font-weight: 600;
+                    }
+                    tr:nth-child(even) { 
+                        background-color: #f8f9fa; 
+                    }
+                    .metric { 
+                        display: inline-block; 
+                        margin: 10px 15px; 
+                        padding: 15px; 
+                        background: #e9ecef; 
+                        border-radius: 5px; 
+                        text-align: center;
+                    }
+                    .metric-value { 
+                        font-size: 24px; 
+                        font-weight: bold; 
+                        color: #495057; 
+                    }
+                    .metric-label { 
+                        font-size: 12px; 
+                        color: #6c757d; 
+                        text-transform: uppercase; 
+                    }
+                    .section { 
+                        margin: 40px 0; 
+                        padding: 20px; 
+                        border-left: 4px solid #667eea;
+                    }
+                    .warning { 
+                        background-color: #fff3cd; 
+                        border: 1px solid #ffeeba; 
+                        color: #856404; 
+                        padding: 15px; 
+                        border-radius: 5px; 
+                        margin: 20px 0;
+                    }
+                    .ci-badge { 
+                        background: #28a745; 
+                        color: white; 
+                        padding: 5px 15px; 
+                        border-radius: 20px; 
+                        font-size: 12px; 
+                        text-transform: uppercase; 
+                        font-weight: bold;
+                    }
+                    .local-badge { 
+                        background: #ffc107; 
+                        color: #212529; 
+                        padding: 5px 15px; 
+                        border-radius: 20px; 
+                        font-size: 12px; 
+                        text-transform: uppercase; 
+                        font-weight: bold;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>📊 DataSON Benchmark Report</h1>
+                        <span class="local-badge">
+                            Local Environment
+                        </span>
+                    </div>
+                    
+                    <div class="summary">
+                        <h2>🎯 Execution Summary</h2>
+                        <div class="metric">
+                            <div class="metric-value">Quick</div>
+                            <div class="metric-label">Suite Type</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">2025-06-17 06:33:13 UTC</div>
+                            <div class="metric-label">Generated</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">Local</div>
+                            <div class="metric-label">Environment</div>
+                        </div>
+                    </div>
+            
+                <div class="warning">
+                    ⚠️ <strong>Warning:</strong> This report was generated in a local environment. 
+                    Results may vary from CI environment and won't be committed to the repository. 
+                    Only CI-generated results are stored for consistency.
+                </div>
+                <div class="section"><h2>🏆 Competitive Analysis</h2><p><strong>Tested Competitors:</strong> datason, orjson, ujson, json</p>
+        <div class="chart-container">
+            <h3>📈 Performance Comparison Chart</h3>
+            <div id="perf_chart_5803980066247151533" style="width:100%;height:500px;"></div>
+            <script>
+                var traces = [{"x": ["api_response", "simple_objects", "nested_structures", "datetime_heavy"], "y": [0.3170248004607856, 0.018624996300786734, 0.03751660115085542, 0.17015860066749156], "name": "datason", "type": "bar", "marker": {"color": "#667eea"}}, {"x": ["api_response", "simple_objects", "nested_structures", "datetime_heavy"], "y": [0.03152479766868055, 0.0034166034311056137, 0.005774805322289467, 0.04322540480643511], "name": "json", "type": "bar", "marker": {}}, {"x": ["simple_objects", "nested_structures", "datetime_heavy"], "y": [0.0004002009518444538, 0.000674807233735919, 0.005100003909319639], "name": "orjson", "type": "bar", "marker": {}}, {"x": ["simple_objects", "nested_structures"], "y": [0.0018749968148767948, 0.0029747956432402134], "name": "ujson", "type": "bar", "marker": {}}];
+                
+                var layout = {
+                    title: 'Serialization Performance by Dataset (Lower is Better)',
+                    xaxis: {
+                        title: 'Dataset',
+                        tickangle: -45
+                    },
+                    yaxis: {
+                        title: 'Time (milliseconds)',
+                        type: 'log'
+                    },
+                    barmode: 'group',
+                    showlegend: true,
+                    legend: {
+                        x: 1.02,
+                        y: 1
+                    },
+                    margin: {
+                        l: 60,
+                        r: 120,
+                        t: 80,
+                        b: 120
+                    }
+                };
+                
+                var config = {
+                    responsive: true,
+                    displayModeBar: true,
+                    modeBarButtonsToAdd: ['pan2d', 'select2d', 'lasso2d']
+                };
+                
+                Plotly.newPlot('perf_chart_5803980066247151533', traces, layout, config);
+            </script>
+        </div>
+        <h3>📋 api_response - Detailed Results</h3><p><em>Typical API response with metadata</em></p><h4>Serialization Performance</h4><table><tr><th>Library</th><th>Mean (ms)</th><th>Min (ms)</th><th>Max (ms)</th><th>Std Dev (ms)</th><th>Success Rate</th></tr><tr style='background-color: #e3f2fd; font-weight: bold;'><td>datason</td><td>0.317</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr><tr ><td>json</td><td>0.032</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr></table><h3>📋 simple_objects - Detailed Results</h3><p><em>Simple data types common in APIs</em></p><h4>Serialization Performance</h4><table><tr><th>Library</th><th>Mean (ms)</th><th>Min (ms)</th><th>Max (ms)</th><th>Std Dev (ms)</th><th>Success Rate</th></tr><tr style='background-color: #e3f2fd; font-weight: bold;'><td>datason</td><td>0.019</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr><tr ><td>orjson</td><td>0.000</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr><tr ><td>ujson</td><td>0.002</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr><tr ><td>json</td><td>0.003</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr></table><h3>📋 nested_structures - Detailed Results</h3><p><em>Deeply nested data structures</em></p><h4>Serialization Performance</h4><table><tr><th>Library</th><th>Mean (ms)</th><th>Min (ms)</th><th>Max (ms)</th><th>Std Dev (ms)</th><th>Success Rate</th></tr><tr style='background-color: #e3f2fd; font-weight: bold;'><td>datason</td><td>0.038</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr><tr ><td>orjson</td><td>0.001</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr><tr ><td>ujson</td><td>0.003</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr><tr ><td>json</td><td>0.006</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr></table><h3>📋 datetime_heavy - Detailed Results</h3><p><em>Data with many datetime and UUID objects</em></p><h4>Serialization Performance</h4><table><tr><th>Library</th><th>Mean (ms)</th><th>Min (ms)</th><th>Max (ms)</th><th>Std Dev (ms)</th><th>Success Rate</th></tr><tr style='background-color: #e3f2fd; font-weight: bold;'><td>datason</td><td>0.170</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr><tr ><td>orjson</td><td>0.005</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr><tr ><td>json</td><td>0.043</td><td>0.000</td><td>0.000</td><td>0.000</td><td>5/5</td></tr></table></div>
+                    <div class="section">
+                        <h2>📋 Raw Data</h2>
+                        <details>
+                            <summary>Click to view raw JSON data</summary>
+                            <pre style="background: #f8f9fa; padding: 20px; border-radius: 5px; overflow-x: auto;">
+            {
   "suite_type": "quick",
   "metadata": {
     "timestamp": "2025-06-17T04:33:09.573892+00:00",
@@ -479,3 +666,10 @@
     }
   }
 }
+                            </pre>
+                        </details>
+                    </div>
+                </div>
+            </body>
+            </html>
+            

@@ -1,0 +1,398 @@
+
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>DataSON Benchmark Report - versioning</title>
+                <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                <style>
+                    body { 
+                        font-family: 'Segoe UI', Arial, sans-serif; 
+                        margin: 0; 
+                        padding: 20px; 
+                        background-color: #f8f9fa;
+                    }
+                    .container { 
+                        max-width: 1400px; 
+                        margin: 0 auto; 
+                        background: white; 
+                        padding: 30px; 
+                        border-radius: 8px; 
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    }
+                    .header { 
+                        text-align: center; 
+                        margin-bottom: 30px; 
+                        padding-bottom: 20px; 
+                        border-bottom: 2px solid #e9ecef;
+                    }
+                    .summary { 
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                        color: white; 
+                        padding: 25px; 
+                        border-radius: 8px; 
+                        margin: 20px 0; 
+                    }
+                    .chart-container { 
+                        margin: 30px 0; 
+                        padding: 20px; 
+                        border: 1px solid #dee2e6; 
+                        border-radius: 8px; 
+                        background: #ffffff;
+                    }
+                    table { 
+                        border-collapse: collapse; 
+                        width: 100%; 
+                        margin: 20px 0; 
+                        background: white;
+                    }
+                    th, td { 
+                        border: 1px solid #dee2e6; 
+                        padding: 12px; 
+                        text-align: left; 
+                    }
+                    th { 
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                        color: white; 
+                        font-weight: 600;
+                    }
+                    tr:nth-child(even) { 
+                        background-color: #f8f9fa; 
+                    }
+                    .metric { 
+                        display: inline-block; 
+                        margin: 10px 15px; 
+                        padding: 15px; 
+                        background: #e9ecef; 
+                        border-radius: 5px; 
+                        text-align: center;
+                    }
+                    .metric-value { 
+                        font-size: 24px; 
+                        font-weight: bold; 
+                        color: #495057; 
+                    }
+                    .metric-label { 
+                        font-size: 12px; 
+                        color: #6c757d; 
+                        text-transform: uppercase; 
+                    }
+                    .section { 
+                        margin: 40px 0; 
+                        padding: 20px; 
+                        border-left: 4px solid #667eea;
+                    }
+                    .warning { 
+                        background-color: #fff3cd; 
+                        border: 1px solid #ffeeba; 
+                        color: #856404; 
+                        padding: 15px; 
+                        border-radius: 5px; 
+                        margin: 20px 0;
+                    }
+                    .ci-badge { 
+                        background: #28a745; 
+                        color: white; 
+                        padding: 5px 15px; 
+                        border-radius: 20px; 
+                        font-size: 12px; 
+                        text-transform: uppercase; 
+                        font-weight: bold;
+                    }
+                    .local-badge { 
+                        background: #ffc107; 
+                        color: #212529; 
+                        padding: 5px 15px; 
+                        border-radius: 20px; 
+                        font-size: 12px; 
+                        text-transform: uppercase; 
+                        font-weight: bold;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>📊 DataSON Benchmark Report</h1>
+                        <span class="local-badge">
+                            Local Environment
+                        </span>
+                    </div>
+                    
+                    <div class="summary">
+                        <h2>🎯 Execution Summary</h2>
+                        <div class="metric">
+                            <div class="metric-value">Versioning</div>
+                            <div class="metric-label">Suite Type</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">2025-06-17 06:33:34 UTC</div>
+                            <div class="metric-label">Generated</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">Local</div>
+                            <div class="metric-label">Environment</div>
+                        </div>
+                    </div>
+            
+                <div class="warning">
+                    ⚠️ <strong>Warning:</strong> This report was generated in a local environment. 
+                    Results may vary from CI environment and won't be committed to the repository. 
+                    Only CI-generated results are stored for consistency.
+                </div>
+                <div class="section"><h2>📈 DataSON Version Evolution</h2>
+        <div class="chart-container">
+            <h3>📊 Performance Evolution Across Versions</h3>
+            <div id="version_chart_1734369139477438955" style="width:100%;height:500px;"></div>
+            <script>
+                var traces = [{"x": ["0.9.0", "latest"], "y": [0.021249998826533556, 0.028608401771634817], "name": "basic_types", "type": "scatter", "mode": "lines+markers", "line": {"width": 3}, "marker": {"size": 8}}, {"x": ["0.9.0", "latest"], "y": [0.026791595155373216, 0.03183319349773228], "name": "datetime_types", "type": "scatter", "mode": "lines+markers", "line": {"width": 3}, "marker": {"size": 8}}, {"x": ["0.9.0", "latest"], "y": [0.09584180661477149, 816.9420165999327], "name": "advanced_types", "type": "scatter", "mode": "lines+markers", "line": {"width": 3}, "marker": {"size": 8}}];
+                
+                var layout = {
+                    title: 'DataSON Performance Evolution (Lower is Better)',
+                    xaxis: {
+                        title: 'Version',
+                        type: 'category'
+                    },
+                    yaxis: {
+                        title: 'Time (milliseconds)',
+                        type: 'log'
+                    },
+                    showlegend: true,
+                    legend: {
+                        x: 1.02,
+                        y: 1
+                    },
+                    margin: {
+                        l: 60,
+                        r: 120,
+                        t: 80,
+                        b: 60
+                    }
+                };
+                
+                var config = {
+                    responsive: true,
+                    displayModeBar: true
+                };
+                
+                Plotly.newPlot('version_chart_1734369139477438955', traces, layout, config);
+            </script>
+        </div>
+        <h3>🔧 Version Compatibility</h3><table><tr><th>Version</th><th>Available Features</th><th>Config Methods</th><th>Status</th></tr><tr><td>latest</td><td>deserialize, serialize</td><td>get_api_config, get_strict_config, get_ml_config, get_performance_config</td><td>✅ Available</td></tr><tr><td>0.11.0</td><td colspan='2'>❌ cannot import name 'load_basic_file' from 'datason.api' (/Users/danielmeierendler/.pyenv/versions/3.12.0/lib/python3.12/site-packages/datason/api.py)</td><td>❌ Failed</td></tr><tr><td>0.10.0</td><td colspan='2'>❌ Command '['/Users/danielmeierendler/.pyenv/versions/3.12.0/bin/python', '-m', 'pip', 'install', 'datason==0.10.0']' returned non-zero exit status 1.</td><td>❌ Failed</td></tr><tr><td>0.9.0</td><td>deserialize, serialize</td><td>get_api_config, get_strict_config, get_ml_config, get_performance_config</td><td>✅ Available</td></tr></table></div>
+                    <div class="section">
+                        <h2>📋 Raw Data</h2>
+                        <details>
+                            <summary>Click to view raw JSON data</summary>
+                            <pre style="background: #f8f9fa; padding: 20px; border-radius: 5px; overflow-x: auto;">
+            {
+  "suite_type": "versioning",
+  "metadata": {
+    "timestamp": "2025-06-17T04:33:24.722462+00:00",
+    "python_version": "3.12.0 (main, Feb 22 2025, 21:43:18) [Clang 16.0.0 (clang-1600.0.26.6)]",
+    "runner_info": {
+      "os": "posix",
+      "github_sha": "local",
+      "github_ref": "local",
+      "ci_run_id": "local"
+    }
+  },
+  "versioning": {
+    "metadata": {
+      "timestamp": "2025-06-17T04:33:24.723141+00:00",
+      "versions_tested": [
+        "latest",
+        "0.11.0",
+        "0.10.0",
+        "0.9.0"
+      ],
+      "python_version": "3.12.0 (main, Feb 22 2025, 21:43:18) [Clang 16.0.0 (clang-1600.0.26.6)]"
+    },
+    "version_results": {
+      "latest": {
+        "version": "latest",
+        "available_features": [
+          "deserialize",
+          "serialize"
+        ],
+        "available_configs": [
+          "get_api_config",
+          "get_strict_config",
+          "get_ml_config",
+          "get_performance_config"
+        ],
+        "datasets": {
+          "basic_types": {
+            "description": "Basic types supported by all versions",
+            "results": {
+              "serialize": {
+                "mean_ms": 0.028608401771634817,
+                "min_ms": 0.011166994227096438,
+                "max_ms": 0.09066698839887977,
+                "std_ms": 0.034756713510020035,
+                "successful_runs": 5,
+                "error_count": 0
+              }
+            }
+          },
+          "datetime_types": {
+            "description": "Datetime handling (may vary by version)",
+            "results": {
+              "serialize": {
+                "mean_ms": 0.03183319349773228,
+                "min_ms": 0.009832991054281592,
+                "max_ms": 0.11379198986105621,
+                "std_ms": 0.04585918799240353,
+                "successful_runs": 5,
+                "error_count": 0
+              }
+            }
+          },
+          "advanced_types": {
+            "description": "Advanced types (newer versions)",
+            "results": {
+              "serialize": {
+                "mean_ms": 816.9420165999327,
+                "min_ms": 0.057375000324100256,
+                "max_ms": 4084.472040995024,
+                "std_ms": 1826.6048132687654,
+                "successful_runs": 5,
+                "error_count": 0
+              }
+            }
+          }
+        },
+        "configuration_compatibility": {
+          "get_performance_config": {
+            "available": true,
+            "config_keys": "non-dict"
+          },
+          "get_ml_config": {
+            "available": true,
+            "config_keys": "non-dict"
+          },
+          "get_strict_config": {
+            "available": true,
+            "config_keys": "non-dict"
+          },
+          "get_api_config": {
+            "available": true,
+            "config_keys": "non-dict"
+          }
+        }
+      },
+      "0.11.0": {
+        "error": "cannot import name 'load_basic_file' from 'datason.api' (/Users/danielmeierendler/.pyenv/versions/3.12.0/lib/python3.12/site-packages/datason/api.py)",
+        "available": false
+      },
+      "0.10.0": {
+        "error": "Command '['/Users/danielmeierendler/.pyenv/versions/3.12.0/bin/python', '-m', 'pip', 'install', 'datason==0.10.0']' returned non-zero exit status 1.",
+        "available": false
+      },
+      "0.9.0": {
+        "version": "0.9.0",
+        "available_features": [
+          "deserialize",
+          "serialize"
+        ],
+        "available_configs": [
+          "get_api_config",
+          "get_strict_config",
+          "get_ml_config",
+          "get_performance_config"
+        ],
+        "datasets": {
+          "basic_types": {
+            "description": "Basic types supported by all versions",
+            "results": {
+              "serialize": {
+                "mean_ms": 0.021249998826533556,
+                "min_ms": 0.010750023648142815,
+                "max_ms": 0.057375000324100256,
+                "std_ms": 0.02021853276080526,
+                "successful_runs": 5,
+                "error_count": 0
+              }
+            }
+          },
+          "datetime_types": {
+            "description": "Datetime handling (may vary by version)",
+            "results": {
+              "serialize": {
+                "mean_ms": 0.026791595155373216,
+                "min_ms": 0.010374991688877344,
+                "max_ms": 0.08329199044965208,
+                "std_ms": 0.031620400345751615,
+                "successful_runs": 5,
+                "error_count": 0
+              }
+            }
+          },
+          "advanced_types": {
+            "description": "Advanced types (newer versions)",
+            "results": {
+              "serialize": {
+                "mean_ms": 0.09584180661477149,
+                "min_ms": 0.06595900049433112,
+                "max_ms": 0.1974170154426247,
+                "std_ms": 0.05687783868711479,
+                "successful_runs": 5,
+                "error_count": 0
+              }
+            }
+          }
+        },
+        "configuration_compatibility": {
+          "get_performance_config": {
+            "available": true,
+            "config_keys": "non-dict"
+          },
+          "get_ml_config": {
+            "available": true,
+            "config_keys": "non-dict"
+          },
+          "get_strict_config": {
+            "available": true,
+            "config_keys": "non-dict"
+          },
+          "get_api_config": {
+            "available": true,
+            "config_keys": "non-dict"
+          }
+        }
+      }
+    },
+    "summary": {
+      "performance_evolution": {
+        "basic_types": {
+          "latest": 0.028608401771634817,
+          "0.9.0": 0.021249998826533556
+        },
+        "datetime_types": {
+          "latest": 0.03183319349773228,
+          "0.9.0": 0.026791595155373216
+        },
+        "advanced_types": {
+          "latest": 816.9420165999327,
+          "0.9.0": 0.09584180661477149
+        }
+      },
+      "feature_evolution": {
+        "deserialize": {
+          "latest": true,
+          "0.9.0": true
+        },
+        "serialize": {
+          "latest": true,
+          "0.9.0": true
+        }
+      },
+      "api_compatibility": {}
+    }
+  }
+}
+                            </pre>
+                        </details>
+                    </div>
+                </div>
+            </body>
+            </html>
+            

@@ -152,6 +152,29 @@ pr_comment.md
 *.hdf5
 *.npz
 
-# Results we want to keep (don't ignore)
-!data/results/*.json
-!docs/results/*.html 
+# ==========================================
+# PREVENT LOCAL BENCHMARK RESULTS UPLOAD
+# ==========================================
+# Only allow CI-generated results by blocking local results
+# Use CI_COMMIT_TAG to differentiate CI vs local runs
+
+# Block ALL local benchmark results
+data/results/*_benchmark_*.json
+data/results/latest_*.json
+
+# Block local HTML reports  
+docs/results/*_report_*.html
+
+# Temporary benchmark files
+benchmark_*.json
+*_results.json
+performance_*.json
+
+# Only allow CI-tagged results (these will be allowed via force-add in CI)
+# CI will commit files with pattern: ci_*_*.json
+!data/results/ci_*_*.json
+!docs/results/ci_*_*.html
+
+# Allow historical tracking files
+!data/results/history.json
+!data/results/trends.json 
