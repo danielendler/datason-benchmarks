@@ -63,7 +63,7 @@ python scripts/analyze_trends.py --input-dir data/results --lookback-weeks 12
 
 ### View Latest Results
 
-- **[Interactive Reports](https://datason.github.io/datason-benchmarks/)** - Live performance visualizations
+- **[Interactive Reports](https://danielendler.github.io/datason-benchmarks/results/)** - Live performance visualizations
 - **[Latest Benchmark Results](data/results/)** - JSON files with detailed metrics
 - **[GitHub Actions](https://github.com/datason/datason-benchmarks/actions)** - Automated runs and artifacts
 - **[Performance Trends](data/results/)** - Historical performance data
@@ -86,7 +86,7 @@ python scripts/analyze_trends.py --input-dir data/results --lookback-weeks 12
 
 > **Latest benchmark results from automated daily runs**
 
-*Results updated automatically by GitHub Actions with interactive charts. View [latest reports](https://datason.github.io/datason-benchmarks/) for detailed visualizations.*
+*Results updated automatically by GitHub Actions with interactive charts. View [latest reports](https://danielendler.github.io/datason-benchmarks/results/) for detailed visualizations.*
 
 ## 🔧 Optimization Analysis
 
@@ -188,13 +188,44 @@ Our enhanced PR workflow now provides:
 ### Test Scenarios
 
 #### 🆕 Phase 2: Realistic Synthetic Data
-Automated generation of 5 comprehensive scenarios:
+Automated generation of 5 comprehensive scenarios with **real-world data patterns**:
 
 1. **API Fast** (`api_fast`) - REST API responses, user profiles, product catalogs
+   ```json
+   {
+     "id": "40b2da9f-1c54-4af7-b853-43ee3717a701",
+     "username": "jane92", 
+     "email": "gwilliams@example.net",
+     "profile": {"bio": "Magazine perform foreign air.", "verified": true},
+     "preferences": {"notifications": true, "theme": "dark"},
+     "stats": {"login_count": 131, "last_active": "1993-01-04T03:19:33.872652"}
+   }
+   ```
+
 2. **ML Training** (`ml_training`) - ML model serialization, feature matrices, time series
+   - NumPy arrays with realistic data distributions
+   - Pandas DataFrames with time series patterns
+   - Model parameters and training metadata
+
 3. **Secure Storage** (`secure_storage`) - Nested configurations, hierarchical data
+   ```json
+   {
+     "app_config": {
+       "database": {"host": "61.225.172.203", "port": 2770, "ssl": true},
+       "cache": {"enabled": false, "ttl": 2982, "size_limit": 268},
+       "features": {"analytics": true, "debugging": false}
+     }
+   }
+   ```
+
 4. **Large Data** (`large_data`) - Dataset handling, streaming data patterns
 5. **Edge Cases** (`edge_cases`) - Boundary conditions, Unicode stress tests
+
+#### 📊 Enhanced Reporting Features
+- **Adaptive Unit Formatting** - Automatically chooses best units (ms, μs, ns) for readability
+- **Sample Data Visualization** - Shows exactly what data structures are being tested
+- **Interactive Charts** - Performance comparison charts with Plotly.js
+- **Comprehensive Analysis** - Competitive, configuration, and version comparison in one report
 
 #### Classic Scenarios
 1. **Basic Types** - Core serialization speed testing

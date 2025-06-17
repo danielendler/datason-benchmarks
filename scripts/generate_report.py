@@ -970,4 +970,143 @@ class ReportGenerator:
         </div>
         """
         
-        return chart_html 
+        return chart_html
+
+
+def main():
+    """Command-line interface for generating reports."""
+    import argparse
+    import glob
+    import json
+    import os
+    
+    parser = argparse.ArgumentParser(description='Generate benchmark reports')
+    parser.add_argument('--input-dir', required=True, help='Directory containing benchmark result JSON files')
+    parser.add_argument('--output', required=True, help='Output file path for the report')
+    parser.add_argument('--format', choices=['html', 'markdown'], default='html', help='Output format')
+    parser.add_argument('--include-charts', action='store_true', help='Include interactive charts (HTML only)')
+    
+    args = parser.parse_args()
+    
+    # Find all JSON files in input directory
+    json_files = glob.glob(os.path.join(args.input_dir, '*.json'))
+    
+    if not json_files:
+        print(f"No JSON files found in {args.input_dir}")
+        return 1
+    
+    # Combine all results into a single report
+    combined_results = {
+        "suite_type": "weekly_comprehensive",
+        "timestamp": datetime.now().isoformat(),
+        "environment": "CI" if os.environ.get('CI') else "local"
+    }
+    
+    # Process each JSON file and categorize results
+    for json_file in json_files:
+        try:
+            with open(json_file, 'r') as f:
+                if json_file.endswith('.json'):
+                    # Try DataSON first, fallback to json
+                    try:
+                        content = f.read()
+                        data = datason.deserialize(json.loads(content))
+                    except:
+                        f.seek(0)
+                        data = json.load(f)
+                else:
+                    data = json.load(f)
+            
+            # The data structure from run_benchmarks.py has the actual results nested
+            # Look for the actual benchmark data in the structure
+            if isinstance(data, dict):
+                # Check for direct competitive results
+                if "competitive" in data and isinstance(data["competitive"], dict):
+                    # This is the competitive results from the benchmark
+                    combined_results["competitive"] = data["competitive"]
+                elif "configurations" in data and isinstance(data["configurations"], dict):
+                    combined_results["configurations"] = data["configurations"]
+                elif "versioning" in data and isinstance(data["versioning"], dict):
+                    combined_results["versioning"] = data["versioning"]
+                else:
+                    # Check if this is a results file with nested structure
+                    for key, value in data.items():
+                        if isinstance(value, dict):
+                            if "competitive" in value:
+                                combined_results["competitive"] = value
+                            elif "configurations" in value:
+                                combined_results["configurations"] = value
+                            elif "versioning" in value:
+                                combined_results["versioning"] = value
+                            # Also check for serialization data which indicates competitive results
+                            elif any("serialization" in str(v) for v in value.values() if isinstance(v, dict)):
+                                combined_results["competitive"] = value
+            
+        except Exception as e:
+            print(f"Warning: Could not process {json_file}: {e}")
+            continue
+    
+    # Generate report
+    output_dir = os.path.dirname(args.output)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+    
+    generator = ReportGenerator(output_dir=output_dir if output_dir else ".")
+    
+    if args.format == 'html':
+        report_path = generator.generate_html_report(combined_results)
+        # Move to desired output location if different
+        if report_path != args.output:
+            import shutil
+            shutil.move(report_path, args.output)
+        print(f"✅ HTML report generated: {args.output}")
+    else:
+        # Generate markdown report (simplified)
+        markdown_content = f"""# Weekly DataSON Benchmark Report
+
+Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
+
+## Summary
+
+This comprehensive report includes:
+- Competitive analysis vs other JSON libraries
+- Configuration testing results  
+- Version comparison analysis
+
+## Results
+
+"""
+        
+        # Add basic results summary
+        if "competitive" in combined_results:
+            markdown_content += "### Competitive Analysis\n\n"
+            markdown_content += "DataSON performance compared to standard JSON libraries.\n\n"
+        
+        if "configurations" in combined_results:
+            markdown_content += "### Configuration Testing\n\n"
+            markdown_content += "Performance across different DataSON configurations.\n\n"
+        
+        if "versioning" in combined_results:
+            markdown_content += "### Version Comparison\n\n"
+            markdown_content += "Performance evolution across DataSON versions.\n\n"
+        
+        markdown_content += f"""
+## Raw Data
+
+```json
+{json.dumps(combined_results, indent=2)}
+```
+
+---
+*Generated by DataSON benchmark suite*
+"""
+        
+        with open(args.output, 'w') as f:
+            f.write(markdown_content)
+        print(f"✅ Markdown report generated: {args.output}")
+    
+    return 0
+
+
+if __name__ == "__main__":
+    exit(main())

@@ -149,7 +149,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        datason_version: ['0.11.0', '0.10.0', 'latest']
+        datason_version: ['0.11.0', '0.9.0', 'latest']
     
     steps:
     - name: Checkout repository
@@ -237,7 +237,7 @@ jobs:
     
     - name: Generate comprehensive report
       run: |
-        # Generate analysis report
+        # Generate analysis report with unit formatting and sample data
         python scripts/generate_report.py \
           --input-dir data/results/weekly/$(date +%Y%m%d) \
           --output docs/results/weekly_report_$(date +%Y%m%d).html \
