@@ -120,6 +120,23 @@ class BenchmarkRunner:
         logger.info("✅ Configuration benchmark completed")
         return results
     
+    def run_version_benchmark(self) -> Dict[str, Any]:
+        """DataSON version comparison benchmark."""
+        logger.info("📈 Running DataSON version comparison...")
+        
+        from benchmarks.versioning.version_suite import DataSONVersionBenchmarkSuite
+        version_suite = DataSONVersionBenchmarkSuite()
+        
+        results = {
+            "suite_type": "versioning",
+            "metadata": self.metadata,
+            "versioning": version_suite.run_version_comparison(iterations=5)
+        }
+        
+        self._save_results(results, "versioning")
+        logger.info("✅ Version comparison completed")
+        return results
+    
     def run_complete_benchmark(self) -> Dict[str, Any]:
         """Complete benchmark suite with all tests."""
         logger.info("🎯 Running complete benchmark suite...")
@@ -129,6 +146,7 @@ class BenchmarkRunner:
         # Run all benchmark types
         competitive_results = self.run_competitive_benchmark()
         config_results = self.run_configuration_benchmark()
+        version_results = self.run_version_benchmark()
         
         # Combine results
         results = {
@@ -137,6 +155,7 @@ class BenchmarkRunner:
             "execution_time": time.time() - start_time,
             "competitive": competitive_results["competitive"],
             "configurations": config_results["configurations"],
+            "versioning": version_results["versioning"],
             "summary": self._generate_summary(competitive_results, config_results)
         }
         
@@ -224,6 +243,8 @@ def main():
                        help="Run full competitive benchmark")
     parser.add_argument("--configurations", action="store_true", 
                        help="Run DataSON configuration tests")
+    parser.add_argument("--versioning", action="store_true", 
+                       help="Run DataSON version comparison tests")
     parser.add_argument("--all", action="store_true", 
                        help="Run complete benchmark suite")
     parser.add_argument("--output-dir", default="data/results", 
@@ -234,7 +255,7 @@ def main():
     args = parser.parse_args()
     
     # Default to quick if no specific suite specified
-    if not any([args.quick, args.competitive, args.configurations, args.all]):
+    if not any([args.quick, args.competitive, args.configurations, args.versioning, args.all]):
         args.quick = True
         logger.info("No specific suite specified, running quick benchmark")
     
@@ -248,6 +269,8 @@ def main():
             results = runner.run_competitive_benchmark()
         elif args.configurations:
             results = runner.run_configuration_benchmark()
+        elif args.versioning:
+            results = runner.run_version_benchmark()
         elif args.quick:
             results = runner.run_quick_benchmark()
         
