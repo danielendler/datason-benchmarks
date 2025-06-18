@@ -1,0 +1,781 @@
+{
+  "suite_type": "competitive",
+  "metadata": {
+    "timestamp": "2025-06-18T03:11:48.357947+00:00",
+    "python_version": "3.11.12 (main, Apr  8 2025, 21:35:04) [GCC 13.3.0]",
+    "runner_info": {
+      "os": "posix",
+      "github_sha": "e410e37a190fede7dc1163c81e2a9a289c6913ab",
+      "github_ref": "refs/heads/main",
+      "ci_run_id": "15722975520"
+    }
+  },
+  "competitive": {
+    "api_response": {
+      "description": "Typical API response with metadata",
+      "serialization": {
+        "datason": {
+          "mean": 0.001016822799874717,
+          "min": 0.000878794999607635,
+          "max": 0.00181832399994164,
+          "std": 0.0002964139844216967,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 1.016822799874717
+        },
+        "orjson": {
+          "error": "All serialization attempts failed",
+          "error_count": 10
+        },
+        "ujson": {
+          "error": "All serialization attempts failed",
+          "error_count": 10
+        },
+        "json": {
+          "mean": 0.0001688633000867412,
+          "min": 0.00015027100016595796,
+          "max": 0.00019199000007574796,
+          "std": 1.2655215812865532e-05,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.16886330008674122
+        },
+        "pickle": {
+          "mean": 8.12380999832385e-05,
+          "min": 7.209500017779646e-05,
+          "max": 9.734300010677543e-05,
+          "std": 8.173191982844366e-06,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.0812380999832385
+        },
+        "jsonpickle": {
+          "mean": 0.0012986472000193316,
+          "min": 0.0011548620000212395,
+          "max": 0.002097135999974853,
+          "std": 0.00028254712876903267,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 1.2986472000193316
+        },
+        "msgpack": {
+          "mean": 5.195509997975023e-05,
+          "min": 4.661700040742289e-05,
+          "max": 8.937799975683447e-05,
+          "std": 1.3215866973330742e-05,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.05195509997975023
+        }
+      },
+      "deserialization": {
+        "datason": {
+          "mean": 0.042576547199951166,
+          "min": 0.04223975800005064,
+          "max": 0.04289142899961007,
+          "std": 0.00019827254481182712,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 42.576547199951165
+        },
+        "json": {
+          "mean": 2.045719993475359e-05,
+          "min": 1.757299969540327e-05,
+          "max": 3.576700009944034e-05,
+          "std": 5.426864065349996e-06,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.02045719993475359
+        },
+        "pickle": {
+          "mean": 2.1906999972998164e-05,
+          "min": 2.0598999981302768e-05,
+          "max": 2.6979999802279053e-05,
+          "std": 1.8908340773083105e-06,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.021906999972998165
+        },
+        "jsonpickle": {
+          "mean": 0.0007199156999831757,
+          "min": 0.0007049490000099468,
+          "max": 0.0007438430002366658,
+          "std": 1.1380446017956923e-05,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.7199156999831757
+        },
+        "msgpack": {
+          "mean": 1.639359998080181e-05,
+          "min": 1.5497999811486807e-05,
+          "max": 1.7843000023276545e-05,
+          "std": 6.542978329453442e-07,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.01639359998080181
+        }
+      },
+      "output_size": {
+        "datason": {
+          "size": 2720,
+          "size_type": "string chars",
+          "supports_binary": false
+        },
+        "orjson": {
+          "error": "Type is not JSON serializable: decimal.Decimal"
+        },
+        "ujson": {
+          "error": "datetime.datetime(2024, 1, 1, 12, 0, tzinfo=datetime.timezone.utc) is not JSON serializable"
+        },
+        "json": {
+          "size": 2760,
+          "size_type": "utf-8 bytes",
+          "supports_binary": false
+        },
+        "pickle": {
+          "size": 1897,
+          "size_type": "bytes",
+          "supports_binary": true
+        },
+        "jsonpickle": {
+          "size": 6143,
+          "size_type": "utf-8 bytes",
+          "supports_binary": false
+        },
+        "msgpack": {
+          "size": 1885,
+          "size_type": "bytes",
+          "supports_binary": true
+        }
+      },
+      "competitors_tested": [
+        "datason",
+        "orjson",
+        "ujson",
+        "json",
+        "pickle",
+        "jsonpickle",
+        "msgpack"
+      ]
+    },
+    "simple_objects": {
+      "description": "Simple data types common in APIs",
+      "serialization": {
+        "datason": {
+          "mean": 4.9625099927652626e-05,
+          "min": 4.292999983590562e-05,
+          "max": 7.516100004067994e-05,
+          "std": 1.04156731316118e-05,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.04962509992765263
+        },
+        "orjson": {
+          "mean": 8.522999905835604e-07,
+          "min": 7.210001058410853e-07,
+          "max": 1.44300020110677e-06,
+          "std": 2.226178058379428e-07,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.0008522999905835604
+        },
+        "ujson": {
+          "mean": 2.661099915712839e-06,
+          "min": 2.485000095475698e-06,
+          "max": 2.924999989772914e-06,
+          "std": 1.46260347605017e-07,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.002661099915712839
+        },
+        "json": {
+          "mean": 6.392099976437748e-06,
+          "min": 5.932000021857675e-06,
+          "max": 7.41400026527117e-06,
+          "std": 4.764367203700921e-07,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.006392099976437748
+        },
+        "pickle": {
+          "mean": 1.3505999504559441e-06,
+          "min": 1.1619999895629007e-06,
+          "max": 1.9839999367832206e-06,
+          "std": 2.422689840922712e-07,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.001350599950455944
+        },
+        "jsonpickle": {
+          "mean": 3.2418700084235755e-05,
+          "min": 3.0376999802683713e-05,
+          "max": 3.919300024790573e-05,
+          "std": 2.712756115713492e-06,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.03241870008423575
+        },
+        "msgpack": {
+          "mean": 1.8774000182020244e-06,
+          "min": 1.75300010596402e-06,
+          "max": 2.2939998416404705e-06,
+          "std": 1.725334907386968e-07,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.0018774000182020245
+        }
+      },
+      "deserialization": {
+        "datason": {
+          "mean": 0.0048120195998762934,
+          "min": 0.0047510239996881864,
+          "max": 0.004888040999958321,
+          "std": 4.3827636905719244e-05,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 4.812019599876294
+        },
+        "orjson": {
+          "mean": 1.6060000234574545e-06,
+          "min": 1.1219999578315765e-06,
+          "max": 2.6550001166469883e-06,
+          "std": 5.119872477348328e-07,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.0016060000234574545
+        },
+        "ujson": {
+          "mean": 2.48159994953312e-06,
+          "min": 2.193000000261236e-06,
+          "max": 2.9359998734435067e-06,
+          "std": 2.680821950134247e-07,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.00248159994953312
+        },
+        "json": {
+          "mean": 3.4544999380159425e-06,
+          "min": 3.217000084987376e-06,
+          "max": 4.128000000491738e-06,
+          "std": 3.016002306559407e-07,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.0034544999380159425
+        },
+        "pickle": {
+          "mean": 2.002900100706029e-06,
+          "min": 1.7130000742326956e-06,
+          "max": 2.645000222400995e-06,
+          "std": 2.680698345273671e-07,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.0020029001007060288
+        },
+        "jsonpickle": {
+          "mean": 3.629609996096406e-05,
+          "min": 3.518599987728521e-05,
+          "max": 3.941400018447894e-05,
+          "std": 1.2802810216930912e-06,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.03629609996096406
+        },
+        "msgpack": {
+          "mean": 1.624200058358838e-06,
+          "min": 1.4530000953527633e-06,
+          "max": 2.023999968514545e-06,
+          "std": 1.788014685191744e-07,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.0016242000583588379
+        }
+      },
+      "output_size": {
+        "datason": {
+          "size": 225,
+          "size_type": "string chars",
+          "supports_binary": false
+        },
+        "orjson": {
+          "size": 197,
+          "size_type": "bytes",
+          "supports_binary": true
+        },
+        "ujson": {
+          "size": 197,
+          "size_type": "utf-8 bytes",
+          "supports_binary": false
+        },
+        "json": {
+          "size": 225,
+          "size_type": "utf-8 bytes",
+          "supports_binary": false
+        },
+        "pickle": {
+          "size": 210,
+          "size_type": "bytes",
+          "supports_binary": true
+        },
+        "jsonpickle": {
+          "size": 225,
+          "size_type": "utf-8 bytes",
+          "supports_binary": false
+        },
+        "msgpack": {
+          "size": 149,
+          "size_type": "bytes",
+          "supports_binary": true
+        }
+      },
+      "competitors_tested": [
+        "datason",
+        "orjson",
+        "ujson",
+        "json",
+        "pickle",
+        "jsonpickle",
+        "msgpack"
+      ]
+    },
+    "nested_structures": {
+      "description": "Deeply nested data structures",
+      "serialization": {
+        "datason": {
+          "mean": 9.31084000512783e-05,
+          "min": 8.990900005301228e-05,
+          "max": 0.0001067700000021432,
+          "std": 5.16094124343471e-06,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.0931084000512783
+        },
+        "orjson": {
+          "mean": 1.2403999789967201e-06,
+          "min": 1.0129997463081963e-06,
+          "max": 2.494000000297092e-06,
+          "std": 4.4906105603707367e-07,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.0012403999789967202
+        },
+        "ujson": {
+          "mean": 5.341900032362901e-06,
+          "min": 5.129999863129342e-06,
+          "max": 5.761000011261785e-06,
+          "std": 1.9439559008020233e-07,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.005341900032362901
+        },
+        "json": {
+          "mean": 1.4887700035615126e-05,
+          "min": 1.3225000202510273e-05,
+          "max": 2.5578000077075558e-05,
+          "std": 3.7925741176242e-06,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.014887700035615126
+        },
+        "pickle": {
+          "mean": 2.761100040515885e-06,
+          "min": 2.5350000214530155e-06,
+          "max": 3.3760002224880736e-06,
+          "std": 2.609238163170945e-07,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.0027611000405158848
+        },
+        "jsonpickle": {
+          "mean": 9.775899984560965e-05,
+          "min": 9.409599988430273e-05,
+          "max": 0.00010951499962175149,
+          "std": 4.476803091556021e-06,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.09775899984560965
+        },
+        "msgpack": {
+          "mean": 3.4994000088772736e-06,
+          "min": 3.3159999475174118e-06,
+          "max": 3.806999757216545e-06,
+          "std": 1.6177081398349608e-07,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.0034994000088772736
+        }
+      },
+      "deserialization": {
+        "datason": {
+          "mean": 0.01855408669994176,
+          "min": 0.018447435999860318,
+          "max": 0.018784947999847645,
+          "std": 9.207984870937487e-05,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 18.554086699941763
+        },
+        "orjson": {
+          "mean": 2.9674999495910017e-06,
+          "min": 2.7549999686016236e-06,
+          "max": 3.907000063918531e-06,
+          "std": 3.4323051351638775e-07,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.0029674999495910015
+        },
+        "ujson": {
+          "mean": 5.331900001692702e-06,
+          "min": 5.119999968883349e-06,
+          "max": 6.062000011297641e-06,
+          "std": 3.059108887840126e-07,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.005331900001692702
+        },
+        "json": {
+          "mean": 8.13419997029996e-06,
+          "min": 6.472000222856877e-06,
+          "max": 2.065799981210148e-05,
+          "std": 4.416272905452011e-06,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.00813419997029996
+        },
+        "pickle": {
+          "mean": 3.7949000216030983e-06,
+          "min": 3.5570001273299567e-06,
+          "max": 4.327999704401009e-06,
+          "std": 2.2155476267409744e-07,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.003794900021603098
+        },
+        "jsonpickle": {
+          "mean": 9.226800002579694e-05,
+          "min": 8.925700012696325e-05,
+          "max": 0.0001039049998325936,
+          "std": 4.263289253885755e-06,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.09226800002579694
+        },
+        "msgpack": {
+          "mean": 4.313999943406088e-06,
+          "min": 4.087999968760414e-06,
+          "max": 5.1590000111900736e-06,
+          "std": 3.200177295234283e-07,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.004313999943406088
+        }
+      },
+      "output_size": {
+        "datason": {
+          "size": 518,
+          "size_type": "string chars",
+          "supports_binary": false
+        },
+        "orjson": {
+          "size": 454,
+          "size_type": "bytes",
+          "supports_binary": true
+        },
+        "ujson": {
+          "size": 454,
+          "size_type": "utf-8 bytes",
+          "supports_binary": false
+        },
+        "json": {
+          "size": 518,
+          "size_type": "utf-8 bytes",
+          "supports_binary": false
+        },
+        "pickle": {
+          "size": 354,
+          "size_type": "bytes",
+          "supports_binary": true
+        },
+        "jsonpickle": {
+          "size": 518,
+          "size_type": "utf-8 bytes",
+          "supports_binary": false
+        },
+        "msgpack": {
+          "size": 310,
+          "size_type": "bytes",
+          "supports_binary": true
+        }
+      },
+      "competitors_tested": [
+        "datason",
+        "orjson",
+        "ujson",
+        "json",
+        "pickle",
+        "jsonpickle",
+        "msgpack"
+      ]
+    },
+    "datetime_heavy": {
+      "description": "Data with many datetime and UUID objects",
+      "serialization": {
+        "datason": {
+          "mean": 0.00038958429986450936,
+          "min": 0.0003829069996754697,
+          "max": 0.0004015919998892059,
+          "std": 6.207414283916714e-06,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.3895842998645094
+        },
+        "orjson": {
+          "mean": 8.826399971439969e-06,
+          "min": 8.506000085617416e-06,
+          "max": 1.0560000191617291e-05,
+          "std": 6.162300464257001e-07,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.008826399971439969
+        },
+        "ujson": {
+          "error": "All serialization attempts failed",
+          "error_count": 10
+        },
+        "json": {
+          "mean": 0.00010495579995222215,
+          "min": 0.00010187099996983306,
+          "max": 0.00011889300003531389,
+          "std": 5.010813059663536e-06,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.10495579995222215
+        },
+        "pickle": {
+          "mean": 3.3225999959540784e-05,
+          "min": 3.005600001415587e-05,
+          "max": 4.3711999751394615e-05,
+          "std": 4.178370649049536e-06,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.033225999959540786
+        },
+        "jsonpickle": {
+          "mean": 0.0011540383999545157,
+          "min": 0.001125596999827394,
+          "max": 0.0012534870002127718,
+          "std": 3.871354170820025e-05,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 1.1540383999545156
+        },
+        "msgpack": {
+          "mean": 7.68439999774273e-05,
+          "min": 7.50610001887253e-05,
+          "max": 8.86359998730768e-05,
+          "std": 4.154332126305575e-06,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.0768439999774273
+        }
+      },
+      "deserialization": {
+        "datason": {
+          "mean": 0.025518980300012116,
+          "min": 0.025358814999890456,
+          "max": 0.025709682000069733,
+          "std": 0.00010859510406857964,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 25.518980300012117
+        },
+        "orjson": {
+          "mean": 6.664499960606918e-06,
+          "min": 6.372000370902242e-06,
+          "max": 7.92499986346229e-06,
+          "std": 4.59394312268237e-07,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.006664499960606918
+        },
+        "json": {
+          "mean": 1.284920003854495e-05,
+          "min": 1.2442999832273927e-05,
+          "max": 1.4057000043976586e-05,
+          "std": 4.7619831847153676e-07,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.01284920003854495
+        },
+        "pickle": {
+          "mean": 1.3955399936094182e-05,
+          "min": 1.2884999705420341e-05,
+          "max": 1.8074000308843097e-05,
+          "std": 1.548938659956471e-06,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.013955399936094182
+        },
+        "jsonpickle": {
+          "mean": 0.000644977699903393,
+          "min": 0.0006244290002541675,
+          "max": 0.0006717079995723907,
+          "std": 1.4189681216191924e-05,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.6449776999033929
+        },
+        "msgpack": {
+          "mean": 1.019520000227203e-05,
+          "min": 9.698000212665647e-06,
+          "max": 1.1570999959076289e-05,
+          "std": 5.321906137265452e-07,
+          "successful_runs": 10,
+          "error_count": 0,
+          "mean_ms": 0.010195200002272031
+        }
+      },
+      "output_size": {
+        "datason": {
+          "size": 3102,
+          "size_type": "string chars",
+          "supports_binary": false
+        },
+        "orjson": {
+          "size": 2937,
+          "size_type": "bytes",
+          "supports_binary": true
+        },
+        "ujson": {
+          "error": "datetime.datetime(2024, 1, 1, 12, 0, tzinfo=datetime.timezone.utc) is not JSON serializable"
+        },
+        "json": {
+          "size": 3102,
+          "size_type": "utf-8 bytes",
+          "supports_binary": false
+        },
+        "pickle": {
+          "size": 2007,
+          "size_type": "bytes",
+          "supports_binary": true
+        },
+        "jsonpickle": {
+          "size": 7417,
+          "size_type": "utf-8 bytes",
+          "supports_binary": false
+        },
+        "msgpack": {
+          "size": 2589,
+          "size_type": "bytes",
+          "supports_binary": true
+        }
+      },
+      "competitors_tested": [
+        "datason",
+        "orjson",
+        "ujson",
+        "json",
+        "pickle",
+        "jsonpickle",
+        "msgpack"
+      ]
+    },
+    "summary": {
+      "competitors_tested": [
+        "datason",
+        "orjson",
+        "ujson",
+        "json",
+        "pickle",
+        "jsonpickle",
+        "msgpack"
+      ],
+      "datasets_tested": [
+        "api_response",
+        "simple_objects",
+        "nested_structures",
+        "datetime_heavy"
+      ],
+      "fastest_serialization": {
+        "api_response": {
+          "library": "msgpack",
+          "time_ms": 0.05195509997975023
+        },
+        "simple_objects": {
+          "library": "orjson",
+          "time_ms": 0.0008522999905835604
+        },
+        "nested_structures": {
+          "library": "orjson",
+          "time_ms": 0.0012403999789967202
+        },
+        "datetime_heavy": {
+          "library": "orjson",
+          "time_ms": 0.008826399971439969
+        }
+      },
+      "fastest_deserialization": {
+        "api_response": {
+          "library": "msgpack",
+          "time_ms": 0.01639359998080181
+        },
+        "simple_objects": {
+          "library": "orjson",
+          "time_ms": 0.0016060000234574545
+        },
+        "nested_structures": {
+          "library": "orjson",
+          "time_ms": 0.0029674999495910015
+        },
+        "datetime_heavy": {
+          "library": "orjson",
+          "time_ms": 0.006664499960606918
+        }
+      },
+      "smallest_output": {
+        "api_response": {
+          "library": "msgpack",
+          "size_bytes": 1885
+        },
+        "simple_objects": {
+          "library": "msgpack",
+          "size_bytes": 149
+        },
+        "nested_structures": {
+          "library": "msgpack",
+          "size_bytes": 310
+        },
+        "datetime_heavy": {
+          "library": "pickle",
+          "size_bytes": 2007
+        }
+      },
+      "datason_performance": {
+        "api_response": {
+          "serialization_ms": 1.016822799874717,
+          "deserialization_ms": 42.576547199951165
+        },
+        "simple_objects": {
+          "serialization_ms": 0.04962509992765263,
+          "deserialization_ms": 4.812019599876294
+        },
+        "nested_structures": {
+          "serialization_ms": 0.0931084000512783,
+          "deserialization_ms": 18.554086699941763
+        },
+        "datetime_heavy": {
+          "serialization_ms": 0.3895842998645094,
+          "deserialization_ms": 25.518980300012117
+        }
+      }
+    }
+  },
+  "competitor_versions": {
+    "datason": "0.11.0",
+    "orjson": "3.10.18",
+    "ujson": "5.10.0",
+    "json": "2.0.9",
+    "pickle": null,
+    "jsonpickle": "4.1.1",
+    "msgpack": "1.1.1"
+  }
+}

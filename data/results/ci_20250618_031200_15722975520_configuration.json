@@ -1,0 +1,425 @@
+{
+  "suite_type": "configuration",
+  "metadata": {
+    "timestamp": "2025-06-18T03:11:48.357947+00:00",
+    "python_version": "3.11.12 (main, Apr  8 2025, 21:35:04) [GCC 13.3.0]",
+    "runner_info": {
+      "os": "posix",
+      "github_sha": "e410e37a190fede7dc1163c81e2a9a289c6913ab",
+      "github_ref": "refs/heads/main",
+      "ci_run_id": "15722975520"
+    }
+  },
+  "configurations": {
+    "default": {
+      "description": "Out-of-box experience",
+      "datasets": {
+        "small_objects": {
+          "description": "Small API-style objects",
+          "results": {
+            "serialization": {
+              "mean": 2.1085400021547684e-05,
+              "min": 2.0307000340835657e-05,
+              "max": 2.2882999928697245e-05,
+              "std": 7.213069478267446e-07,
+              "mean_ms": 0.021085400021547684
+            },
+            "deserialization": {
+              "mean": 0.0009884675999273895,
+              "min": 0.0009783219998098502,
+              "max": 0.0009998320001614047,
+              "std": 7.171500967498508e-06,
+              "mean_ms": 0.9884675999273895
+            },
+            "total_time_ms": 1.0095529999489372,
+            "successful_runs": 10,
+            "config": {}
+          }
+        },
+        "complex_types": {
+          "description": "Complex type handling",
+          "results": {
+            "serialization": {
+              "mean": 8.931210004448076e-05,
+              "min": 8.509899998898618e-05,
+              "max": 0.00010124899972652202,
+              "std": 4.6672832978727294e-06,
+              "mean_ms": 0.08931210004448076
+            },
+            "deserialization": {
+              "mean": 0.0018043790999854536,
+              "min": 0.0017924150001817907,
+              "max": 0.001827211000090756,
+              "std": 1.0608323003954703e-05,
+              "mean_ms": 1.8043790999854536
+            },
+            "total_time_ms": 1.8936912000299344,
+            "successful_runs": 10,
+            "config": {}
+          }
+        },
+        "medium_dataset": {
+          "description": "Medium-sized realistic dataset",
+          "results": {
+            "serialization": {
+              "mean": 0.0008805453999684687,
+              "min": 0.0008636970001134614,
+              "max": 0.0009329569998044462,
+              "std": 2.0668237355909933e-05,
+              "mean_ms": 0.8805453999684687
+            },
+            "deserialization": {
+              "mean": 0.1326709251999091,
+              "min": 0.13123242499978005,
+              "max": 0.13418196699967666,
+              "std": 0.0009279473134949756,
+              "mean_ms": 132.6709251999091
+            },
+            "total_time_ms": 133.55147059987758,
+            "successful_runs": 10,
+            "config": {}
+          }
+        }
+      }
+    },
+    "api_fast": {
+      "description": "Fast API responses",
+      "datasets": {
+        "small_objects": {
+          "description": "Small API-style objects",
+          "results": {
+            "serialization": {
+              "mean": 2.1750699897893355e-05,
+              "min": 2.1019000087107997e-05,
+              "max": 2.2852999791211914e-05,
+              "std": 5.456383728847755e-07,
+              "mean_ms": 0.021750699897893355
+            },
+            "deserialization": {
+              "mean": 0.0009919613000420214,
+              "min": 0.0009858560001703154,
+              "max": 0.001002417000108835,
+              "std": 4.693114178994369e-06,
+              "mean_ms": 0.9919613000420213
+            },
+            "total_time_ms": 1.0137119999399147,
+            "successful_runs": 10,
+            "config": "SerializationConfig(date_format=<DateFormat.UNIX: 'unix'>, custom_date_format=None, uuid_format='object', parse_uuids=True, dataframe_orient=<DataFrameOrient.VALUES: 'values'>, datetime_output=<OutputType.JSON_SAFE: 'json_safe'>, series_output=<OutputType.JSON_SAFE: 'json_safe'>, dataframe_output=<OutputType.JSON_SAFE: 'json_safe'>, numpy_output=<OutputType.JSON_SAFE: 'json_safe'>, nan_handling=<NanHandling.NULL: 'null'>, type_coercion=<TypeCoercion.SAFE: 'safe'>, preserve_decimals=False, preserve_complex=False, max_depth=50, max_size=100000, max_string_length=1000000, custom_serializers=None, sort_keys=False, ensure_ascii=False, check_if_serialized=False, include_type_hints=False, auto_detect_types=False, redact_fields=None, redact_patterns=None, redact_large_objects=False, redaction_replacement='<REDACTED>', include_redaction_summary=False, audit_trail=False, cache_scope=<CacheScope.OPERATION: 'operation'>, cache_size_limit=1000, cache_warn_on_limit=True, cache_metrics_enabled=False)"
+          }
+        },
+        "complex_types": {
+          "description": "Complex type handling",
+          "results": {
+            "serialization": {
+              "mean": 0.00010111540000252716,
+              "min": 9.744299995873007e-05,
+              "max": 0.00011098699997091899,
+              "std": 3.954497210409761e-06,
+              "mean_ms": 0.10111540000252717
+            },
+            "deserialization": {
+              "mean": 0.0018421738000142795,
+              "min": 0.0018147679998037347,
+              "max": 0.0019375570000192965,
+              "std": 3.5170653325687695e-05,
+              "mean_ms": 1.8421738000142795
+            },
+            "total_time_ms": 1.9432892000168067,
+            "successful_runs": 10,
+            "config": "SerializationConfig(date_format=<DateFormat.UNIX: 'unix'>, custom_date_format=None, uuid_format='object', parse_uuids=True, dataframe_orient=<DataFrameOrient.VALUES: 'values'>, datetime_output=<OutputType.JSON_SAFE: 'json_safe'>, series_output=<OutputType.JSON_SAFE: 'json_safe'>, dataframe_output=<OutputType.JSON_SAFE: 'json_safe'>, numpy_output=<OutputType.JSON_SAFE: 'json_safe'>, nan_handling=<NanHandling.NULL: 'null'>, type_coercion=<TypeCoercion.SAFE: 'safe'>, preserve_decimals=False, preserve_complex=False, max_depth=50, max_size=100000, max_string_length=1000000, custom_serializers=None, sort_keys=False, ensure_ascii=False, check_if_serialized=False, include_type_hints=False, auto_detect_types=False, redact_fields=None, redact_patterns=None, redact_large_objects=False, redaction_replacement='<REDACTED>', include_redaction_summary=False, audit_trail=False, cache_scope=<CacheScope.OPERATION: 'operation'>, cache_size_limit=1000, cache_warn_on_limit=True, cache_metrics_enabled=False)"
+          }
+        },
+        "medium_dataset": {
+          "description": "Medium-sized realistic dataset",
+          "results": {
+            "serialization": {
+              "mean": 0.0009963476000848458,
+              "min": 0.0009762780000528437,
+              "max": 0.001015501999972912,
+              "std": 1.400761982838618e-05,
+              "mean_ms": 0.9963476000848458
+            },
+            "deserialization": {
+              "mean": 0.13197231539998028,
+              "min": 0.1307282520001536,
+              "max": 0.1336497510001209,
+              "std": 0.0010452366057224509,
+              "mean_ms": 131.9723153999803
+            },
+            "total_time_ms": 132.96866300006513,
+            "successful_runs": 10,
+            "config": "SerializationConfig(date_format=<DateFormat.UNIX: 'unix'>, custom_date_format=None, uuid_format='object', parse_uuids=True, dataframe_orient=<DataFrameOrient.VALUES: 'values'>, datetime_output=<OutputType.JSON_SAFE: 'json_safe'>, series_output=<OutputType.JSON_SAFE: 'json_safe'>, dataframe_output=<OutputType.JSON_SAFE: 'json_safe'>, numpy_output=<OutputType.JSON_SAFE: 'json_safe'>, nan_handling=<NanHandling.NULL: 'null'>, type_coercion=<TypeCoercion.SAFE: 'safe'>, preserve_decimals=False, preserve_complex=False, max_depth=50, max_size=100000, max_string_length=1000000, custom_serializers=None, sort_keys=False, ensure_ascii=False, check_if_serialized=False, include_type_hints=False, auto_detect_types=False, redact_fields=None, redact_patterns=None, redact_large_objects=False, redaction_replacement='<REDACTED>', include_redaction_summary=False, audit_trail=False, cache_scope=<CacheScope.OPERATION: 'operation'>, cache_size_limit=1000, cache_warn_on_limit=True, cache_metrics_enabled=False)"
+          }
+        }
+      }
+    },
+    "ml_training": {
+      "description": "ML model serialization",
+      "datasets": {
+        "small_objects": {
+          "description": "Small API-style objects",
+          "results": {
+            "serialization": {
+              "mean": 2.438970004732255e-05,
+              "min": 2.3844999759603525e-05,
+              "max": 2.5678999918454792e-05,
+              "std": 6.018823849969746e-07,
+              "mean_ms": 0.02438970004732255
+            },
+            "deserialization": {
+              "mean": 0.000998334900032205,
+              "min": 0.0009907950002343568,
+              "max": 0.0010051919998659287,
+              "std": 5.001761661828478e-06,
+              "mean_ms": 0.998334900032205
+            },
+            "total_time_ms": 1.0227246000795276,
+            "successful_runs": 10,
+            "config": "SerializationConfig(date_format=<DateFormat.UNIX_MS: 'unix_ms'>, custom_date_format=None, uuid_format='object', parse_uuids=True, dataframe_orient=<DataFrameOrient.RECORDS: 'records'>, datetime_output=<OutputType.JSON_SAFE: 'json_safe'>, series_output=<OutputType.JSON_SAFE: 'json_safe'>, dataframe_output=<OutputType.JSON_SAFE: 'json_safe'>, numpy_output=<OutputType.JSON_SAFE: 'json_safe'>, nan_handling=<NanHandling.NULL: 'null'>, type_coercion=<TypeCoercion.AGGRESSIVE: 'aggressive'>, preserve_decimals=False, preserve_complex=False, max_depth=50, max_size=100000, max_string_length=1000000, custom_serializers=None, sort_keys=True, ensure_ascii=False, check_if_serialized=False, include_type_hints=True, auto_detect_types=False, redact_fields=None, redact_patterns=None, redact_large_objects=False, redaction_replacement='<REDACTED>', include_redaction_summary=False, audit_trail=False, cache_scope=<CacheScope.OPERATION: 'operation'>, cache_size_limit=1000, cache_warn_on_limit=True, cache_metrics_enabled=False)"
+          }
+        },
+        "complex_types": {
+          "description": "Complex type handling",
+          "results": {
+            "serialization": {
+              "mean": 0.00010651420002432133,
+              "min": 0.0001046160000441887,
+              "max": 0.00011060699989684508,
+              "std": 1.6214764179245394e-06,
+              "mean_ms": 0.10651420002432133
+            },
+            "deserialization": {
+              "mean": 0.0018350185999679524,
+              "min": 0.0018174930000895984,
+              "max": 0.0018550029999460094,
+              "std": 1.1269232744038697e-05,
+              "mean_ms": 1.8350185999679525
+            },
+            "total_time_ms": 1.9415327999922738,
+            "successful_runs": 10,
+            "config": "SerializationConfig(date_format=<DateFormat.UNIX_MS: 'unix_ms'>, custom_date_format=None, uuid_format='object', parse_uuids=True, dataframe_orient=<DataFrameOrient.RECORDS: 'records'>, datetime_output=<OutputType.JSON_SAFE: 'json_safe'>, series_output=<OutputType.JSON_SAFE: 'json_safe'>, dataframe_output=<OutputType.JSON_SAFE: 'json_safe'>, numpy_output=<OutputType.JSON_SAFE: 'json_safe'>, nan_handling=<NanHandling.NULL: 'null'>, type_coercion=<TypeCoercion.AGGRESSIVE: 'aggressive'>, preserve_decimals=False, preserve_complex=False, max_depth=50, max_size=100000, max_string_length=1000000, custom_serializers=None, sort_keys=True, ensure_ascii=False, check_if_serialized=False, include_type_hints=True, auto_detect_types=False, redact_fields=None, redact_patterns=None, redact_large_objects=False, redaction_replacement='<REDACTED>', include_redaction_summary=False, audit_trail=False, cache_scope=<CacheScope.OPERATION: 'operation'>, cache_size_limit=1000, cache_warn_on_limit=True, cache_metrics_enabled=False)"
+          }
+        },
+        "medium_dataset": {
+          "description": "Medium-sized realistic dataset",
+          "results": {
+            "serialization": {
+              "mean": 0.0011780554999404557,
+              "min": 0.0011467560002529353,
+              "max": 0.0012239109996698971,
+              "std": 2.0093959354386993e-05,
+              "mean_ms": 1.1780554999404558
+            },
+            "deserialization": {
+              "mean": 0.13244108830008372,
+              "min": 0.1312754360001236,
+              "max": 0.13411861200029307,
+              "std": 0.001026348869330539,
+              "mean_ms": 132.44108830008372
+            },
+            "total_time_ms": 133.61914380002418,
+            "successful_runs": 10,
+            "config": "SerializationConfig(date_format=<DateFormat.UNIX_MS: 'unix_ms'>, custom_date_format=None, uuid_format='object', parse_uuids=True, dataframe_orient=<DataFrameOrient.RECORDS: 'records'>, datetime_output=<OutputType.JSON_SAFE: 'json_safe'>, series_output=<OutputType.JSON_SAFE: 'json_safe'>, dataframe_output=<OutputType.JSON_SAFE: 'json_safe'>, numpy_output=<OutputType.JSON_SAFE: 'json_safe'>, nan_handling=<NanHandling.NULL: 'null'>, type_coercion=<TypeCoercion.AGGRESSIVE: 'aggressive'>, preserve_decimals=False, preserve_complex=False, max_depth=50, max_size=100000, max_string_length=1000000, custom_serializers=None, sort_keys=True, ensure_ascii=False, check_if_serialized=False, include_type_hints=True, auto_detect_types=False, redact_fields=None, redact_patterns=None, redact_large_objects=False, redaction_replacement='<REDACTED>', include_redaction_summary=False, audit_trail=False, cache_scope=<CacheScope.OPERATION: 'operation'>, cache_size_limit=1000, cache_warn_on_limit=True, cache_metrics_enabled=False)"
+          }
+        }
+      }
+    },
+    "secure_storage": {
+      "description": "Secure data storage",
+      "datasets": {
+        "small_objects": {
+          "description": "Small API-style objects",
+          "results": {
+            "serialization": {
+              "mean": 2.1864899963475182e-05,
+              "min": 2.125999981217319e-05,
+              "max": 2.3022999812383205e-05,
+              "std": 6.035433851799487e-07,
+              "mean_ms": 0.02186489996347518
+            },
+            "deserialization": {
+              "mean": 0.0010107260000040696,
+              "min": 0.0009971370000130264,
+              "max": 0.0010753330002444272,
+              "std": 2.3283796525425536e-05,
+              "mean_ms": 1.0107260000040696
+            },
+            "total_time_ms": 1.0325908999675448,
+            "successful_runs": 10,
+            "config": "SerializationConfig(date_format=<DateFormat.ISO: 'iso'>, custom_date_format=None, uuid_format='object', parse_uuids=True, dataframe_orient=<DataFrameOrient.RECORDS: 'records'>, datetime_output=<OutputType.JSON_SAFE: 'json_safe'>, series_output=<OutputType.JSON_SAFE: 'json_safe'>, dataframe_output=<OutputType.JSON_SAFE: 'json_safe'>, numpy_output=<OutputType.JSON_SAFE: 'json_safe'>, nan_handling=<NanHandling.NULL: 'null'>, type_coercion=<TypeCoercion.STRICT: 'strict'>, preserve_decimals=True, preserve_complex=True, max_depth=50, max_size=100000, max_string_length=1000000, custom_serializers=None, sort_keys=False, ensure_ascii=False, check_if_serialized=False, include_type_hints=False, auto_detect_types=False, redact_fields=None, redact_patterns=None, redact_large_objects=False, redaction_replacement='<REDACTED>', include_redaction_summary=False, audit_trail=False, cache_scope=<CacheScope.OPERATION: 'operation'>, cache_size_limit=1000, cache_warn_on_limit=True, cache_metrics_enabled=False)"
+          }
+        },
+        "complex_types": {
+          "description": "Complex type handling",
+          "results": {
+            "serialization": {
+              "mean": 0.00010745809995569289,
+              "min": 0.0001015809998534678,
+              "max": 0.00011915300001419382,
+              "std": 5.303264902884918e-06,
+              "mean_ms": 0.10745809995569289
+            },
+            "deserialization": {
+              "mean": 0.0018476106999514741,
+              "min": 0.0018325109999750566,
+              "max": 0.0018709920000219427,
+              "std": 1.170217633932816e-05,
+              "mean_ms": 1.847610699951474
+            },
+            "total_time_ms": 1.955068799907167,
+            "successful_runs": 10,
+            "config": "SerializationConfig(date_format=<DateFormat.ISO: 'iso'>, custom_date_format=None, uuid_format='object', parse_uuids=True, dataframe_orient=<DataFrameOrient.RECORDS: 'records'>, datetime_output=<OutputType.JSON_SAFE: 'json_safe'>, series_output=<OutputType.JSON_SAFE: 'json_safe'>, dataframe_output=<OutputType.JSON_SAFE: 'json_safe'>, numpy_output=<OutputType.JSON_SAFE: 'json_safe'>, nan_handling=<NanHandling.NULL: 'null'>, type_coercion=<TypeCoercion.STRICT: 'strict'>, preserve_decimals=True, preserve_complex=True, max_depth=50, max_size=100000, max_string_length=1000000, custom_serializers=None, sort_keys=False, ensure_ascii=False, check_if_serialized=False, include_type_hints=False, auto_detect_types=False, redact_fields=None, redact_patterns=None, redact_large_objects=False, redaction_replacement='<REDACTED>', include_redaction_summary=False, audit_trail=False, cache_scope=<CacheScope.OPERATION: 'operation'>, cache_size_limit=1000, cache_warn_on_limit=True, cache_metrics_enabled=False)"
+          }
+        },
+        "medium_dataset": {
+          "description": "Medium-sized realistic dataset",
+          "results": {
+            "serialization": {
+              "mean": 0.0010985822998918592,
+              "min": 0.0010816449998856115,
+              "max": 0.0011247649999859277,
+              "std": 1.267341928077485e-05,
+              "mean_ms": 1.0985822998918593
+            },
+            "deserialization": {
+              "mean": 0.13202846890008005,
+              "min": 0.13041903400016963,
+              "max": 0.13296278600000733,
+              "std": 0.000826762299587812,
+              "mean_ms": 132.02846890008004
+            },
+            "total_time_ms": 133.1270511999719,
+            "successful_runs": 10,
+            "config": "SerializationConfig(date_format=<DateFormat.ISO: 'iso'>, custom_date_format=None, uuid_format='object', parse_uuids=True, dataframe_orient=<DataFrameOrient.RECORDS: 'records'>, datetime_output=<OutputType.JSON_SAFE: 'json_safe'>, series_output=<OutputType.JSON_SAFE: 'json_safe'>, dataframe_output=<OutputType.JSON_SAFE: 'json_safe'>, numpy_output=<OutputType.JSON_SAFE: 'json_safe'>, nan_handling=<NanHandling.NULL: 'null'>, type_coercion=<TypeCoercion.STRICT: 'strict'>, preserve_decimals=True, preserve_complex=True, max_depth=50, max_size=100000, max_string_length=1000000, custom_serializers=None, sort_keys=False, ensure_ascii=False, check_if_serialized=False, include_type_hints=False, auto_detect_types=False, redact_fields=None, redact_patterns=None, redact_large_objects=False, redaction_replacement='<REDACTED>', include_redaction_summary=False, audit_trail=False, cache_scope=<CacheScope.OPERATION: 'operation'>, cache_size_limit=1000, cache_warn_on_limit=True, cache_metrics_enabled=False)"
+          }
+        }
+      }
+    },
+    "api_consistent": {
+      "description": "Consistent API responses",
+      "datasets": {
+        "small_objects": {
+          "description": "Small API-style objects",
+          "results": {
+            "serialization": {
+              "mean": 2.36571999721491e-05,
+              "min": 2.3043000055622542e-05,
+              "max": 2.47369998760405e-05,
+              "std": 4.777364809381348e-07,
+              "mean_ms": 0.0236571999721491
+            },
+            "deserialization": {
+              "mean": 0.0009993216000566464,
+              "min": 0.00098948200002269,
+              "max": 0.0010174750000260246,
+              "std": 7.551699957136465e-06,
+              "mean_ms": 0.9993216000566464
+            },
+            "total_time_ms": 1.0229788000287956,
+            "successful_runs": 10,
+            "config": "SerializationConfig(date_format=<DateFormat.ISO: 'iso'>, custom_date_format=None, uuid_format='string', parse_uuids=False, dataframe_orient=<DataFrameOrient.RECORDS: 'records'>, datetime_output=<OutputType.JSON_SAFE: 'json_safe'>, series_output=<OutputType.JSON_SAFE: 'json_safe'>, dataframe_output=<OutputType.JSON_SAFE: 'json_safe'>, numpy_output=<OutputType.JSON_SAFE: 'json_safe'>, nan_handling=<NanHandling.NULL: 'null'>, type_coercion=<TypeCoercion.SAFE: 'safe'>, preserve_decimals=True, preserve_complex=True, max_depth=50, max_size=100000, max_string_length=1000000, custom_serializers=None, sort_keys=True, ensure_ascii=True, check_if_serialized=False, include_type_hints=False, auto_detect_types=False, redact_fields=None, redact_patterns=None, redact_large_objects=False, redaction_replacement='<REDACTED>', include_redaction_summary=False, audit_trail=False, cache_scope=<CacheScope.OPERATION: 'operation'>, cache_size_limit=1000, cache_warn_on_limit=True, cache_metrics_enabled=False)"
+          }
+        },
+        "complex_types": {
+          "description": "Complex type handling",
+          "results": {
+            "serialization": {
+              "mean": 0.00010795139992296754,
+              "min": 0.00010537699972701375,
+              "max": 0.00011227099957977771,
+              "std": 1.985803956484596e-06,
+              "mean_ms": 0.10795139992296754
+            },
+            "deserialization": {
+              "mean": 0.0018371280001247214,
+              "min": 0.0018250960001751082,
+              "max": 0.0018657630002962833,
+              "std": 1.2013932961334536e-05,
+              "mean_ms": 1.8371280001247214
+            },
+            "total_time_ms": 1.945079400047689,
+            "successful_runs": 10,
+            "config": "SerializationConfig(date_format=<DateFormat.ISO: 'iso'>, custom_date_format=None, uuid_format='string', parse_uuids=False, dataframe_orient=<DataFrameOrient.RECORDS: 'records'>, datetime_output=<OutputType.JSON_SAFE: 'json_safe'>, series_output=<OutputType.JSON_SAFE: 'json_safe'>, dataframe_output=<OutputType.JSON_SAFE: 'json_safe'>, numpy_output=<OutputType.JSON_SAFE: 'json_safe'>, nan_handling=<NanHandling.NULL: 'null'>, type_coercion=<TypeCoercion.SAFE: 'safe'>, preserve_decimals=True, preserve_complex=True, max_depth=50, max_size=100000, max_string_length=1000000, custom_serializers=None, sort_keys=True, ensure_ascii=True, check_if_serialized=False, include_type_hints=False, auto_detect_types=False, redact_fields=None, redact_patterns=None, redact_large_objects=False, redaction_replacement='<REDACTED>', include_redaction_summary=False, audit_trail=False, cache_scope=<CacheScope.OPERATION: 'operation'>, cache_size_limit=1000, cache_warn_on_limit=True, cache_metrics_enabled=False)"
+          }
+        },
+        "medium_dataset": {
+          "description": "Medium-sized realistic dataset",
+          "results": {
+            "serialization": {
+              "mean": 0.0012004113000330108,
+              "min": 0.0011857100002998777,
+              "max": 0.0012303839998821786,
+              "std": 1.3916711822823055e-05,
+              "mean_ms": 1.2004113000330108
+            },
+            "deserialization": {
+              "mean": 0.13192538720004449,
+              "min": 0.13084099500019875,
+              "max": 0.13303823700016437,
+              "std": 0.0005651006723775172,
+              "mean_ms": 131.9253872000445
+            },
+            "total_time_ms": 133.1257985000775,
+            "successful_runs": 10,
+            "config": "SerializationConfig(date_format=<DateFormat.ISO: 'iso'>, custom_date_format=None, uuid_format='string', parse_uuids=False, dataframe_orient=<DataFrameOrient.RECORDS: 'records'>, datetime_output=<OutputType.JSON_SAFE: 'json_safe'>, series_output=<OutputType.JSON_SAFE: 'json_safe'>, dataframe_output=<OutputType.JSON_SAFE: 'json_safe'>, numpy_output=<OutputType.JSON_SAFE: 'json_safe'>, nan_handling=<NanHandling.NULL: 'null'>, type_coercion=<TypeCoercion.SAFE: 'safe'>, preserve_decimals=True, preserve_complex=True, max_depth=50, max_size=100000, max_string_length=1000000, custom_serializers=None, sort_keys=True, ensure_ascii=True, check_if_serialized=False, include_type_hints=False, auto_detect_types=False, redact_fields=None, redact_patterns=None, redact_large_objects=False, redaction_replacement='<REDACTED>', include_redaction_summary=False, audit_trail=False, cache_scope=<CacheScope.OPERATION: 'operation'>, cache_size_limit=1000, cache_warn_on_limit=True, cache_metrics_enabled=False)"
+          }
+        }
+      }
+    },
+    "summary": {
+      "configurations_tested": [
+        "default",
+        "api_fast",
+        "ml_training",
+        "secure_storage",
+        "api_consistent"
+      ],
+      "fastest_configuration": {
+        "small_objects": {
+          "config": "default",
+          "time_ms": 1.0095529999489372
+        },
+        "complex_types": {
+          "config": "default",
+          "time_ms": 1.8936912000299344
+        },
+        "medium_dataset": {
+          "config": "api_fast",
+          "time_ms": 132.96866300006513
+        }
+      },
+      "best_for_use_case": {
+        "speed_critical": "default",
+        "complex_types": "default",
+        "large_datasets": "api_fast"
+      },
+      "performance_comparison": {
+        "default": {
+          "small_objects": 1.0095529999489372,
+          "complex_types": 1.8936912000299344,
+          "medium_dataset": 133.55147059987758
+        },
+        "api_fast": {
+          "small_objects": 1.0137119999399147,
+          "complex_types": 1.9432892000168067,
+          "medium_dataset": 132.96866300006513
+        },
+        "ml_training": {
+          "small_objects": 1.0227246000795276,
+          "complex_types": 1.9415327999922738,
+          "medium_dataset": 133.61914380002418
+        },
+        "secure_storage": {
+          "small_objects": 1.0325908999675448,
+          "complex_types": 1.955068799907167,
+          "medium_dataset": 133.1270511999719
+        },
+        "api_consistent": {
+          "small_objects": 1.0229788000287956,
+          "complex_types": 1.945079400047689,
+          "medium_dataset": 133.1257985000775
+        }
+      }
+    }
+  }
+}
