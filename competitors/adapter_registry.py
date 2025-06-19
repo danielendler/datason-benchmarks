@@ -9,7 +9,7 @@ Provides a unified interface for benchmarking against various competitors.
 
 import importlib
 import logging
-from typing import Dict, Any, Optional, Callable, List
+from typing import Dict, Any, Optional, Callable, List, Set
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +44,10 @@ class CompetitorAdapter:
     def supports_binary(self) -> bool:
         """Whether this competitor produces binary output."""
         return False
+    
+    def get_capabilities(self) -> Set[str]:
+        """Get the data type capabilities of this adapter."""
+        return {"json_safe"}  # Default: only basic JSON types
 
 
 class DataSONAdapter(CompetitorAdapter):
@@ -61,6 +65,163 @@ class DataSONAdapter(CompetitorAdapter):
         if not self.available or self.module is None:
             raise RuntimeError("DataSON not available")
         return self.module.deserialize(data)
+    
+    def get_capabilities(self) -> Set[str]:
+        return {"json_safe", "object_enhanced", "ml_complex"}
+
+
+class DataSONAPIAdapter(CompetitorAdapter):
+    """DataSON API-optimized adapter using dump_api()."""
+    
+    def __init__(self):
+        super().__init__("datason_api", "datason")
+    
+    def serialize(self, data: Any) -> str:
+        if not self.available or self.module is None:
+            raise RuntimeError("DataSON not available")
+        if hasattr(self.module, 'dump_api'):
+            return self.module.dump_api(data)
+        else:
+            # Fallback to regular serialize for older versions
+            return self.module.serialize(data)
+    
+    def deserialize(self, data: str) -> Any:
+        if not self.available or self.module is None:
+            raise RuntimeError("DataSON not available")
+        if hasattr(self.module, 'load_smart'):
+            return self.module.load_smart(data)
+        else:
+            return self.module.deserialize(data)
+    
+    def get_capabilities(self) -> Set[str]:
+        return {"json_safe", "object_enhanced"}
+
+
+class DataSONMLAdapter(CompetitorAdapter):
+    """DataSON ML-optimized adapter using dump_ml()."""
+    
+    def __init__(self):
+        super().__init__("datason_ml", "datason")
+    
+    def serialize(self, data: Any) -> str:
+        if not self.available or self.module is None:
+            raise RuntimeError("DataSON not available")
+        if hasattr(self.module, 'dump_ml'):
+            return self.module.dump_ml(data)
+        else:
+            return self.module.serialize(data)
+    
+    def deserialize(self, data: str) -> Any:
+        if not self.available or self.module is None:
+            raise RuntimeError("DataSON not available")
+        if hasattr(self.module, 'load_smart'):
+            return self.module.load_smart(data)
+        else:
+            return self.module.deserialize(data)
+    
+    def get_capabilities(self) -> Set[str]:
+        return {"json_safe", "object_enhanced", "ml_complex"}
+
+
+class DataSONFastAdapter(CompetitorAdapter):
+    """DataSON performance-optimized adapter using dump_fast()."""
+    
+    def __init__(self):
+        super().__init__("datason_fast", "datason")
+    
+    def serialize(self, data: Any) -> str:
+        if not self.available or self.module is None:
+            raise RuntimeError("DataSON not available")
+        if hasattr(self.module, 'dump_fast'):
+            return self.module.dump_fast(data)
+        else:
+            return self.module.serialize(data)
+    
+    def deserialize(self, data: str) -> Any:
+        if not self.available or self.module is None:
+            raise RuntimeError("DataSON not available")
+        if hasattr(self.module, 'load_smart'):
+            return self.module.load_smart(data)
+        else:
+            return self.module.deserialize(data)
+    
+    def get_capabilities(self) -> Set[str]:
+        return {"json_safe", "object_enhanced"}
+
+
+class DataSONSecureAdapter(CompetitorAdapter):
+    """DataSON security-focused adapter using dump_secure() with PII redaction."""
+    
+    def __init__(self):
+        super().__init__("datason_secure", "datason")
+    
+    def serialize(self, data: Any) -> str:
+        if not self.available or self.module is None:
+            raise RuntimeError("DataSON not available")
+        if hasattr(self.module, 'dump_secure'):
+            return self.module.dump_secure(data)
+        else:
+            # Fallback to regular serialize for older versions
+            return self.module.serialize(data)
+    
+    def deserialize(self, data: str) -> Any:
+        if not self.available or self.module is None:
+            raise RuntimeError("DataSON not available")
+        if hasattr(self.module, 'load_smart'):
+            return self.module.load_smart(data)
+        else:
+            return self.module.deserialize(data)
+    
+    def get_capabilities(self) -> Set[str]:
+        return {"json_safe", "object_enhanced", "ml_complex", "security_enhanced"}
+
+
+class DataSONSmartAdapter(CompetitorAdapter):
+    """DataSON intelligent loading adapter using load_smart() for ~90% accuracy."""
+    
+    def __init__(self):
+        super().__init__("datason_smart", "datason")
+    
+    def serialize(self, data: Any) -> str:
+        if not self.available or self.module is None:
+            raise RuntimeError("DataSON not available")
+        return self.module.serialize(data)
+    
+    def deserialize(self, data: str) -> Any:
+        if not self.available or self.module is None:
+            raise RuntimeError("DataSON not available")
+        if hasattr(self.module, 'load_smart'):
+            return self.module.load_smart(data)
+        else:
+            # Fallback to regular deserialize
+            return self.module.deserialize(data)
+    
+    def get_capabilities(self) -> Set[str]:
+        return {"json_safe", "object_enhanced", "ml_complex", "smart_loading"}
+
+
+class DataSONPerfectAdapter(CompetitorAdapter):
+    """DataSON perfect reconstruction adapter using load_perfect() for 100% accuracy."""
+    
+    def __init__(self):
+        super().__init__("datason_perfect", "datason")
+    
+    def serialize(self, data: Any) -> str:
+        if not self.available or self.module is None:
+            raise RuntimeError("DataSON not available")
+        return self.module.serialize(data)
+    
+    def deserialize(self, data: str) -> Any:
+        if not self.available or self.module is None:
+            raise RuntimeError("DataSON not available")
+        if hasattr(self.module, 'load_perfect'):
+            return self.module.load_perfect(data)
+        else:
+            # Fallback to regular deserialize
+            return self.module.deserialize(data)
+    
+    def get_capabilities(self) -> Set[str]:
+        return {"json_safe", "object_enhanced", "ml_complex", "perfect_loading"}
 
 
 class OrjsonAdapter(CompetitorAdapter):
@@ -75,7 +236,7 @@ class OrjsonAdapter(CompetitorAdapter):
         return self.module.dumps(data)
     
     def deserialize(self, data: bytes) -> Any:
-        if not self.available:
+        if not self.available or self.module is None:
             raise RuntimeError("orjson not available")
         if isinstance(data, str):
             data = data.encode()
@@ -83,6 +244,9 @@ class OrjsonAdapter(CompetitorAdapter):
     
     def supports_binary(self) -> bool:
         return True
+    
+    def get_capabilities(self) -> Set[str]:
+        return {"json_safe"}
 
 
 class UjsonAdapter(CompetitorAdapter):
@@ -92,14 +256,17 @@ class UjsonAdapter(CompetitorAdapter):
         super().__init__("ujson", "ujson")
     
     def serialize(self, data: Any) -> str:
-        if not self.available:
+        if not self.available or self.module is None:
             raise RuntimeError("ujson not available")
         return self.module.dumps(data)
     
     def deserialize(self, data: str) -> Any:
-        if not self.available:
+        if not self.available or self.module is None:
             raise RuntimeError("ujson not available")
         return self.module.loads(data)
+    
+    def get_capabilities(self) -> Set[str]:
+        return {"json_safe"}
 
 
 class JsonAdapter(CompetitorAdapter):
@@ -109,14 +276,17 @@ class JsonAdapter(CompetitorAdapter):
         super().__init__("json", "json")
     
     def serialize(self, data: Any) -> str:
-        if not self.available:
+        if not self.available or self.module is None:
             raise RuntimeError("json not available")
         return self.module.dumps(data, default=str, ensure_ascii=False)
     
     def deserialize(self, data: str) -> Any:
-        if not self.available:
+        if not self.available or self.module is None:
             raise RuntimeError("json not available")
         return self.module.loads(data)
+    
+    def get_capabilities(self) -> Set[str]:
+        return {"json_safe"}
 
 
 class PickleAdapter(CompetitorAdapter):
@@ -137,6 +307,9 @@ class PickleAdapter(CompetitorAdapter):
     
     def supports_binary(self) -> bool:
         return True
+    
+    def get_capabilities(self) -> Set[str]:
+        return {"json_safe", "object_enhanced", "ml_complex"}
 
 
 class JsonpickleAdapter(CompetitorAdapter):
@@ -154,6 +327,9 @@ class JsonpickleAdapter(CompetitorAdapter):
         if not self.available:
             raise RuntimeError("jsonpickle not available")
         return self.module.decode(data)
+    
+    def get_capabilities(self) -> Set[str]:
+        return {"json_safe", "object_enhanced"}
 
 
 class MsgpackAdapter(CompetitorAdapter):
@@ -174,6 +350,9 @@ class MsgpackAdapter(CompetitorAdapter):
     
     def supports_binary(self) -> bool:
         return True
+    
+    def get_capabilities(self) -> Set[str]:
+        return {"json_safe", "basic_objects"}
 
 
 class CompetitorRegistry:
@@ -185,26 +364,28 @@ class CompetitorRegistry:
     
     def _register_adapters(self):
         """Register all available adapters."""
-        adapter_classes = [
-            DataSONAdapter,
-            OrjsonAdapter, 
-            UjsonAdapter,
-            JsonAdapter,
-            PickleAdapter,
-            JsonpickleAdapter,
-            MsgpackAdapter
+        adapters = [
+            # DataSON variants - Phase 1 & 2 API methods
+            DataSONAdapter(),
+            DataSONAPIAdapter(),
+            DataSONMLAdapter(),
+            DataSONFastAdapter(),
+            DataSONSecureAdapter(),
+            DataSONSmartAdapter(),
+            DataSONPerfectAdapter(),
+            
+            # Competitive libraries
+            OrjsonAdapter(),
+            UjsonAdapter(),
+            JsonAdapter(),
+            PickleAdapter(),
+            JsonpickleAdapter(),
+            MsgpackAdapter(),
         ]
         
-        for adapter_class in adapter_classes:
-            try:
-                adapter = adapter_class()
-                self.adapters[adapter.name] = adapter
-                if adapter.available:
-                    logger.info(f"✅ {adapter.name} available (v{adapter.version})")
-                else:
-                    logger.debug(f"❌ {adapter.name} not available")
-            except Exception as e:
-                logger.warning(f"Failed to initialize {adapter_class.__name__}: {e}")
+        for adapter in adapters:
+            self.adapters[adapter.name] = adapter
+            logger.debug(f"Registered adapter: {adapter.name} (available: {adapter.available})")
     
     def get_available_competitors(self) -> Dict[str, Dict[str, Any]]:
         """Get all available competitors with their metadata."""
@@ -213,11 +394,19 @@ class CompetitorRegistry:
                 "version": adapter.version,
                 "available": adapter.available,
                 "supports_binary": adapter.supports_binary(),
+                "capabilities": list(adapter.get_capabilities()),
                 "module": adapter.library_module
             }
             for name, adapter in self.adapters.items()
             if adapter.available
         }
+    
+    def get_competitors_by_capability(self, capability: str) -> List[str]:
+        """Get competitors that support a specific capability."""
+        return [
+            name for name, adapter in self.adapters.items()
+            if adapter.available and capability in adapter.get_capabilities()
+        ]
     
     def get_adapter(self, name: str) -> Optional[CompetitorAdapter]:
         """Get a specific adapter by name."""

@@ -12,6 +12,9 @@ import numpy as np
 import pandas as pd
 from faker import Faker
 import warnings
+from decimal import Decimal
+import uuid
+from datetime import timezone
 
 # Suppress DataSON datetime parsing warnings for cleaner logs  
 # These warnings are caused by overly aggressive datetime detection in DataSON v0.9.0
@@ -723,6 +726,202 @@ class SyntheticDataGenerator:
         print(f"Summary saved to {summary_file}")
         
         return generated_files, summary_file
+
+    def generate_phase2_security_data(self, count: int = 100) -> List[Dict[str, Any]]:
+        """
+        Generate data with PII and sensitive information for security testing.
+        Tests DataSON's dump_secure() PII redaction capabilities.
+        """
+        datasets = []
+        for i in range(count):
+            # Create realistic user data with PII
+            user_data = {
+                "user_profile": {
+                    "user_id": str(uuid.uuid4()),
+                    "email": self.fake.email(),
+                    "first_name": self.fake.first_name(),
+                    "last_name": self.fake.last_name(),
+                    "phone": self.fake.phone_number(),
+                    "ssn": self.fake.ssn(),
+                    "address": {
+                        "street": self.fake.street_address(),
+                        "city": self.fake.city(),
+                        "state": self.fake.state(),
+                        "zip_code": self.fake.zipcode(),
+                        "country": self.fake.country()
+                    },
+                    "date_of_birth": self.fake.date_of_birth(minimum_age=18, maximum_age=80),
+                    "created_at": datetime.now(timezone.utc)
+                },
+                "financial_data": {
+                    "account_number": self.fake.bban(),
+                    "routing_number": self.fake.random_number(digits=9, fix_len=True),
+                    "credit_score": self.fake.random_int(min=300, max=850),
+                    "annual_income": Decimal(str(self.fake.random_int(min=25000, max=200000))),
+                    "bank_balance": Decimal(str(self.fake.random_int(min=100, max=50000))),
+                    "transactions": [
+                        {
+                            "transaction_id": str(uuid.uuid4()),
+                            "amount": Decimal(str(self.fake.random_int(min=1, max=1000))),
+                            "merchant": self.fake.company(),
+                            "timestamp": self.fake.date_time_between(start_date='-30d', end_date='now')
+                        } for _ in range(self.fake.random_int(min=1, max=10))
+                    ]
+                },
+                "medical_info": {
+                    "patient_id": str(uuid.uuid4()),
+                    "conditions": self.fake.words(nb=3),
+                    "medications": self.fake.words(nb=2),
+                    "doctor_notes": self.fake.text(max_nb_chars=200),
+                    "insurance_number": self.fake.random_number(digits=12, fix_len=True)
+                },
+                "metadata": {
+                    "source": "security_test",
+                    "generated_at": datetime.now(timezone.utc),
+                    "sensitivity_level": "HIGH_PII"
+                }
+            }
+            datasets.append(user_data)
+        
+        return datasets
+
+    def generate_phase2_accuracy_data(self, count: int = 50) -> List[Dict[str, Any]]:
+        """
+        Generate complex nested objects for accuracy testing.
+        Tests load_smart() vs load_perfect() reconstruction accuracy.
+        """
+        datasets = []
+        for i in range(count):
+            # Create deeply nested object with various edge cases
+            complex_data = {
+                "nested_objects": {
+                    "level_1": {
+                        "level_2": {
+                            "level_3": {
+                                "level_4": {
+                                    "deep_value": f"nested_value_{i}",
+                                    "deep_datetime": datetime.now(timezone.utc),
+                                    "deep_decimal": Decimal("123.456789"),
+                                    "deep_uuid": uuid.uuid4()
+                                }
+                            }
+                        }
+                    }
+                },
+                "mixed_types_list": [
+                    "string_item",
+                    42,
+                    3.14159,
+                    True,
+                    None,
+                    datetime.now(timezone.utc),
+                    uuid.uuid4(),
+                    Decimal("999.999"),
+                    {"nested": "dict"},
+                    [1, 2, 3, {"deep": "list"}]
+                ],
+                "edge_cases": {
+                    "empty_dict": {},
+                    "empty_list": [],
+                    "null_value": None,
+                    "unicode_text": "Hello 世界 🌍 🚀 🎯",
+                    "special_chars": "!@#$%^&*()_+-=[]{}|;':\",./<>?",
+                    "very_long_string": "x" * 1000,
+                    "scientific_notation": Decimal("1.23e-10"),
+                    "large_number": Decimal("99999999999999999999.99999999999999")
+                },
+                "datetime_variants": {
+                    "utc_now": datetime.now(timezone.utc),
+                    "local_now": datetime.now(),
+                    "past_date": datetime(2020, 1, 1, 12, 0, 0),
+                    "future_date": datetime(2030, 12, 31, 23, 59, 59),
+                    "microseconds": datetime.now(timezone.utc).replace(microsecond=123456)
+                },
+                "metadata": {
+                    "test_type": "accuracy_challenge",
+                    "complexity_score": 95,
+                    "generated_at": datetime.now(timezone.utc)
+                }
+            }
+            datasets.append(complex_data)
+        
+        return datasets
+
+    def generate_phase2_ml_framework_data(self, count: int = 25) -> List[Dict[str, Any]]:
+        """
+        Generate ML framework objects for testing DataSON's ML capabilities.
+        Tests integration with numpy, pandas, and optionally torch/tensorflow.
+        """
+        datasets = []
+        for i in range(count):
+            ml_data = {
+                "experiment_metadata": {
+                    "experiment_id": str(uuid.uuid4()),
+                    "model_name": f"experiment_model_{i}",
+                    "created_at": datetime.now(timezone.utc),
+                    "researcher": self.fake.name(),
+                    "framework": "mixed"
+                },
+                "basic_arrays": {
+                    "feature_vector": [float(x) for x in range(10)],
+                    "label_vector": [i % 2 for i in range(10)],
+                    "weights": [Decimal(str(self.fake.random.random())) for _ in range(5)]
+                },
+                "dataset_info": {
+                    "name": f"synthetic_dataset_{i}",
+                    "rows": self.fake.random_int(min=1000, max=10000),
+                    "features": self.fake.random_int(min=10, max=100),
+                    "target_type": self.fake.random_element(["classification", "regression"]),
+                    "created": datetime.now(timezone.utc)
+                },
+                "hyperparameters": {
+                    "learning_rate": Decimal(str(self.fake.random.uniform(0.001, 0.1))),
+                    "batch_size": self.fake.random_element([16, 32, 64, 128]),
+                    "epochs": self.fake.random_int(min=10, max=100),
+                    "dropout_rate": Decimal(str(self.fake.random.uniform(0.1, 0.5))),
+                    "optimizer": self.fake.random_element(["adam", "sgd", "rmsprop"])
+                },
+                "performance_metrics": {
+                    "train_accuracy": Decimal(str(self.fake.random.uniform(0.7, 0.99))),
+                    "val_accuracy": Decimal(str(self.fake.random.uniform(0.65, 0.95))),
+                    "train_loss": Decimal(str(self.fake.random.uniform(0.01, 0.5))),
+                    "val_loss": Decimal(str(self.fake.random.uniform(0.02, 0.6))),
+                    "f1_score": Decimal(str(self.fake.random.uniform(0.7, 0.95))),
+                    "precision": Decimal(str(self.fake.random.uniform(0.7, 0.95))),
+                    "recall": Decimal(str(self.fake.random.uniform(0.7, 0.95)))
+                }
+            }
+            
+            # Try to add numpy arrays if available
+            try:
+                import numpy as np
+                ml_data["numpy_arrays"] = {
+                    "feature_matrix": np.random.rand(10, 5).tolist(),  # Convert to list for JSON compatibility
+                    "target_array": np.random.randint(0, 2, size=10).tolist(),
+                    "weights_matrix": np.random.normal(0, 1, size=(5, 3)).tolist()
+                }
+            except ImportError:
+                ml_data["numpy_arrays"] = "numpy_not_available"
+            
+            # Try to add pandas structures if available
+            try:
+                import pandas as pd
+                df_data = {
+                    "feature_1": [self.fake.random.random() for _ in range(5)],
+                    "feature_2": [self.fake.random.random() for _ in range(5)],
+                    "target": [self.fake.random_int(0, 1) for _ in range(5)]
+                }
+                ml_data["pandas_data"] = {
+                    "dataframe_dict": df_data,
+                    "series_data": list(pd.Series([1, 2, 3, 4, 5])),
+                    "index_info": "RangeIndex(start=0, stop=5, step=1)"
+                }
+            except ImportError:
+                ml_data["pandas_data"] = "pandas_not_available"
+            
+            datasets.append(ml_data)
+        
+        return datasets
 
 if __name__ == '__main__':
     # Generate all synthetic data

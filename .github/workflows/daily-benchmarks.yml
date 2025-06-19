@@ -9,14 +9,15 @@ on:
       benchmark_type:
         description: 'Type of benchmark to run'
         required: false
-        default: 'all'
+        default: 'complete'
         type: choice
         options:
           - 'quick'
           - 'competitive'
           - 'configurations'
           - 'versioning'
-          - 'all'
+          - 'complete'
+          - 'phase2'
 
 permissions:
   contents: write
@@ -85,7 +86,7 @@ jobs:
 
     - name: 📊 Run CI benchmark suite
       run: |
-        BENCHMARK_TYPE="${{ github.event.inputs.benchmark_type || 'all' }}"
+        BENCHMARK_TYPE="${{ github.event.inputs.benchmark_type || 'complete' }}"
         echo "🚀 Running CI benchmark type: $BENCHMARK_TYPE"
         
         # Ensure results directory exists
@@ -104,12 +105,19 @@ jobs:
           "versioning")
             python scripts/run_benchmarks.py --versioning --generate-report
             ;;
+          "complete")
+            python scripts/run_benchmarks.py --complete --generate-report
+            ;;
+          "phase2")
+            python scripts/run_benchmarks.py --phase2 --generate-report
+            ;;
           "all")
-            python scripts/run_benchmarks.py --all --generate-report
+            # Backward compatibility - map to complete
+            python scripts/run_benchmarks.py --complete --generate-report
             ;;
           *)
-            echo "Unknown benchmark type: $BENCHMARK_TYPE, running all"
-            python scripts/run_benchmarks.py --all --generate-report
+            echo "Unknown benchmark type: $BENCHMARK_TYPE, running complete"
+            python scripts/run_benchmarks.py --complete --generate-report
             ;;
         esac
       env:
@@ -159,7 +167,7 @@ jobs:
         if ! git diff --staged --quiet; then
           commit_msg="📊 CI Benchmark Results - $(date -u '+%Y-%m-%d %H:%M UTC')
 
-        Suite: ${{ github.event.inputs.benchmark_type || 'all' }}
+        Suite: ${{ github.event.inputs.benchmark_type || 'complete' }}
         Run ID: ${{ github.run_id }}
         SHA: ${{ github.sha }}"
           
