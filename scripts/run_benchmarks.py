@@ -188,6 +188,188 @@ class BenchmarkRunner:
         logger.info("✅ Phase 2 benchmark completed")
         return results
 
+    def run_phase3_benchmark(self, test_type: str = "complete") -> Dict[str, Any]:
+        """Run Phase 3 realistic use case scenarios benchmark."""
+        logger.info("🌍 Running Phase 3 Realistic Use Case Scenarios...")
+        
+        from benchmarks.phase3.phase3_suite import Phase3BenchmarkSuite
+        phase3_suite = Phase3BenchmarkSuite()
+        
+        if test_type == "domain":
+            logger.info("🎯 Testing domain-specific scenarios only...")
+            results = {
+                "suite_type": "phase3_domain",
+                "metadata": self.metadata,
+                "domain_scenarios": phase3_suite.run_domain_focused(iterations=10)
+            }
+        elif test_type == "success":
+            logger.info("📊 Testing success rate analysis only...")
+            results = {
+                "suite_type": "phase3_success",
+                "metadata": self.metadata,
+                "success_analysis": phase3_suite.run_success_focused(iterations=50)
+            }
+        else:  # complete
+            logger.info("🎯 Running complete Phase 3 suite...")
+            results = {
+                "suite_type": "phase3_complete",
+                "metadata": self.metadata,
+                "phase3": phase3_suite.run_phase3_complete(iterations=10)
+            }
+        
+        self._save_results(results, f"phase3_{test_type}")
+        
+        # Print summary
+        self._print_phase3_summary(results)
+        
+        logger.info("✅ Phase 3 benchmark completed")
+        return results
+
+    def run_phase4_enhanced_report(self, result_file: str) -> str:
+        """Generate Phase 4 enhanced HTML report."""
+        logger.info(f"🎨 Generating Phase 4 enhanced report for {result_file}")
+        
+        from scripts.phase4_enhanced_reports import Phase4ReportGenerator
+        generator = Phase4ReportGenerator()
+        
+        try:
+            report_path = generator.generate_comprehensive_report(result_file)
+            logger.info(f"✅ Phase 4 enhanced report generated: {report_path}")
+            return report_path
+        except Exception as e:
+            logger.error(f"Failed to generate Phase 4 report: {e}")
+            raise
+    
+    def run_phase4_decision_engine(self, domain: str) -> Dict[str, Any]:
+        """Run Phase 4 decision engine for library recommendation."""
+        logger.info(f"🤖 Running Phase 4 decision engine for {domain} domain")
+        
+        from scripts.phase4_decision_engine import DecisionEngine, create_requirements_from_questionnaire, Domain
+        
+        # Map CLI domain to questionnaire format
+        domain_map = {
+            'web': 'web',
+            'ml': 'ml', 
+            'finance': 'finance',
+            'data': 'data',
+            'enterprise': 'enterprise',
+            'performance': 'performance'
+        }
+        
+        # Create sample requirements for the domain
+        questionnaire_answers = {
+            "domain": domain_map.get(domain, 'general'),
+            "speed_priority": "high" if domain == 'performance' else "medium",
+            "accuracy_priority": "high",
+            "security_priority": "high" if domain == 'finance' else "medium",
+            "compatibility_priority": "high",
+            "data_types": self._get_typical_data_types_for_domain(domain),
+            "volume_level": "high" if domain == 'performance' else "medium",
+            "team_expertise": "intermediate",
+            "existing_stack": [],
+            "compliance_needs": domain == 'finance'
+        }
+        
+        requirements = create_requirements_from_questionnaire(questionnaire_answers)
+        engine = DecisionEngine()
+        
+        recommendations = engine.recommend_library(requirements)
+        
+        # Print recommendations
+        if recommendations:
+            print(f"\n🎯 Top Recommendations for {domain} domain:")
+            for i, rec in enumerate(recommendations[:3], 1):
+                method_str = f".{rec.method_name}" if rec.method_name else ""
+                print(f"\n{i}. {rec.library_name}{method_str}")
+                print(f"   Score: {rec.total_score:.2f} | Confidence: {rec.confidence:.2f}")
+                print(f"   Fit: {rec.use_case_fit}")
+                if rec.pros:
+                    print(f"   ✅ {rec.pros[0]}")
+                if rec.cons:
+                    print(f"   ⚠️  {rec.cons[0]}")
+            
+            # Detailed explanation for top recommendation
+            explanation = engine.explain_recommendation(recommendations[0], requirements)
+            print(f"\n📋 Why {recommendations[0].library_name}?")
+            print(f"   {explanation['implementation_guidance']['basic_usage'][:100]}...")
+        
+        return {
+            "domain": domain,
+            "recommendations": [
+                {
+                    "library": rec.library_name,
+                    "method": rec.method_name,
+                    "score": rec.total_score,
+                    "confidence": rec.confidence,
+                    "fit": rec.use_case_fit,
+                    "pros": rec.pros,
+                    "cons": rec.cons
+                }
+                for rec in recommendations
+            ]
+        }
+    
+    def run_phase4_trend_analysis(self) -> Dict[str, Any]:
+        """Run Phase 4 trend analysis and regression detection."""
+        logger.info("📈 Running Phase 4 trend analysis...")
+        
+        from scripts.phase4_trend_analyzer import TrendAnalyzer
+        
+        analyzer = TrendAnalyzer()
+        
+        # Find recent result files to ingest
+        recent_files = list(self.output_dir.glob("*.json"))
+        
+        # Ingest recent results
+        ingested_count = 0
+        for result_file in recent_files[-5:]:  # Last 5 files
+            try:
+                analyzer.ingest_benchmark_results(result_file.name)
+                ingested_count += 1
+            except Exception as e:
+                logger.warning(f"Failed to ingest {result_file.name}: {e}")
+        
+        logger.info(f"📊 Ingested {ingested_count} result files")
+        
+        # Detect regressions
+        regressions = analyzer.detect_performance_regressions(lookback_days=30)
+        
+        # Generate trend report
+        trend_report = analyzer.generate_trend_report(lookback_days=30)
+        
+        # Print summary
+        if regressions:
+            print(f"\n🚨 Detected {len(regressions)} performance regressions:")
+            for reg in regressions[:3]:  # Show first 3
+                print(f"   • {reg['severity'].upper()}: {reg['description']}")
+        else:
+            print("\n✅ No performance regressions detected")
+        
+        print(f"\n📈 Trend Report Summary:")
+        summary = trend_report['summary']
+        print(f"   • {summary['total_benchmark_runs']} benchmark runs analyzed")
+        print(f"   • {summary['unique_libraries_tested']} libraries tested")
+        print(f"   • {summary['recent_alerts']} recent alerts")
+        
+        if trend_report['performance_insights']:
+            print(f"\n💡 Key Insights:")
+            for insight in trend_report['performance_insights'][:3]:
+                print(f"   • {insight}")
+        
+        return trend_report
+    
+    def _get_typical_data_types_for_domain(self, domain: str) -> list:
+        """Get typical data types used in each domain."""
+        domain_data_types = {
+            'web': ['datetime', 'uuid'],
+            'ml': ['numpy', 'pandas', 'datetime'],
+            'finance': ['decimal', 'datetime', 'uuid'],
+            'data': ['datetime', 'decimal', 'numpy'],
+            'enterprise': ['datetime', 'uuid', 'decimal'],
+            'performance': ['datetime']
+        }
+        return domain_data_types.get(domain, ['datetime'])
+
     def run_complete_benchmark(self) -> Dict[str, Any]:
         """Complete enhanced benchmark suite with all tests including Phase 2."""
         logger.info("🎯 Running Complete Enhanced Benchmark Suite with Phase 2...")
@@ -339,6 +521,64 @@ class BenchmarkRunner:
         
         print("\n" + "="*80)
 
+    def _print_phase3_summary(self, results: Dict[str, Any]):
+        """Print Phase 3 benchmark summary."""
+        print("\n" + "="*80)
+        print("🌍 PHASE 3 REALISTIC USE CASE SCENARIOS SUMMARY")
+        print("="*80)
+        
+        if "domain_scenarios" in results:
+            print("\n🎯 DOMAIN-SPECIFIC SCENARIOS")
+            domain = results["domain_scenarios"]
+            if "scenarios" in domain:
+                scenario_count = len(domain["scenarios"])
+                print(f"   Tested {scenario_count} realistic scenarios across multiple domains")
+                
+                # Show domain breakdown
+                domains = set()
+                for scenario_data in domain["scenarios"].values():
+                    if "domain" in scenario_data:
+                        domains.add(scenario_data["domain"])
+                
+                for domain_name in sorted(domains):
+                    print(f"   • {domain_name.replace('_', ' ').title()}")
+        
+        if "success_analysis" in results:
+            print("\n📊 SUCCESS RATE ANALYSIS")
+            success = results["success_analysis"]
+            if "overall_analysis" in success and "cross_dataset_performance" in success["overall_analysis"]:
+                performance = success["overall_analysis"]["cross_dataset_performance"]
+                
+                # Show top 3 most reliable
+                top_performers = sorted(
+                    performance.items(),
+                    key=lambda x: x[1]["avg_success_rate"],
+                    reverse=True
+                )[:3]
+                
+                print("   Top 3 Most Reliable Libraries:")
+                for i, (name, data) in enumerate(top_performers, 1):
+                    rate = data["avg_success_rate"] * 100
+                    acc = data["avg_accuracy"] * 100
+                    print(f"   {i}. {name}: {rate:.1f}% success, {acc:.1f}% accuracy")
+        
+        if "phase3" in results:
+            phase3 = results["phase3"]
+            if "summary" in phase3:
+                summary = phase3["summary"]
+                
+                print("\n🎯 PHASE 3 KEY INSIGHTS")
+                if "key_findings" in summary:
+                    for finding in summary["key_findings"]:
+                        print(f"   • {finding}")
+                
+                if "performance_recommendations" in summary:
+                    print("\n🚀 OPTIMIZATION RECOMMENDATIONS")
+                    for rec in summary["performance_recommendations"]:
+                        print(f"   • {rec}")
+        
+        print("\n" + "="*80)
+
     def _save_results(self, results: Dict[str, Any], benchmark_type: str):
         """Save benchmark results to file."""
         timestamp = int(time.time())
@@ -383,6 +623,23 @@ def main():
     parser.add_argument('--phase2-ml', action='store_true',
                        help='Run Phase 2 ML framework integration only')
     
+    # Phase 3 specific options
+    parser.add_argument('--phase3', action='store_true',
+                       help='Run Phase 3 realistic use case scenarios benchmark')
+    parser.add_argument('--phase3-domain', action='store_true',
+                       help='Run Phase 3 domain-specific scenarios only')
+    parser.add_argument('--phase3-success', action='store_true',
+                       help='Run Phase 3 success rate analysis only')
+    
+    # Phase 4 enhanced reporting options
+    parser.add_argument('--phase4-report', type=str, metavar='RESULT_FILE',
+                       help='Generate Phase 4 enhanced HTML report from result file')
+    parser.add_argument('--phase4-decide', type=str, metavar='DOMAIN',
+                       choices=['web', 'ml', 'finance', 'data', 'enterprise', 'performance'],
+                       help='Get Phase 4 library recommendation for domain')
+    parser.add_argument('--phase4-trends', action='store_true',
+                       help='Run Phase 4 trend analysis and regression detection')
+    
     # Output options
     parser.add_argument('--output', type=str,
                        help='Output file for results (optional)')
@@ -398,8 +655,28 @@ def main():
     runner = BenchmarkRunner()
     
     try:
+        # Phase 4 options
+        if args.phase4_report:
+            report_path = runner.run_phase4_enhanced_report(args.phase4_report)
+            print(f"✅ Phase 4 enhanced report generated: {report_path}")
+            return 0
+        elif args.phase4_decide:
+            results = runner.run_phase4_decision_engine(args.phase4_decide)
+            return 0
+        elif args.phase4_trends:
+            results = runner.run_phase4_trend_analysis()
+            return 0
+        
+        # Phase 3 options
+        elif args.phase3_domain:
+            results = runner.run_phase3_benchmark("domain")
+        elif args.phase3_success:
+            results = runner.run_phase3_benchmark("success")
+        elif args.phase3:
+            results = runner.run_phase3_benchmark("complete")
+        
         # Phase 2 options
-        if args.phase2_security:
+        elif args.phase2_security:
             results = runner.run_phase2_benchmark("security")
         elif args.phase2_accuracy:
             results = runner.run_phase2_benchmark("accuracy")

@@ -14,13 +14,20 @@ def generate_github_pages():
     docs_dir = Path('docs/results')
     docs_dir.mkdir(parents=True, exist_ok=True)
     
-    # Find latest CI reports
-    reports = list(docs_dir.glob('ci_*_report.html'))
-    reports.sort(reverse=True)  # Latest first
+    # Find latest CI reports and Phase 4 enhanced reports
+    ci_reports = list(docs_dir.glob('ci_*_report.html'))
+    phase4_reports = list(docs_dir.glob('phase4_comprehensive_*.html'))
+    weekly_reports = list(docs_dir.glob('weekly_*_*.html'))
+    
+    # Sort all reports by modification time
+    all_reports = ci_reports + phase4_reports + weekly_reports
+    all_reports.sort(key=lambda x: x.stat().st_mtime, reverse=True)
     
     # Group by suite type
     suite_reports = {}
-    for report in reports[:20]:  # Last 20 reports
+    
+    # Process CI reports
+    for report in ci_reports[:15]:  # Last 15 CI reports
         parts = report.name.split('_')
         if len(parts) >= 4:
             suite_type = parts[-2]  # Extract suite type
@@ -28,8 +35,34 @@ def generate_github_pages():
                 suite_reports[suite_type] = []
             suite_reports[suite_type].append({
                 'filename': report.name,
-                'timestamp': '_'.join(parts[1:3])  # Extract timestamp
+                'timestamp': '_'.join(parts[1:3]),  # Extract timestamp
+                'type': 'ci'
             })
+    
+    # Process Phase 4 enhanced reports
+    phase4_reports_list = []
+    for report in phase4_reports[:10]:  # Last 10 Phase 4 reports
+        timestamp = report.name.replace('phase4_comprehensive_', '').replace('.html', '')
+        phase4_reports_list.append({
+            'filename': report.name,
+            'timestamp': timestamp,
+            'type': 'phase4'
+        })
+    
+    if phase4_reports_list:
+        suite_reports['phase4_enhanced'] = phase4_reports_list
+    
+    # Process weekly reports
+    weekly_reports_list = []
+    for report in weekly_reports[:5]:  # Last 5 weekly reports
+        weekly_reports_list.append({
+            'filename': report.name,
+            'timestamp': report.name.split('_')[-1].replace('.html', ''),
+            'type': 'weekly'
+        })
+    
+    if weekly_reports_list:
+        suite_reports['weekly'] = weekly_reports_list
     
     # Generate index.html
     timestamp_str = datetime.now().strftime('%Y-%m-%d %H:%M UTC')
@@ -61,15 +94,38 @@ def generate_github_pages():
 """
     
     for suite_type, reports in suite_reports.items():
+        # Custom titles and descriptions for different report types
+        if suite_type == 'phase4_enhanced':
+            title = "🎨 Phase 4 Enhanced Reports"
+            description = "Interactive reports with comprehensive tables, smart units, and visualizations"
+        elif suite_type == 'weekly':
+            title = "📅 Weekly Reports"
+            description = "Comprehensive weekly analysis with trend data"
+        else:
+            title = f"📊 {suite_type.title()} Reports"
+            description = "Standard benchmark reports"
+            
         html += f"""
         <div class="suite-section">
-            <h2><span class="badge">{suite_type}</span> Benchmark Reports</h2>
+            <h2><span class="badge">{title}</span></h2>
+            <p style="color: #666; font-size: 0.9em; margin-bottom: 15px;">{description}</p>
             <ul class="report-list">
 """
         for report in reports[:5]:  # Show last 5 per suite
+            report_type = report.get('type', 'ci')
+            if report_type == 'phase4':
+                icon = "🎨"
+                label = "Enhanced Analysis"
+            elif report_type == 'weekly':
+                icon = "📅"
+                label = "Weekly Report"
+            else:
+                icon = "📊"
+                label = f"{suite_type.title()} Report"
+                
             html += f"""
                 <li class="report-item">
-                    <a href="{report['filename']}">{suite_type.title()} Report</a>
+                    <a href="{report['filename']}">{icon} {label}</a>
                     <span class="timestamp">({report['timestamp']})</span>
                 </li>
 """

@@ -108,6 +108,20 @@ Everything with detailed reports:
 python scripts/run_benchmarks.py --all --generate-report
 ```
 
+### 🎨 Phase 4 Enhanced Reports (NEW!)
+Generate beautiful interactive reports with comprehensive tables:
+```bash
+# Generate enhanced report from any benchmark result
+python scripts/run_benchmarks.py --phase4-report phase2_complete_1750338755.json
+
+# Get intelligent library recommendations
+python scripts/run_benchmarks.py --phase4-decide web      # Web API recommendations
+python scripts/run_benchmarks.py --phase4-decide ml       # ML framework recommendations
+
+# Historical trend analysis
+python scripts/run_benchmarks.py --phase4-trends
+```
+
 ## 📁 Understanding Results
 
 ### Result Files
@@ -116,6 +130,7 @@ python scripts/run_benchmarks.py --all --generate-report
 - `data/results/latest_competitive.json` - Most recent competitive analysis
 - `data/results/latest_configuration.json` - Most recent config testing
 - `docs/results/*.html` - Generated HTML reports
+- `docs/results/phase4_comprehensive_*.html` - **NEW!** Enhanced Phase 4 reports with comprehensive tables and smart units
 
 ### Key Metrics
 

@@ -1,20 +1,28 @@
 # DataSON Benchmarks
 
-> **Open source competitive benchmarking for DataSON serialization library**
+> **Open source competitive benchmarking for [DataSON serialization library](https://github.com/danielendler/datason)**
 
-[![Daily Benchmarks](https://github.com/datason/datason-benchmarks/actions/workflows/daily-benchmarks.yml/badge.svg)](https://github.com/datason/datason-benchmarks/actions/workflows/daily-benchmarks.yml)
-[![PR Performance Check](https://github.com/datason/datason-benchmarks/actions/workflows/pr-performance-check.yml/badge.svg)](https://github.com/datason/datason-benchmarks/actions/workflows/pr-performance-check.yml)
+[![Daily Benchmarks](https://github.com/danielendler/datason-benchmarks/actions/workflows/daily-benchmarks.yml/badge.svg)](https://github.com/danielendler/datason-benchmarks/actions/workflows/daily-benchmarks.yml)
+[![PR Performance Check](https://github.com/danielendler/datason-benchmarks/actions/workflows/pr-performance-check.yml/badge.svg)](https://github.com/danielendler/datason-benchmarks/actions/workflows/pr-performance-check.yml)
+
+## 🔗 Important Links
+
+- 📚 **[DataSON Main Repository](https://github.com/danielendler/datason)** - The main DataSON library
+- 📖 **[DataSON Documentation](https://datason.readthedocs.io/en/latest/)** - Full API docs and guides  
+- 📊 **[Live Benchmark Results](https://danielendler.github.io/datason-benchmarks/)** - Interactive performance reports
+- 🧪 **[This Benchmarks Repository](https://github.com/danielendler/datason-benchmarks)** - Benchmarking infrastructure
 
 ## 🎯 Overview
 
-This repository provides **transparent, reproducible benchmarks** for DataSON against major serialization libraries. Using GitHub Actions for zero-cost infrastructure, we deliver accurate competitive analysis and deep optimization insights that help users make informed decisions.
+This repository provides **transparent, reproducible benchmarks** for [DataSON](https://github.com/danielendler/datason) against major serialization libraries. Using GitHub Actions for zero-cost infrastructure, we deliver accurate competitive analysis and deep optimization insights that help users make informed decisions.
 
 ### Key Features
 
 - **🏆 Competitive Analysis**: Head-to-head comparison with 6-8 major serialization libraries
-- **🔧 Deep Optimization Analysis**: DataSON configuration optimization with API-level insights
+- **🔧 Deep Optimization Analysis**: DataSON configuration optimization with API-level insights  
 - **📊 Version Evolution Tracking**: Performance analysis across DataSON versions
 - **🤖 Enhanced CI/CD Integration**: Smart PR performance checks with regression detection
+- **🎨 Phase 4 Enhanced Reports**: **NEW!** Interactive reports with comprehensive performance tables, smart units (μs/ms/s), ML compatibility matrix
 - **📈 Interactive Reports**: Beautiful charts and visualizations with GitHub Pages hosting
 - **🚀 Community Friendly**: Easy setup, contribution guidelines, free infrastructure
 
@@ -24,7 +32,7 @@ This repository provides **transparent, reproducible benchmarks** for DataSON ag
 
 ```bash
 # Clone the repository
-git clone https://github.com/datason/datason-benchmarks.git
+git clone https://github.com/danielendler/datason-benchmarks.git
 cd datason-benchmarks
 
 # Install dependencies
@@ -46,6 +54,23 @@ python scripts/run_benchmarks.py --configurations --generate-report
 python scripts/run_benchmarks.py --all --generate-report
 ```
 
+### Phase 4: Enhanced Reporting & Visualization 🎨
+
+**NEW:** Interactive reports with comprehensive performance tables and smart unit formatting:
+
+```bash
+# Generate Phase 4 enhanced report from any benchmark result
+python scripts/run_benchmarks.py --phase4-report phase2_complete_1750338755.json
+
+# Get intelligent library recommendations by domain  
+python scripts/run_benchmarks.py --phase4-decide web      # Web API recommendations
+python scripts/run_benchmarks.py --phase4-decide ml       # ML framework recommendations
+python scripts/run_benchmarks.py --phase4-decide finance  # Financial services recommendations
+
+# Run trend analysis and regression detection
+python scripts/run_benchmarks.py --phase4-trends
+```
+
 ### Phase 2: Automated Benchmarking 🤖
 
 **NEW:** Full automation with synthetic data generation and regression detection:
@@ -63,10 +88,11 @@ python scripts/analyze_trends.py --input-dir data/results --lookback-weeks 12
 
 ### View Latest Results
 
-- **[Interactive Reports](https://danielendler.github.io/datason-benchmarks/results/)** - Live performance visualizations
-- **[Latest Benchmark Results](data/results/)** - JSON files with detailed metrics
-- **[GitHub Actions](https://github.com/datason/datason-benchmarks/actions)** - Automated runs and artifacts
-- **[Performance Trends](data/results/)** - Historical performance data
+- **[🎨 Enhanced Phase 4 Reports](https://danielendler.github.io/datason-benchmarks/weekly-reports/latest_phase4_enhanced.html)** - **NEW!** Interactive reports with comprehensive tables and smart units
+- **[📊 Interactive Reports](https://danielendler.github.io/datason-benchmarks/results/)** - Live performance visualizations
+- **[📈 Latest Benchmark Results](data/results/)** - JSON files with detailed metrics  
+- **[🔄 GitHub Actions](https://github.com/danielendler/datason-benchmarks/actions)** - Automated runs and artifacts
+- **[📊 Performance Trends](data/results/)** - Historical performance data
 
 ## 📊 Current Competitive Landscape
 
@@ -74,7 +100,7 @@ python scripts/analyze_trends.py --input-dir data/results --lookback-weeks 12
 
 | Library | Type | Why Tested | Latest Status |
 |---------|------|------------|---------------|
-| **DataSON** | JSON+objects | Our library | ✅ Active |
+| **[DataSON](https://github.com/danielendler/datason)** | JSON+objects | Our library | ✅ Active |
 | **orjson** | JSON (Rust) | Speed benchmark standard | ✅ Available |
 | **ujson** | JSON (C) | Popular drop-in replacement | ✅ Available |
 | **json** | JSON (stdlib) | Baseline reference | ✅ Available |
@@ -92,13 +118,21 @@ python scripts/analyze_trends.py --input-dir data/results --lookback-weeks 12
 
 ### DataSON Configuration Deep Dive
 
-Our enhanced benchmarking system now provides **deep API analysis** of DataSON's optimization configurations:
+Our enhanced benchmarking system now provides **deep API analysis** of [DataSON's](https://github.com/danielendler/datason) optimization configurations:
 
 #### Available Optimization Configs
 - **`get_performance_config()`** - Speed-optimized settings (`UNIX` dates, `VALUES` orient, no type hints)
 - **`get_ml_config()`** - ML-optimized settings (`UNIX_MS` dates, type hints enabled, aggressive coercion)
 - **`get_strict_config()`** - Type preservation (`ISO` dates, strict coercion, complex/decimal preservation)
 - **`get_api_config()`** - API-compatible settings (`ISO` dates, ASCII encoding, string UUIDs)
+
+#### New DataSON API Methods (Testing Needed)
+- **`dump_api()`** - Web API optimized serialization
+- **`dump_ml()`** - ML framework optimized serialization  
+- **`dump_secure()`** - Security-focused with PII redaction
+- **`dump_fast()`** - Performance optimized serialization
+- **`load_smart()`** - Intelligent deserialization (80-90% success rate)
+- **`load_perfect()`** - 100% accurate reconstruction with templates
 
 #### Key Performance Insights
 
@@ -134,6 +168,46 @@ Our system automatically discovers and analyzes optimization parameters:
     }
 }
 ```
+
+## 🎨 Phase 4: Enhanced Reporting & Visualization
+
+### Interactive Reports with Comprehensive Analysis
+
+Phase 4 delivers **beautiful, interactive HTML reports** that transform raw benchmark data into actionable insights:
+
+#### 📊 **Enhanced Features**:
+- **Performance Summary Tables**: Real benchmark data with method comparison
+- **Smart Unit Formatting**: Automatic μs → ms → s conversion based on values
+- **ML Framework Compatibility Matrix**: Complete NumPy/Pandas support analysis
+- **Security Features Analysis**: PII redaction effectiveness and compliance insights  
+- **Interactive Charts**: Chart.js visualizations with real performance data
+- **Domain-Specific Recommendations**: Optimized advice for Web API, ML, Finance, Data Engineering
+
+#### 🎯 **Quick Examples**:
+
+```bash
+# Generate enhanced report from any benchmark result
+python scripts/run_benchmarks.py --phase4-report phase2_complete_1750338755.json
+
+# Get intelligent recommendations for your use case
+python scripts/run_benchmarks.py --phase4-decide ml       # → datason.dump_ml() for NumPy/Pandas
+python scripts/run_benchmarks.py --phase4-decide finance  # → datason.dump_secure() for PII protection
+python scripts/run_benchmarks.py --phase4-decide web      # → datason.dump_api() for JSON compatibility
+
+# Historical trend analysis with regression detection
+python scripts/run_benchmarks.py --phase4-trends
+```
+
+#### 📈 **Report Highlights**:
+- **Performance Table**: Shows `dump_secure()` at 387.31ms vs `serialize()` at 0.32ms with use case guidance
+- **ML Compatibility**: Visual matrix showing 100% NumPy/Pandas support for DataSON ML methods
+- **Security Analysis**: Quantifies PII redaction effectiveness (90-95%) and performance cost (+930%)
+- **Smart Units**: Displays `53.0μs` for fast operations, `387.31ms` for complex ones, `2.5s` for large datasets
+
+#### 🌐 **Automated Integration**:
+Phase 4 reports are **automatically generated** by both daily and weekly CI workflows, with enhanced reports available at:
+- [Latest Enhanced Report](https://danielendler.github.io/datason-benchmarks/weekly-reports/latest_phase4_enhanced.html)
+- [All Enhanced Reports](https://danielendler.github.io/datason-benchmarks/results/)
 
 ## 🤖 Enhanced CI/CD Integration
 
@@ -412,4 +486,4 @@ This benchmarking methodology and infrastructure is open source and freely avail
 
 ---
 
-**Latest Update**: Results automatically updated by [Daily Benchmarks workflow](https://github.com/datason/datason-benchmarks/actions/workflows/daily-benchmarks.yml) with interactive reports available at [GitHub Pages](https://datason.github.io/datason-benchmarks/) 
+**Latest Update**: Results automatically updated by [Daily Benchmarks workflow](https://github.com/danielendler/datason-benchmarks/actions/workflows/daily-benchmarks.yml) with interactive reports available at [GitHub Pages](https://datason.github.io/datason-benchmarks/) 

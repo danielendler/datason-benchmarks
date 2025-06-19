@@ -143,6 +143,30 @@ jobs:
           fi
         done
 
+    - name: 🎨 Generate Phase 4 Enhanced Reports
+      run: |
+        echo "🚀 Generating Phase 4 Enhanced Reports with comprehensive tables and visualizations..."
+        
+        # Generate Phase 4 enhanced reports for all available result files
+        cd data/results
+        for result_file in latest_*.json; do
+          if [ -f "$result_file" ]; then
+            echo "📊 Processing $result_file with Phase 4 enhancements..."
+            python ../../scripts/phase4_enhanced_reports.py "$result_file" || echo "⚠️ Phase 4 report generation failed for $result_file"
+          fi
+        done
+        
+        # Also generate Phase 4 reports for any CI-tagged files from this run
+        for result_file in ci_*_${{ github.run_id }}_*.json; do
+          if [ -f "$result_file" ]; then
+            echo "📊 Processing CI result $result_file with Phase 4 enhancements..."
+            python ../../scripts/phase4_enhanced_reports.py "$result_file" || echo "⚠️ Phase 4 report generation failed for $result_file"
+          fi
+        done
+        
+        cd ../..
+        echo "✅ Phase 4 enhanced report generation completed"
+
     - name: 📊 Generate GitHub Pages index
       run: |
         python scripts/generate_github_pages.py
@@ -160,6 +184,7 @@ jobs:
         # Force add CI-tagged results (override gitignore)
         git add -f data/results/ci_*_*.json
         git add -f docs/results/ci_*_*.html
+        git add -f docs/results/phase4_comprehensive_*.html
         git add docs/results/index.html
         git add docs/index.md
         
@@ -169,7 +194,13 @@ jobs:
 
         Suite: ${{ github.event.inputs.benchmark_type || 'complete' }}
         Run ID: ${{ github.run_id }}
-        SHA: ${{ github.sha }}"
+        SHA: ${{ github.sha }}
+        
+        ✨ Includes Phase 4 Enhanced Reports with:
+        - 📊 Comprehensive performance tables
+        - 🎯 Smart unit formatting (μs/ms/s)
+        - 📈 Interactive visualizations
+        - 🔍 Detailed ML/Security analysis"
           
           git commit -m "$commit_msg"
           git push
@@ -186,6 +217,7 @@ jobs:
         path: |
           data/results/ci_*_*.json
           docs/results/ci_*_*.html
+          docs/results/phase4_comprehensive_*.html
           docs/results/index.html
         retention-days: 90
 
