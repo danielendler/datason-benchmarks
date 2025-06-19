@@ -686,8 +686,8 @@ class SyntheticDataGenerator:
         # Save as JSON using DataSON for dogfooding
         output_file = os.path.join(output_dir, f'{scenario_name}_data.json')
         with open(output_file, 'w', encoding='utf-8') as f:
-            # DataSON dumps returns a JSON string like json.dumps
-            json_string = datason.dumps(data)
+            # Use DataSON's JSON-compatible function for true JSON output
+            json_string = datason.dumps_json(data)
             f.write(json_string)
         
         print(f"Saved {len(data)} samples for scenario '{scenario_name}' to {output_file}")
@@ -715,8 +715,8 @@ class SyntheticDataGenerator:
         
         summary_file = os.path.join(output_dir, 'generation_summary.json')
         with open(summary_file, 'w', encoding='utf-8') as f:
-            # DataSON dumps returns a JSON string like json.dumps
-            json_string = datason.dumps(summary)
+            # Use DataSON's JSON-compatible function for true JSON output
+            json_string = datason.dumps_json(summary)
             f.write(json_string)
         
         print(f"Generated {len(generated_files)} scenario files")
