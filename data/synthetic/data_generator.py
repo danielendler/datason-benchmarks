@@ -11,6 +11,12 @@ from dataclasses import dataclass, asdict
 import numpy as np
 import pandas as pd
 from faker import Faker
+import warnings
+
+# Suppress DataSON datetime parsing warnings for cleaner logs  
+# These warnings are caused by overly aggressive datetime detection in DataSON v0.9.0
+# See DATASON_DATETIME_PARSING_ISSUES.md for detailed analysis
+warnings.filterwarnings('ignore', message='Failed to parse datetime string', module='datason')
 
 fake = Faker()
 

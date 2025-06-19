@@ -12,6 +12,12 @@ import re
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+import warnings
+
+# Suppress DataSON datetime parsing warnings for cleaner logs
+# These warnings are caused by overly aggressive datetime detection in DataSON v0.9.0
+# See DATASON_DATETIME_PARSING_ISSUES.md for detailed analysis
+warnings.filterwarnings('ignore', message='Failed to parse datetime string', module='datason')
 
 try:
     import datason
