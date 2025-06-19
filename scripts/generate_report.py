@@ -23,13 +23,24 @@ try:
     import datason
     import json
     
-    # Create a wrapper to match json.dumps interface
+    # Create a wrapper to match json.dumps interface using DataSON v0.11.1+ JSON functions
     def serialize_with_datason(obj, **kwargs):
-        """DataSON serialize + json.dumps for string output."""
-        serialized_obj = datason.serialize(obj)
-        return json.dumps(serialized_obj, **kwargs)
+        """Use DataSON's JSON-compatible functions for string output."""
+        try:
+            # Try the new JSON-compatible function first
+            if hasattr(datason, 'dumps_json'):
+                return datason.dumps_json(obj, **kwargs)
+            elif hasattr(datason, 'serialize'):
+                # Fallback for older versions
+                serialized_obj = datason.serialize(obj)
+                return json.dumps(serialized_obj, **kwargs)
+            else:
+                return json.dumps(obj, **kwargs)
+        except Exception:
+            # If DataSON fails, fallback to standard json
+            return json.dumps(obj, **kwargs)
     
-    # Use DataSON for serialization but json.dumps for final string conversion
+    # Use DataSON for serialization but with proper error handling
     datason_serialize = serialize_with_datason
 except ImportError:
     # Fallback to standard json if DataSON not available
@@ -985,6 +996,14 @@ def main():
     import glob
     import json
     import os
+    import sys
+    
+    # Set up logging for CI visibility
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[logging.StreamHandler(sys.stdout)]
+    )
     
     parser = argparse.ArgumentParser(description='Generate benchmark reports')
     parser.add_argument('--input-dir', required=True, help='Directory containing benchmark result JSON files')
@@ -994,12 +1013,22 @@ def main():
     
     args = parser.parse_args()
     
+    logging.info(f"🔍 Searching for JSON files in: {args.input_dir}")
+    
     # Find all JSON files in input directory
     json_files = glob.glob(os.path.join(args.input_dir, '*.json'))
     
     if not json_files:
-        print(f"No JSON files found in {args.input_dir}")
+        logging.warning(f"📂 No JSON files found in {args.input_dir}")
+        # List what files are actually there
+        try:
+            all_files = os.listdir(args.input_dir)
+            logging.info(f"📋 Files in directory: {all_files}")
+        except FileNotFoundError:
+            logging.error(f"❌ Directory {args.input_dir} does not exist")
         return 1
+    
+    logging.info(f"📊 Found {len(json_files)} JSON files: {[os.path.basename(f) for f in json_files]}")
     
     # Combine all results into a single report
     combined_results = {
@@ -1009,15 +1038,26 @@ def main():
     }
     
     # Process each JSON file and categorize results
-    for json_file in json_files:
+    logging.info(f"🔄 Processing {len(json_files)} result files...")
+    
+    for i, json_file in enumerate(json_files, 1):
+        logging.info(f"📄 Processing file {i}/{len(json_files)}: {os.path.basename(json_file)}")
+        
         try:
             with open(json_file, 'r') as f:
                 if json_file.endswith('.json'):
                     # Try DataSON first, fallback to json
                     try:
                         content = f.read()
-                        data = datason.deserialize(json.loads(content))
-                    except:
+                        # Use safer loading approach with timeout
+                        if hasattr(datason, 'loads_json'):
+                            data = datason.loads_json(content)
+                        elif hasattr(datason, 'deserialize'):
+                            data = datason.deserialize(json.loads(content))
+                        else:
+                            data = json.loads(content)
+                    except Exception as datason_error:
+                        logging.warning(f"⚠️  DataSON loading failed for {os.path.basename(json_file)}, using standard JSON: {datason_error}")
                         f.seek(0)
                         data = json.load(f)
                 else:
@@ -1026,49 +1066,87 @@ def main():
             # The data structure from run_benchmarks.py has the actual results nested
             # Look for the actual benchmark data in the structure
             if isinstance(data, dict):
+                found_data_type = None
+                
                 # Check for direct competitive results
                 if "competitive" in data and isinstance(data["competitive"], dict):
                     # This is the competitive results from the benchmark
                     combined_results["competitive"] = data["competitive"]
+                    found_data_type = "competitive"
                 elif "configurations" in data and isinstance(data["configurations"], dict):
                     combined_results["configurations"] = data["configurations"]
+                    found_data_type = "configurations"
                 elif "versioning" in data and isinstance(data["versioning"], dict):
                     combined_results["versioning"] = data["versioning"]
+                    found_data_type = "versioning"
                 else:
                     # Check if this is a results file with nested structure
                     for key, value in data.items():
                         if isinstance(value, dict):
                             if "competitive" in value:
                                 combined_results["competitive"] = value
+                                found_data_type = "competitive"
+                                break
                             elif "configurations" in value:
                                 combined_results["configurations"] = value
+                                found_data_type = "configurations"
+                                break
                             elif "versioning" in value:
                                 combined_results["versioning"] = value
+                                found_data_type = "versioning"
+                                break
                             # Also check for serialization data which indicates competitive results
                             elif any("serialization" in str(v) for v in value.values() if isinstance(v, dict)):
                                 combined_results["competitive"] = value
+                                found_data_type = "competitive"
+                                break
+                
+                if found_data_type:
+                    logging.info(f"✅ Found {found_data_type} data in {os.path.basename(json_file)}")
+                else:
+                    logging.warning(f"❓ No recognized benchmark data found in {os.path.basename(json_file)}")
             
         except Exception as e:
-            print(f"Warning: Could not process {json_file}: {e}")
+            logging.error(f"❌ Could not process {os.path.basename(json_file)}: {e}")
             continue
     
     # Generate report
+    logging.info(f"📈 Generating {args.format} report...")
+    
+    # Log what data we have
+    data_types = [key for key in ["competitive", "configurations", "versioning"] if key in combined_results]
+    if data_types:
+        logging.info(f"📊 Report will include: {', '.join(data_types)}")
+    else:
+        logging.warning("⚠️  No benchmark data found to include in report")
+    
     output_dir = os.path.dirname(args.output)
     if output_dir:
         os.makedirs(output_dir, exist_ok=True)
+        logging.info(f"📁 Created output directory: {output_dir}")
     
     generator = ReportGenerator(output_dir=output_dir if output_dir else ".")
     
     if args.format == 'html':
-        report_path = generator.generate_html_report(combined_results)
-        # Move to desired output location if different
-        if report_path != args.output:
-            import shutil
-            shutil.move(report_path, args.output)
-        print(f"✅ HTML report generated: {args.output}")
+        logging.info("🎨 Generating HTML report with interactive charts...")
+        
+        try:
+            report_path = generator.generate_html_report(combined_results)
+            # Move to desired output location if different
+            if report_path != args.output:
+                import shutil
+                logging.info(f"📋 Moving report from {report_path} to {args.output}")
+                shutil.move(report_path, args.output)
+            logging.info(f"✅ HTML report generated: {args.output}")
+        except Exception as e:
+            logging.error(f"❌ Failed to generate HTML report: {e}")
+            return 1
     else:
-        # Generate markdown report (simplified)
-        markdown_content = f"""# Weekly DataSON Benchmark Report
+        logging.info("📝 Generating Markdown report...")
+        
+        try:
+            # Generate markdown report (simplified)
+            markdown_content = f"""# Weekly DataSON Benchmark Report
 
 Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
 
@@ -1082,21 +1160,21 @@ This comprehensive report includes:
 ## Results
 
 """
-        
-        # Add basic results summary
-        if "competitive" in combined_results:
-            markdown_content += "### Competitive Analysis\n\n"
-            markdown_content += "DataSON performance compared to standard JSON libraries.\n\n"
-        
-        if "configurations" in combined_results:
-            markdown_content += "### Configuration Testing\n\n"
-            markdown_content += "Performance across different DataSON configurations.\n\n"
-        
-        if "versioning" in combined_results:
-            markdown_content += "### Version Comparison\n\n"
-            markdown_content += "Performance evolution across DataSON versions.\n\n"
-        
-        markdown_content += f"""
+            
+            # Add basic results summary
+            if "competitive" in combined_results:
+                markdown_content += "### Competitive Analysis\n\n"
+                markdown_content += "DataSON performance compared to standard JSON libraries.\n\n"
+            
+            if "configurations" in combined_results:
+                markdown_content += "### Configuration Testing\n\n"
+                markdown_content += "Performance across different DataSON configurations.\n\n"
+            
+            if "versioning" in combined_results:
+                markdown_content += "### Version Comparison\n\n"
+                markdown_content += "Performance evolution across DataSON versions.\n\n"
+            
+            markdown_content += f"""
 ## Raw Data
 
 ```json
@@ -1106,11 +1184,15 @@ This comprehensive report includes:
 ---
 *Generated by DataSON benchmark suite*
 """
-        
-        with open(args.output, 'w') as f:
-            f.write(markdown_content)
-        print(f"✅ Markdown report generated: {args.output}")
+            
+            with open(args.output, 'w') as f:
+                f.write(markdown_content)
+            logging.info(f"✅ Markdown report generated: {args.output}")
+        except Exception as e:
+            logging.error(f"❌ Failed to generate Markdown report: {e}")
+            return 1
     
+    logging.info("🎉 Report generation completed successfully!")
     return 0
 
 

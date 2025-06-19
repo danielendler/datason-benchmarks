@@ -237,18 +237,27 @@ jobs:
     
     - name: Generate comprehensive report
       run: |
+        echo "🔍 Checking what files are available for report generation..."
+        ls -la data/results/weekly/$(date +%Y%m%d)/ || echo "Directory not found"
+        
+        echo "📊 Starting report generation..."
+        
         # Generate analysis report with unit formatting and sample data
-        python scripts/generate_report.py \
+        echo "🎨 Generating HTML report..."
+        timeout 300 python scripts/generate_report.py \
           --input-dir data/results/weekly/$(date +%Y%m%d) \
           --output docs/results/weekly_report_$(date +%Y%m%d).html \
           --format html \
-          --include-charts
+          --include-charts || echo "HTML report generation failed or timed out"
         
+        echo "📝 Generating Markdown summary..."
         # Generate markdown summary for easy reading
-        python scripts/generate_report.py \
+        timeout 180 python scripts/generate_report.py \
           --input-dir data/results/weekly/$(date +%Y%m%d) \
           --output docs/results/weekly_summary_$(date +%Y%m%d).md \
-          --format markdown
+          --format markdown || echo "Markdown report generation failed or timed out"
+          
+        echo "✅ Report generation step completed"
       continue-on-error: true
     
     - name: Update latest results
