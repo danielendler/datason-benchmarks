@@ -591,6 +591,18 @@ class BenchmarkRunner:
             logger.info(f"💾 Results saved to: {filepath}")
         except Exception as e:
             logger.error(f"Failed to save results: {e}")
+    
+    def _save_results_to_file(self, results: Dict[str, Any], output_file: str):
+        """Save benchmark results to a specific file."""
+        filepath = Path(output_file)
+        filepath.parent.mkdir(parents=True, exist_ok=True)
+        
+        try:
+            with open(filepath, 'w') as f:
+                json.dump(results, f, indent=2, default=str)
+            logger.info(f"💾 Results saved to: {filepath}")
+        except Exception as e:
+            logger.error(f"Failed to save results: {e}")
 
 
 def main():
