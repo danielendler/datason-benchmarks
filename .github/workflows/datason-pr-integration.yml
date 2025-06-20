@@ -168,13 +168,29 @@ jobs:
 
     - name: 🎨 Generate enhanced report
       run: |
-        # Generate Phase 4 enhanced report if available
-        if [ -f scripts/phase4_enhanced_reports.py ]; then
-          echo "🎨 Generating Phase 4 enhanced report..."
-          python scripts/phase4_enhanced_reports.py \
-            --input data/results/pr_${{ github.event.inputs.pr_number }}.json \
-            --output docs/results/datason_pr_${{ github.event.inputs.pr_number }}.html \
-            --title "DataSON PR #${{ github.event.inputs.pr_number }} Analysis"
+        # Generate enhanced report if result file exists
+        if [ -f data/results/pr_${{ github.event.inputs.pr_number }}.json ]; then
+          echo "🎨 Generating enhanced report..."
+          
+          # Try Phase 4 enhanced reports first
+          if [ -f scripts/phase4_enhanced_reports.py ]; then
+            echo "Using Phase 4 enhanced reporting..."
+            python scripts/phase4_enhanced_reports.py \
+              data/results/pr_${{ github.event.inputs.pr_number }}.json \
+              --output-dir docs/results/ || echo "Phase 4 report generation failed, continuing..."
+          fi
+          
+          # Fallback to standard report generation
+          if [ -f scripts/generate_report.py ]; then
+            echo "Generating standard HTML report..."
+            python scripts/generate_report.py \
+              --input-dir data/results/ \
+              --output docs/results/pr_${{ github.event.inputs.pr_number }}_report.html \
+              --format html \
+              --include-charts || echo "Standard report generation failed, continuing..."
+          fi
+        else
+          echo "⚠️ No result file found at data/results/pr_${{ github.event.inputs.pr_number }}.json"
         fi
 
     - name: 🔍 Regression detection
@@ -264,7 +280,7 @@ jobs:
         name: benchmark-results-${{ github.event.inputs.pr_number }}
         path: |
           data/results/pr_${{ github.event.inputs.pr_number }}.json
-          docs/results/datason_pr_${{ github.event.inputs.pr_number }}.html
+          docs/results/*.html
           comment.md
           regression_analysis.md
         retention-days: 30

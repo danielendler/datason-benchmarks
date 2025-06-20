@@ -72,12 +72,14 @@ jobs:
         echo "🎯 Running PR-optimized benchmark suite..."
         python scripts/pr_optimized_benchmark.py
         
-        # Generate Phase 4 enhanced report
-        echo "🎨 Generating Phase 4 enhanced report..."
-        python scripts/phase4_enhanced_reports.py \
-          --input data/results/pr_optimized_*.json \
-          --output docs/results/datason_pr_${{ github.event.inputs.pr_number }}.html \
-          --title "DataSON PR #${{ github.event.inputs.pr_number }} Analysis"
+        # Generate Phase 4 enhanced report if available
+        if [ -f scripts/phase4_enhanced_reports.py ] && ls data/results/pr_optimized_*.json 1> /dev/null 2>&1; then
+          echo "🎨 Generating Phase 4 enhanced report..."
+          RESULT_FILE=$(ls data/results/pr_optimized_*.json | head -n1)
+          python scripts/phase4_enhanced_reports.py \
+            "$RESULT_FILE" \
+            --output-dir docs/results/
+        fi
           
     - name: 🔍 Regression detection
       run: |
