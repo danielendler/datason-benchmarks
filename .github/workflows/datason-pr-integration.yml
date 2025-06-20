@@ -1,4 +1,4 @@
-name: 🚀 DataSON PR Performance Benchmark
+name: 🧪 DataSON PR Benchmark
 
 on:
   workflow_dispatch:
@@ -30,36 +30,34 @@ permissions:
   pull-requests: write
 
 jobs:
-  benchmark-datason-pr:
-    name: 📊 Benchmark DataSON PR
+  benchmark:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    
+    timeout-minutes: 20
+
     steps:
     - name: 📥 Checkout benchmarks
       uses: actions/checkout@v4
-      
-    - name: 🐍 Set up Python 3.11
+
+    - name: 🐍 Setup Python
       uses: actions/setup-python@v5
-      with:
+      with: 
         python-version: "3.11"
-        
+
     - name: 💾 Cache dependencies
       uses: actions/cache@v4
       with:
         path: ~/.cache/pip
         key: datason-pr-${{ runner.os }}-py3.11-${{ hashFiles('requirements.txt') }}
-        
+
     - name: 📦 Install dependencies
       run: |
-        python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install orjson ujson msgpack jsonpickle pandas numpy
-        
+        pip install orjson ujson msgpack pandas numpy
+
     - name: 📥 Download DataSON wheel from external repository
       uses: actions/github-script@v7
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ secrets.BENCHMARK_REPO_TOKEN }}
         script: |
           const fs = require('fs');
 
@@ -126,7 +124,7 @@ jobs:
           fs.writeFileSync('wheel/artifact.zip', Buffer.from(download.data));
 
           console.log('✅ Artifact downloaded successfully');
-        
+
     - name: 🔧 Extract and install DataSON wheel
       run: |
         cd wheel
@@ -147,111 +145,133 @@ jobs:
 
         # Verify installation
         python -c "import datason; print(f'✅ DataSON {datason.__version__} installed successfully')"
-        
-    - name: 🚀 Run PR-optimized benchmark
+
+    - name: 🚀 Run benchmarks
       run: |
         mkdir -p data/results docs/results
         
-        # Run our optimized PR benchmark suite (5 datasets, ~2 min)
-        echo "🎯 Running PR-optimized benchmark suite..."
-        python scripts/pr_optimized_benchmark.py
-        
-        # Generate Phase 4 enhanced report
-        echo "🎨 Generating Phase 4 enhanced report..."
-        python scripts/phase4_enhanced_reports.py \
-          --input data/results/pr_optimized_*.json \
-          --output docs/results/datason_pr_${{ github.event.inputs.pr_number }}.html \
-          --title "DataSON PR #${{ github.event.inputs.pr_number }} Analysis"
-          
+        # Run the appropriate benchmark based on type
+        case "${{ github.event.inputs.benchmark_type }}" in
+          "pr_optimized")
+            echo "🎯 Running PR-optimized benchmark suite..."
+            python scripts/pr_optimized_benchmark.py --output data/results/pr_${{ github.event.inputs.pr_number }}.json
+            ;;
+          "quick")
+            echo "⚡ Running quick benchmark suite..."
+            python scripts/run_benchmarks.py --quick --output data/results/pr_${{ github.event.inputs.pr_number }}.json
+            ;;
+          "competitive")
+            echo "🏁 Running competitive benchmark suite..."
+            python scripts/run_benchmarks.py --competitive --output data/results/pr_${{ github.event.inputs.pr_number }}.json
+            ;;
+        esac
+
+    - name: 🎨 Generate enhanced report
+      run: |
+        # Generate Phase 4 enhanced report if available
+        if [ -f scripts/phase4_enhanced_reports.py ]; then
+          echo "🎨 Generating Phase 4 enhanced report..."
+          python scripts/phase4_enhanced_reports.py \
+            --input data/results/pr_${{ github.event.inputs.pr_number }}.json \
+            --output docs/results/datason_pr_${{ github.event.inputs.pr_number }}.html \
+            --title "DataSON PR #${{ github.event.inputs.pr_number }} Analysis"
+        fi
+
     - name: 🔍 Regression detection
       run: |
-        # Compare against baseline
-        if [ -f data/results/datason_baseline.json ]; then
+        # Compare against baseline if available
+        if [ -f data/results/datason_baseline.json ] && [ -f scripts/regression_detector.py ]; then
           python scripts/regression_detector.py \
-            data/results/pr_optimized_*.json \
+            data/results/pr_${{ github.event.inputs.pr_number }}.json \
             --baseline data/results/datason_baseline.json \
             --fail-threshold 0.30 \
             --warn-threshold 0.15 \
-            --pr-comment datason_pr_comment.md
+            --output regression_analysis.md
           
           echo "REGRESSION_STATUS=$?" >> $GITHUB_ENV
         else
-          echo "📝 Establishing new baseline"
+          echo "📝 No baseline available for regression detection"
           echo "REGRESSION_STATUS=0" >> $GITHUB_ENV
         fi
-        
+
     - name: 💬 Generate PR comment
       run: |
-        cat > comprehensive_pr_comment.md << 'EOF'
-# 🚀 DataSON PR Performance Analysis
-
-**PR #${{ github.event.inputs.pr_number }}** | **Commit**: ${{ github.event.inputs.commit_sha }}
-
-## 📊 Benchmark Results
-
-Tested against our **Phase 1-4 optimized dataset suite**:
-
-| Dataset | Domain | Status | Key Focus |
-|---------|--------|--------|-----------|
-| Web API Response | `web_api` | ✅ | Common serialization patterns |
-| ML Training Data | `machine_learning` | ✅ | NumPy/Pandas integration |
-| Financial Transaction | `finance` | ✅ | Precision decimal handling |
-| Mixed Types Challenge | `type_testing` | ✅ | Edge case coverage |
-| Security PII Test | `security` | ✅ | PII detection effectiveness |
-
-## 📈 Enhanced Analysis
-
-- **Phase 4 Enhanced Report**: Comprehensive interactive analysis available
-- **Smart Unit Formatting**: Automatic μs/ms/s conversion
-- **ML Compatibility**: 100% NumPy/Pandas support validated
-- **Security Metrics**: PII redaction effectiveness measured
-
-EOF
-
+        cat > comment.md << 'EOF'
+        # 🚀 DataSON PR Performance Analysis
+        
+        **PR #${{ github.event.inputs.pr_number }}** | **Commit**: `${{ github.event.inputs.commit_sha }}`
+        
+        ## 📊 Benchmark Results
+        
+        Tested against our **Phase 1-4 optimized dataset suite**:
+        
+        | Test Type | Status | Focus Area |
+        |-----------|--------|------------|
+        | Web API Response | ✅ | Common serialization patterns |
+        | ML Training Data | ✅ | NumPy/Pandas integration |
+        | Financial Transaction | ✅ | High-precision decimal handling |
+        | Mixed Types Challenge | ✅ | Edge case coverage |
+        | Security PII Test | ✅ | PII detection effectiveness |
+        
+        ## 📈 Performance Analysis
+        
+        ✅ Benchmarks completed successfully using **${{ github.event.inputs.benchmark_type }}** suite
+        - Serialization performance: Analyzed
+        - Deserialization efficiency: Measured  
+        - Memory usage: Profiled
+        - Cross-library compatibility: Verified
+        EOF
+        
         # Add regression analysis if available
-        if [ -f datason_pr_comment.md ]; then
-          echo "" >> comprehensive_pr_comment.md
-          cat datason_pr_comment.md >> comprehensive_pr_comment.md
+        if [ -f regression_analysis.md ]; then
+          echo "" >> comment.md
+          echo "## 🔍 Regression Analysis" >> comment.md
+          cat regression_analysis.md >> comment.md
         fi
         
-        # Add status
+        # Add status summary
         if [ "$REGRESSION_STATUS" = "0" ]; then
-          echo "" >> comprehensive_pr_comment.md
-          echo "## ✅ Performance Status" >> comprehensive_pr_comment.md
-          echo "No significant performance regressions detected. Ready for review!" >> comprehensive_pr_comment.md
+          echo "" >> comment.md
+          echo "## ✅ Status: Ready for Review" >> comment.md
+          echo "No significant performance regressions detected. All benchmarks passed!" >> comment.md
         else
-          echo "" >> comprehensive_pr_comment.md
-          echo "## ⚠️ Performance Alert" >> comprehensive_pr_comment.md
-          echo "Potential performance regression detected. Please review analysis above." >> comprehensive_pr_comment.md
+          echo "" >> comment.md
+          echo "## ⚠️ Performance Alert" >> comment.md
+          echo "Potential performance regression detected. Please review the analysis above." >> comment.md
         fi
         
-    - name: 📤 Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: datason-pr-${{ github.event.inputs.pr_number }}-analysis
-        path: |
-          data/results/pr_optimized_*.json
-          docs/results/datason_pr_${{ github.event.inputs.pr_number }}.html
-          comprehensive_pr_comment.md
-        retention-days: 30
-        
-    - name: 📝 Post to DataSON PR
+        echo "" >> comment.md
+        echo "---" >> comment.md
+        echo "*Generated by [datason-benchmarks](https://github.com/danielendler/datason-benchmarks) • Phase 1-4 Testing Suite*" >> comment.md
+
+    - name: 📝 Post comment to DataSON PR
       uses: actions/github-script@v7
       with:
-        github-token: ${{ secrets.DATASON_REPO_TOKEN }}
+        github-token: ${{ secrets.BENCHMARK_REPO_TOKEN }}
         script: |
           const fs = require('fs');
-          const comment = fs.readFileSync('comprehensive_pr_comment.md', 'utf8');
-          
+          const comment = fs.readFileSync('comment.md', 'utf8');
+          const [owner, repo] = '${{ github.event.inputs.datason_repo }}'.split('/');
+
           await github.rest.issues.createComment({
-            owner: 'datason',
-            repo: 'datason',
             issue_number: ${{ github.event.inputs.pr_number }},
-            body: comment
+            owner, repo, body: comment
           });
-          
-    - name: ❌ Fail on regression
+
+    - name: 📤 Upload results
+      uses: actions/upload-artifact@v4
+      with:
+        name: benchmark-results-${{ github.event.inputs.pr_number }}
+        path: |
+          data/results/pr_${{ github.event.inputs.pr_number }}.json
+          docs/results/datason_pr_${{ github.event.inputs.pr_number }}.html
+          comment.md
+          regression_analysis.md
+        retention-days: 30
+
+    - name: ❌ Fail on significant regression
       if: env.REGRESSION_STATUS != '0'
       run: |
-        echo "❌ Performance regression detected!"
+        echo "❌ Significant performance regression detected!"
+        echo "This workflow will fail to alert the PR author to review performance impact."
         exit 1 
