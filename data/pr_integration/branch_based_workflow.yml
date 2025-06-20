@@ -1,0 +1,55 @@
+
+name: 🚀 DataSON PR Branch Benchmark
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  benchmark-from-branch:
+    name: 📊 Benchmark PR Branch
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout benchmark repository
+      uses: actions/checkout@v4
+      with:
+        repository: datason/datason-benchmarks
+        path: benchmarks
+        
+    - name: 📥 Checkout DataSON PR branch
+      uses: actions/checkout@v4
+      with:
+        repository: datason/datason
+        ref: ${{ github.head_ref }}
+        path: datason-pr
+        
+    - name: 🐍 Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+        
+    - name: 🔧 Install DataSON from PR branch
+      run: |
+        cd datason-pr
+        
+        # Install build dependencies
+        pip install -e .
+        
+        # Verify installation
+        python -c "
+        import datason
+        print(f'DataSON {datason.__version__} installed from PR branch')
+        "
+        
+    - name: 📦 Install benchmark dependencies
+      run: |
+        cd benchmarks
+        pip install -r requirements.txt
+        pip install orjson ujson msgpack jsonpickle pandas numpy
+        
+    - name: 🚀 Run PR benchmark
+      run: |
+        cd benchmarks
+        python scripts/pr_optimized_benchmark.py

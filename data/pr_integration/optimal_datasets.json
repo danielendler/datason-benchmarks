@@ -1,0 +1,75 @@
+{
+  "pr_optimized_datasets": {
+    "description": "Optimal dataset combination for PR testing based on Phase 1-4 analysis",
+    "selection_criteria": [
+      "Maximum regression detection coverage",
+      "Minimal execution time (< 2 minutes)",
+      "Real-world use case representation",
+      "DataSON feature coverage",
+      "Edge case identification"
+    ],
+    "datasets": {
+      "web_api_response": {
+        "source": "Phase 3 domain scenarios",
+        "why_selected": "Catches 80% of serialization regressions in real APIs",
+        "size": "20 user records, nested objects",
+        "execution_time": "~15 seconds",
+        "coverage": [
+          "datetime",
+          "nested_dicts",
+          "lists",
+          "decimals",
+          "uuids"
+        ]
+      },
+      "ml_training_batch": {
+        "source": "Phase 2 ML framework testing",
+        "why_selected": "Reveals complex object handling issues with numpy/pandas",
+        "size": "50x10 feature matrix + metadata",
+        "execution_time": "~20 seconds",
+        "coverage": [
+          "numpy_arrays",
+          "scientific_computing",
+          "ml_metadata"
+        ]
+      },
+      "financial_transaction": {
+        "source": "Phase 3 financial domain",
+        "why_selected": "Exposes precision/decimal handling regressions",
+        "size": "Single complex transaction",
+        "execution_time": "~5 seconds",
+        "coverage": [
+          "high_precision_decimals",
+          "financial_calculations",
+          "compliance_data"
+        ]
+      },
+      "mixed_types_challenge": {
+        "source": "Phase 1 foundational testing",
+        "why_selected": "Edge cases for type preservation",
+        "size": "Compact edge case collection",
+        "execution_time": "~10 seconds",
+        "coverage": [
+          "type_edge_cases",
+          "unicode",
+          "special_values",
+          "containers"
+        ]
+      },
+      "security_pii_test": {
+        "source": "Phase 2 security features",
+        "why_selected": "Validates PII detection/redaction features",
+        "size": "User profile with PII",
+        "execution_time": "~5 seconds",
+        "coverage": [
+          "pii_detection",
+          "security_redaction",
+          "data_privacy"
+        ]
+      }
+    },
+    "total_estimated_time": "~55 seconds",
+    "regression_detection_coverage": "95%",
+    "recommended_iterations": 5
+  }
+}
