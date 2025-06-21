@@ -252,19 +252,15 @@ jobs:
         EOF
         fi
 
-    - name: 📝 Post comment to DataSON PR
-      uses: actions/github-script@v7
-      with:
-        github-token: ${{ secrets.BENCHMARK_REPO_TOKEN }}
-        script: |
-          const fs = require('fs');
-          const comment = fs.readFileSync('comment.md', 'utf8');
-          const [owner, repo] = '${{ github.event.inputs.datason_repo }}'.split('/');
-
-          await github.rest.issues.createComment({
-            issue_number: ${{ github.event.inputs.pr_number }},
-            owner, repo, body: comment
-          });
+    - name: 📝 Post or update comment on DataSON PR  
+      run: |
+        echo "🔄 Managing PR comments to avoid duplication..."
+        python scripts/manage_pr_comments.py \
+          --token "${{ secrets.BENCHMARK_REPO_TOKEN }}" \
+          --repo "${{ github.event.inputs.datason_repo }}" \
+          --pr-number ${{ github.event.inputs.pr_number }} \
+          --comment-file comment.md \
+          --strategy update
 
     - name: 📤 Upload results
       uses: actions/upload-artifact@v4
