@@ -322,10 +322,10 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         
-        # Add new results including Phase 4 enhanced reports
-        git add data/results/weekly/ data/results/latest.json docs/results/ docs/index.md
-        git add -f docs/results/phase4_comprehensive_*.html
-        git add -f docs/results/weekly_phase4_enhanced_*.html
+        # Add new results including Phase 4 enhanced reports - with safety checks
+        git add data/results/weekly/ data/results/latest.json docs/results/ docs/index.md 2>/dev/null || echo "ℹ️ Some files not found, continuing..."
+        find docs/results -name "phase4_comprehensive_*.html" -exec git add -f {} \; 2>/dev/null || echo "ℹ️ No Phase 4 comprehensive reports to commit"
+        find docs/results -name "weekly_phase4_enhanced_*.html" -exec git add -f {} \; 2>/dev/null || echo "ℹ️ No weekly Phase 4 reports to commit"
         
         # Only commit if there are changes
         if ! git diff --staged --quiet; then

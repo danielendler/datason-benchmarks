@@ -181,12 +181,12 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         
-        # Force add CI-tagged results (override gitignore)
-        git add -f data/results/ci_*_*.json
-        git add -f docs/results/ci_*_*.html
-        git add -f docs/results/phase4_comprehensive_*.html
-        git add docs/results/index.html
-        git add docs/index.md
+        # Force add CI-tagged results (override gitignore) - with safety checks
+        find data/results -name "ci_*_*.json" -exec git add -f {} \; 2>/dev/null || echo "ℹ️ No CI JSON results to commit"
+        find docs/results -name "ci_*_*.html" -exec git add -f {} \; 2>/dev/null || echo "ℹ️ No CI HTML results to commit"
+        find docs/results -name "phase4_comprehensive_*.html" -exec git add -f {} \; 2>/dev/null || echo "ℹ️ No Phase 4 reports to commit"
+        git add docs/results/index.html 2>/dev/null || echo "ℹ️ No index.html to commit"
+        git add docs/index.md 2>/dev/null || echo "ℹ️ No docs index.md to commit"
         
         # Commit if there are changes
         if ! git diff --staged --quiet; then

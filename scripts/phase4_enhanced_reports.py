@@ -33,8 +33,17 @@ class Phase4ReportGenerator:
         """Generate comprehensive Phase 4 report with all visualizations."""
         logger.info(f"🎨 Generating Phase 4 comprehensive report for {result_file}")
         
+        # Handle both absolute and relative paths
+        result_path = Path(result_file)
+        if result_path.is_absolute() or result_path.exists():
+            # Use the path as-is if it's absolute or exists
+            file_path = result_path
+        else:
+            # Treat as relative to results_dir
+            file_path = self.results_dir / result_file
+        
         # Load benchmark results
-        with open(self.results_dir / result_file, 'r') as f:
+        with open(file_path, 'r') as f:
             results = json.load(f)
         
         # Store original results for data extraction
