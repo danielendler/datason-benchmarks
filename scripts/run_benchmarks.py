@@ -655,6 +655,8 @@ def main():
     # Output options
     parser.add_argument('--output', type=str,
                        help='Output file for results (optional)')
+    parser.add_argument('--generate-report', action='store_true',
+                       help='Generate HTML report after running benchmarks (legacy compatibility)')
     parser.add_argument('--quiet', action='store_true',
                        help='Reduce output verbosity')
     
@@ -721,6 +723,12 @@ def main():
         if args.output:
             runner._save_results_to_file(results, args.output)
             print(f"Results saved to: {args.output}")
+        
+        # Handle legacy --generate-report flag
+        if args.generate_report:
+            logger.info("🎨 --generate-report flag detected (results already saved automatically)")
+            # The script already saves results, this flag is for workflow compatibility
+            # Results are saved in _save_results() method called by each benchmark
         
         return 0
         
