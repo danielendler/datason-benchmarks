@@ -13,6 +13,7 @@ import logging
 import time
 from pathlib import Path
 from typing import Dict, Any
+import datason
 
 # Configure logging
 logging.basicConfig(
@@ -580,26 +581,28 @@ class BenchmarkRunner:
         print("\n" + "="*80)
 
     def _save_results(self, results: Dict[str, Any], benchmark_type: str):
-        """Save benchmark results to file."""
+        """Save benchmark results to file using DataSON (dogfooding our own product)."""
         timestamp = int(time.time())
         filename = f"{benchmark_type}_{timestamp}.json"
         filepath = self.output_dir / filename
         
         try:
             with open(filepath, 'w') as f:
-                json.dump(results, f, indent=2, default=str)
+                # Dogfood DataSON for saving our own benchmark results
+                f.write(datason.dumps(results, indent=2))
             logger.info(f"💾 Results saved to: {filepath}")
         except Exception as e:
             logger.error(f"Failed to save results: {e}")
     
     def _save_results_to_file(self, results: Dict[str, Any], output_file: str):
-        """Save benchmark results to a specific file."""
+        """Save benchmark results to a specific file using DataSON."""
         filepath = Path(output_file)
         filepath.parent.mkdir(parents=True, exist_ok=True)
         
         try:
             with open(filepath, 'w') as f:
-                json.dump(results, f, indent=2, default=str)
+                # Dogfood DataSON for saving our own benchmark results
+                f.write(datason.dumps(results, indent=2))
             logger.info(f"💾 Results saved to: {filepath}")
         except Exception as e:
             logger.error(f"Failed to save results: {e}")

@@ -45,7 +45,17 @@ def extract_datason_performance(results: Dict[str, Any]) -> Dict[str, Any]:
     # Handle different result structures
     test_data = None
     if "competitive" in results:
-        test_data = results["competitive"]
+        # Handle both new PR optimized structure and legacy competitive structure
+        competitive = results["competitive"]
+        if "tiers" in competitive:
+            # New structure: competitive.tiers.tier_name.datasets
+            test_data = {}
+            for tier_name, tier_info in competitive["tiers"].items():
+                if "datasets" in tier_info:
+                    test_data.update(tier_info["datasets"])
+        else:
+            # Legacy structure: competitive.dataset_name
+            test_data = competitive
     elif "phase2" in results:
         test_data = results["phase2"]
     elif "phase3" in results:
@@ -190,12 +200,12 @@ def generate_pr_comment(pr_number: str, commit_sha: str, benchmark_type: str,
     comment_lines.extend([
         "### 🎯 DataSON Performance Summary",
         "",
-        "| Metric | Result | Status |",
-        "|--------|--------|--------|",
-        f"| Serialization (avg) | {performance['serialization_avg_ms']:.3f} ms | {'✅' if performance['serialization_avg_ms'] > 0 else '❌'} |",
-        f"| Deserialization (avg) | {performance['deserialization_avg_ms']:.3f} ms | {'✅' if performance['deserialization_avg_ms'] > 0 else '❌'} |",
-        f"| Success Rate | {performance['success_rate']:.1f}% | {'✅' if performance['success_rate'] > 90 else '⚠️' if performance['success_rate'] > 70 else '❌'} |",
-        f"| Total Scenarios | {performance['total_scenarios']} | ✅ |",
+        "| Metric | Result | Benchmark Details | Status |",
+        "|--------|--------|-------------------|--------|",
+        f"| Serialization (avg) | **{performance['serialization_avg_ms']:.3f} ms** | {len([s for s in performance['scenarios'] if 'serialization_ms' in s])} measurements across {performance['tests_run']} scenarios | {'✅' if performance['serialization_avg_ms'] > 0 else '❌'} |",
+        f"| Deserialization (avg) | **{performance['deserialization_avg_ms']:.3f} ms** | {len([s for s in performance['scenarios'] if 'deserialization_ms' in s])} measurements | {'✅' if performance['deserialization_avg_ms'] > 0 else '❌'} |",
+        f"| Success Rate | **{performance['success_rate']:.1f}%** | {performance['tests_run']} scenarios tested with 5 iterations each | {'✅' if performance['success_rate'] > 90 else '⚠️' if performance['success_rate'] > 70 else '❌'} |",
+        f"| Performance Range | {performance['fastest_scenario']:.3f} - {performance['slowest_scenario']:.3f} ms | Min to max serialization times | {'✅' if performance['slowest_scenario'] < 100 else '⚠️'} |",
         ""
     ])
     

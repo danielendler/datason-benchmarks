@@ -282,7 +282,7 @@ class OptimizedPRBenchmark:
         }
     
     def run_pr_benchmark(self, iterations: int = 5) -> Dict[str, Any]:
-        """Run optimized PR benchmark suite."""
+        """Run optimized PR benchmark suite with actual performance testing."""
         if not self.datason_available:
             return {"error": "DataSON not available"}
         
@@ -297,24 +297,134 @@ class OptimizedPRBenchmark:
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "iterations": iterations,
                 "datasets_count": len(datasets),
-                "numpy_available": self.numpy_available
+                "numpy_available": self.numpy_available,
+                "datason_version": getattr(self.datason, '__version__', 'unknown')
             },
-            "datasets": {},
+            "competitive": {
+                "tiers": {
+                    "pr_optimized": {
+                        "description": "PR-optimized scenarios for regression detection",
+                        "datasets": {}
+                    }
+                }
+            },
+            "performance_summary": {
+                "total_tests": 0,
+                "successful_tests": 0,
+                "failed_tests": 0,
+                "avg_serialization_ms": 0.0,
+                "avg_deserialization_ms": 0.0
+            },
             "execution_time": 0.0
         }
         
-        # Benchmark each dataset
+        total_serialization_times = []
+        total_deserialization_times = []
+        successful_tests = 0
+        failed_tests = 0
+        
+        # Benchmark each dataset with actual performance testing
         for dataset_name, dataset_info in datasets.items():
             logger.info(f"  📊 Testing {dataset_name}...")
             
-            results["datasets"][dataset_name] = {
+            dataset_result = {
                 "description": dataset_info["description"],
                 "domain": dataset_info["domain"],
-                "size_category": dataset_info["size_category"]
+                "size_category": dataset_info["size_category"],
+                "serialization": {"datason": {}},
+                "deserialization": {"datason": {}}
             }
+            
+            # Run serialization benchmarks
+            serialization_times = []
+            serialization_errors = 0
+            
+            for i in range(iterations):
+                try:
+                    start = time.perf_counter()
+                    serialized = self.datason.dump(dataset_info["data"])
+                    end = time.perf_counter()
+                    serialization_times.append((end - start) * 1000)  # Convert to ms
+                except Exception as e:
+                    serialization_errors += 1
+                    logger.warning(f"    Serialization error in {dataset_name} iteration {i}: {e}")
+            
+            # Run deserialization benchmarks
+            deserialization_times = []
+            deserialization_errors = 0
+            
+            if serialization_times:  # Only test deserialization if serialization worked
+                try:
+                    # Get a successful serialization result for deserialization testing
+                    test_serialized = self.datason.dumps(dataset_info["data"])
+                    
+                    for i in range(iterations):
+                        try:
+                            start = time.perf_counter()
+                            deserialized = self.datason.loads(test_serialized)
+                            end = time.perf_counter()
+                            deserialization_times.append((end - start) * 1000)  # Convert to ms
+                        except Exception as e:
+                            deserialization_errors += 1
+                            logger.warning(f"    Deserialization error in {dataset_name} iteration {i}: {e}")
+                except Exception as e:
+                    logger.warning(f"    Could not create test data for deserialization in {dataset_name}: {e}")
+            
+            # Calculate statistics
+            if serialization_times:
+                dataset_result["serialization"]["datason"] = {
+                    "mean_ms": round(sum(serialization_times) / len(serialization_times), 3),
+                    "min_ms": round(min(serialization_times), 3),
+                    "max_ms": round(max(serialization_times), 3),
+                    "iterations": len(serialization_times),
+                    "error_count": serialization_errors
+                }
+                total_serialization_times.extend(serialization_times)
+                successful_tests += 1
+            else:
+                dataset_result["serialization"]["datason"] = {
+                    "error_count": serialization_errors,
+                    "status": "failed"
+                }
+                failed_tests += 1
+            
+            if deserialization_times:
+                dataset_result["deserialization"]["datason"] = {
+                    "mean_ms": round(sum(deserialization_times) / len(deserialization_times), 3),
+                    "min_ms": round(min(deserialization_times), 3),
+                    "max_ms": round(max(deserialization_times), 3),
+                    "iterations": len(deserialization_times),
+                    "error_count": deserialization_errors
+                }
+                total_deserialization_times.extend(deserialization_times)
+            else:
+                dataset_result["deserialization"]["datason"] = {
+                    "error_count": deserialization_errors,
+                    "status": "failed"
+                }
+            
+            results["competitive"]["tiers"]["pr_optimized"]["datasets"][dataset_name] = dataset_result
+        
+        # Calculate overall performance summary
+        results["performance_summary"]["total_tests"] = len(datasets)
+        results["performance_summary"]["successful_tests"] = successful_tests
+        results["performance_summary"]["failed_tests"] = failed_tests
+        
+        if total_serialization_times:
+            results["performance_summary"]["avg_serialization_ms"] = round(
+                sum(total_serialization_times) / len(total_serialization_times), 3
+            )
+        
+        if total_deserialization_times:
+            results["performance_summary"]["avg_deserialization_ms"] = round(
+                sum(total_deserialization_times) / len(total_deserialization_times), 3
+            )
         
         results["execution_time"] = time.time() - start_time
         logger.info(f"✅ PR benchmark completed in {results['execution_time']:.2f}s")
+        logger.info(f"   📊 {successful_tests}/{len(datasets)} scenarios passed")
+        logger.info(f"   ⚡ Avg serialization: {results['performance_summary']['avg_serialization_ms']:.3f}ms")
+        logger.info(f"   ⚡ Avg deserialization: {results['performance_summary']['avg_deserialization_ms']:.3f}ms")
         
         return results
 
@@ -328,7 +438,8 @@ def main():
     filename = f"data/results/pr_optimized_{timestamp}.json"
     
     with open(filename, 'w') as f:
-        json.dump(results, f, indent=2, default=str)
+        # Dogfood DataSON for saving our own benchmark results
+        f.write(datason.dumps(results, indent=2))
     
     print(f"📊 Results saved to {filename}")
 
