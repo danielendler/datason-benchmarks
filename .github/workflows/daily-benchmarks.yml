@@ -49,24 +49,11 @@ jobs:
     - name: 💾 Cache Python dependencies
       uses: actions/cache@v4
       with:
-        path: |
-          ~/.cache/pip
-          ~/.cache/pypoetry
+        path: ~/.cache/pip
         key: benchmark-deps-${{ runner.os }}-py3.11-${{ hashFiles('requirements.txt') }}-${{ github.run_id }}
         restore-keys: |
           benchmark-deps-${{ runner.os }}-py3.11-${{ hashFiles('requirements.txt') }}-
           benchmark-deps-${{ runner.os }}-py3.11-
-
-    - name: 💾 Cache competitor libraries
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.cache/pip/http
-          ~/.cache/pip/wheels
-        key: competitors-${{ runner.os }}-${{ hashFiles('requirements.txt') }}-${{ github.run_id }}
-        restore-keys: |
-          competitors-${{ runner.os }}-${{ hashFiles('requirements.txt') }}-
-          competitors-${{ runner.os }}-
 
     - name: 📦 Install dependencies
       run: |
