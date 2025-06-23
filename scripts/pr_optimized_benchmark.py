@@ -21,6 +21,7 @@ from datetime import datetime, timezone, timedelta
 from decimal import Decimal
 from typing import Any, Dict, List
 import json
+import argparse
 
 logger = logging.getLogger(__name__)
 
@@ -431,6 +432,10 @@ class OptimizedPRBenchmark:
 
 def main():
     """Run optimized PR benchmark."""
+    parser = argparse.ArgumentParser(description="Run PR-optimized benchmark suite")
+    parser.add_argument("--output", type=str, help="Output file for results")
+    args = parser.parse_args()
+
     # Import DataSON for result saving
     try:
         import datason
@@ -440,14 +445,17 @@ def main():
     
     pr_benchmark = OptimizedPRBenchmark()
     results = pr_benchmark.run_pr_benchmark(iterations=5)
-    
-    timestamp = int(time.time())
-    filename = f"data/results/pr_optimized_{timestamp}.json"
-    
+
+    if args.output:
+        filename = args.output
+    else:
+        timestamp = int(time.time())
+        filename = f"data/results/pr_optimized_{timestamp}.json"
+
     with open(filename, 'w') as f:
         # Dogfood DataSON v0.11.2 for JSON serialization
         f.write(datason.dumps_json(results))
-    
+
     print(f"📊 Results saved to {filename}")
     return 0
 
