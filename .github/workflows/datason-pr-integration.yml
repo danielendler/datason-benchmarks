@@ -187,7 +187,7 @@ jobs:
             echo "Attempting Phase 4 enhanced reporting..."
             python scripts/phase4_enhanced_reports.py \
               data/results/pr_${{ github.event.inputs.pr_number }}.json \
-              --output-dir docs/results/ 2>/dev/null || echo "Phase 4 reports not available, using standard reports"
+              2>/dev/null || echo "Phase 4 reports not available, using standard reports"
           fi
         else
           echo "⚠️ No result file found at data/results/pr_${{ github.event.inputs.pr_number }}.json"
