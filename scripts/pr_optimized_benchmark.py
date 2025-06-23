@@ -342,7 +342,7 @@ class OptimizedPRBenchmark:
             for i in range(iterations):
                 try:
                     start = time.perf_counter()
-                    serialized = self.datason.dump(dataset_info["data"])
+                    serialized = self.datason.dumps(dataset_info["data"])
                     end = time.perf_counter()
                     serialization_times.append((end - start) * 1000)  # Convert to ms
                 except Exception as e:
@@ -431,6 +431,13 @@ class OptimizedPRBenchmark:
 
 def main():
     """Run optimized PR benchmark."""
+    # Import DataSON for result saving
+    try:
+        import datason
+    except ImportError:
+        print("Error: DataSON not available for saving results")
+        return 1
+    
     pr_benchmark = OptimizedPRBenchmark()
     results = pr_benchmark.run_pr_benchmark(iterations=5)
     
@@ -442,6 +449,7 @@ def main():
         f.write(datason.dumps(results))
     
     print(f"📊 Results saved to {filename}")
+    return 0
 
 
 if __name__ == "__main__":
