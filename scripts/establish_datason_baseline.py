@@ -13,6 +13,7 @@ import logging
 import os
 from datetime import datetime
 from pathlib import Path
+import datason
 
 from pr_optimized_benchmark import OptimizedPRBenchmark
 
@@ -61,9 +62,10 @@ def main():
         "purpose": "Performance regression detection baseline"
     }
     
-    # Save baseline
+    # Save baseline using DataSON (dogfooding our own product)
     with open(args.output, 'w') as f:
-        json.dump(results, f, indent=2, default=str)
+        # Dogfood DataSON for serialization (no indent param in DataSON)
+        f.write(datason.dumps(results))
     
     logger.info(f"✅ Baseline established: {args.output}")
     logger.info(f"DataSON {datason.__version__} performance recorded")

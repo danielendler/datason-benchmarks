@@ -588,8 +588,8 @@ class BenchmarkRunner:
         
         try:
             with open(filepath, 'w') as f:
-                # Dogfood DataSON for saving our own benchmark results
-                f.write(datason.dumps(results, indent=2))
+                # Dogfood DataSON for serialization (no indent param in DataSON)
+                f.write(datason.dumps(results))
             logger.info(f"💾 Results saved to: {filepath}")
         except Exception as e:
             logger.error(f"Failed to save results: {e}")
@@ -601,8 +601,8 @@ class BenchmarkRunner:
         
         try:
             with open(filepath, 'w') as f:
-                # Dogfood DataSON for saving our own benchmark results
-                f.write(datason.dumps(results, indent=2))
+                # Dogfood DataSON for serialization (no indent param in DataSON)
+                f.write(datason.dumps(results))
             logger.info(f"💾 Results saved to: {filepath}")
         except Exception as e:
             logger.error(f"Failed to save results: {e}")

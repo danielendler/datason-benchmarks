@@ -14,6 +14,7 @@ from dataclasses import dataclass, asdict
 import statistics
 from pathlib import Path
 import argparse
+import datason
 
 @dataclass
 class TrendDataPoint:
@@ -444,14 +445,15 @@ class PerformanceTrendAnalyzer:
         )
     
     def save_trend_analysis(self, summary: TrendSummary, output_file: str):
-        """Save trend analysis to JSON file"""
+        """Save trend analysis to JSON file using DataSON (dogfooding)"""
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
         
         # Convert to serializable format
         output_data = asdict(summary)
         
         with open(output_file, 'w') as f:
-            json.dump(output_data, f, indent=2)
+            # Dogfood DataSON for serialization (no indent param in DataSON)
+            f.write(datason.dumps(output_data))
         
         print(f"Trend analysis saved to: {output_file}")
     

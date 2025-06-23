@@ -11,6 +11,7 @@ from typing import Dict, List, Tuple, Optional, Any
 from dataclasses import dataclass
 from pathlib import Path
 import datetime
+import datason
 
 @dataclass
 class RegressionThresholds:
@@ -390,7 +391,8 @@ class PerformanceRegressionDetector:
             os.makedirs(output_dir, exist_ok=True)
         
         with open(output_file, 'w') as f:
-            json.dump(report, f, indent=2)
+            # Dogfood DataSON for serialization (no indent param in DataSON)
+            f.write(datason.dumps(report))
 
 def main():
     """Command line interface for regression detection"""

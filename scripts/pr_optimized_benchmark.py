@@ -438,8 +438,8 @@ def main():
     filename = f"data/results/pr_optimized_{timestamp}.json"
     
     with open(filename, 'w') as f:
-        # Dogfood DataSON for saving our own benchmark results
-        f.write(datason.dumps(results, indent=2))
+        # Dogfood DataSON for serialization (no indent param in DataSON)
+        f.write(datason.dumps(results))
     
     print(f"📊 Results saved to {filename}")
 
