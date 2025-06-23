@@ -342,7 +342,7 @@ class OptimizedPRBenchmark:
             for i in range(iterations):
                 try:
                     start = time.perf_counter()
-                    serialized = self.datason.dumps(dataset_info["data"])
+                    serialized = self.datason.dumps_json(dataset_info["data"])
                     end = time.perf_counter()
                     serialization_times.append((end - start) * 1000)  # Convert to ms
                 except Exception as e:
@@ -356,7 +356,7 @@ class OptimizedPRBenchmark:
             if serialization_times:  # Only test deserialization if serialization worked
                 try:
                     # Get a successful serialization result for deserialization testing
-                    test_serialized = self.datason.dumps(dataset_info["data"])
+                    test_serialized = self.datason.dumps_json(dataset_info["data"])
                     
                     for i in range(iterations):
                         try:
@@ -445,8 +445,8 @@ def main():
     filename = f"data/results/pr_optimized_{timestamp}.json"
     
     with open(filename, 'w') as f:
-        # Dogfood DataSON for serialization (no indent param in DataSON)
-        f.write(datason.dumps(results))
+        # Dogfood DataSON v0.11.2 for JSON serialization
+        f.write(datason.dumps_json(results))
     
     print(f"📊 Results saved to {filename}")
     return 0

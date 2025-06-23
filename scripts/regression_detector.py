@@ -391,8 +391,8 @@ class PerformanceRegressionDetector:
             os.makedirs(output_dir, exist_ok=True)
         
         with open(output_file, 'w') as f:
-            # Dogfood DataSON for serialization (no indent param in DataSON)
-            f.write(datason.dumps(report))
+            # Dogfood DataSON v0.11.2 for JSON serialization
+            f.write(datason.dumps_json(report))
 
 def main():
     """Command line interface for regression detection"""

@@ -452,8 +452,8 @@ class PerformanceTrendAnalyzer:
         output_data = asdict(summary)
         
         with open(output_file, 'w') as f:
-            # Dogfood DataSON for serialization (no indent param in DataSON)
-            f.write(datason.dumps(output_data))
+            # Dogfood DataSON v0.11.2 for JSON serialization
+            f.write(datason.dumps_json(output_data))
         
         print(f"Trend analysis saved to: {output_file}")
     

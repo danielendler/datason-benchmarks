@@ -64,8 +64,8 @@ def main():
     
     # Save baseline using DataSON (dogfooding our own product)
     with open(args.output, 'w') as f:
-        # Dogfood DataSON for serialization (no indent param in DataSON)
-        f.write(datason.dumps(results))
+        # Dogfood DataSON v0.11.2 for JSON serialization
+        f.write(datason.dumps_json(results))
     
     logger.info(f"✅ Baseline established: {args.output}")
     logger.info(f"DataSON {datason.__version__} performance recorded")
