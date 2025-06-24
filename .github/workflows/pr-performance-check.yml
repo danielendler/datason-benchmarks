@@ -76,15 +76,21 @@ jobs:
     - name: 📊 Generate PR comment
       if: github.event_name == 'pull_request'
       run: |
-        python scripts/generate_pr_comment.py \
-          --pr-number "${{ github.event.number }}" \
-          --commit-sha "${{ github.sha }}" \
-          --benchmark-type "quick" \
-          --result-file data/results/latest_quick.json \
-          --baseline-file data/results/latest.json \
-          --output pr_comment.md
+        if [ -f data/results/latest_quick.json ]; then
+          python scripts/generate_pr_comment.py \
+            --pr-number "${{ github.event.number }}" \
+            --commit-sha "${{ github.sha }}" \
+            --benchmark-type "quick" \
+            --result-file data/results/latest_quick.json \
+            --baseline-file data/results/latest.json \
+            --output pr_comment.md
 
-        echo "📊 PR comment generated"
+          cat pr_comment.md >> "$GITHUB_STEP_SUMMARY"
+          echo "📊 PR comment generated"
+        else
+          echo "⚠️ No benchmark results found" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "No benchmark results found" > pr_comment.md
+        fi
     - name: 🔍 Advanced Regression Detection
       run: |
         # Install regression detection dependencies if needed
