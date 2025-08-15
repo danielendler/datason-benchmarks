@@ -124,7 +124,7 @@ jobs:
       - name: Run benchmarks
         run: python scripts/version_benchmark.py
       - name: Store results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
 ```
 
 ### Key Tracking Metrics (Automated)

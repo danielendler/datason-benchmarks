@@ -72,7 +72,12 @@ def benchmark(op: str, shape: str, size: int, repeats: int) -> Dict[str, float]:
 
 def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("op", choices=["save_string", "load_basic"])
+    parser.add_argument(
+        "op",
+        nargs="?",
+        default="save_string",
+        choices=["save_string", "load_basic"],
+    )
     parser.add_argument("--with-rust", choices=["on", "off", "auto"], default="auto")
     parser.add_argument("--sizes", default="10k,100k,1m")
     parser.add_argument("--shapes", default="flat,nested,mixed")
@@ -108,4 +113,3 @@ def main(argv: Iterable[str] | None = None) -> None:
 
 if __name__ == "__main__":  # pragma: no cover
     main()
-
