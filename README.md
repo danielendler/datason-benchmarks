@@ -54,6 +54,28 @@ python scripts/run_benchmarks.py --configurations --generate-report
 python scripts/run_benchmarks.py --all --generate-report
 ```
 
+### Rust Core Benchmarks (experimental)
+
+The `scripts/bench_rust_core.py` helper exercises `datason.save_string` and
+`datason.load_basic` with the optional Rust accelerator toggled on or off.
+Use it to measure fast-path speedups and fallback overhead.
+
+```bash
+# Run save_string with Rust enabled
+python scripts/bench_rust_core.py save_string --with-rust on --sizes 10k --shapes flat --repeat 5 --output results_rust_on.json
+
+# Run save_string with Rust disabled
+python scripts/bench_rust_core.py save_string --with-rust off --sizes 10k --shapes flat --repeat 5 --output results_rust_off.json
+```
+
+Configuration notes:
+
+- `--with-rust` controls the `DATASON_RUST` environment variable (`on`, `off`,
+  or `auto` to respect the existing value).
+- Ensure your DataSON wheel includes the Rust extension; otherwise the script
+  skips `--with-rust on` runs.
+- Output files are JSON and can be merged or inspected directly.
+
 ### Phase 4: Enhanced Reporting & Visualization 🎨
 
 **NEW:** Interactive reports with comprehensive performance tables and smart unit formatting:
