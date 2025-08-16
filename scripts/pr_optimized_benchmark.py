@@ -12,7 +12,7 @@ by using warmup runs, more iterations, and outlier removal.
 
 Key Tiers:
 1. Basic: Raw performance with save_string/load_basic.
-2. API Optimized: For web services using dump_api/load_basic.
+2. API Optimized: For web services using save_api/load_basic.
 3. Smart: Advanced type handling with dump/load_smart.
 4. ML Optimized: For scientific workloads with dump_ml/load_smart.
 5. Compatibility: For stdlib json drop-in replacement.
@@ -58,24 +58,30 @@ class OptimizedPRBenchmark:
         """
         if not self.datason_available:
             return {}
+        # Determine available serialization methods, with fallbacks
+        basic_ser = getattr(self.datason, 'save_string', self.datason.dumps_json)
+        api_ser = getattr(self.datason, 'save_api', getattr(self.datason, 'dump_api', basic_ser))
+        smart_ser = getattr(self.datason, 'dump', getattr(self.datason, 'save_chunked', basic_ser))
+        ml_ser = getattr(self.datason, 'dump_ml', getattr(self.datason, 'save_ml', smart_ser))
+
         return {
             'basic': {
-                'serialize': self.datason.save_string,
+                'serialize': basic_ser,
                 'deserialize': self.datason.load_basic,
                 'description': 'Direct basic API - fastest baseline'
             },
             'api_optimized': {
-                'serialize': self.datason.dump_api,
+                'serialize': api_ser,
                 'deserialize': self.datason.load_basic,
                 'description': 'API-optimized - best for web services'
             },
             'smart': {
-                'serialize': self.datason.dump,
+                'serialize': smart_ser,
                 'deserialize': self.datason.load_smart,
                 'description': 'Smart detection - type preservation'
             },
             'ml_optimized': {
-                'serialize': self.datason.dump_ml,
+                'serialize': ml_ser,
                 'deserialize': self.datason.load_smart,
                 'description': 'ML-optimized - NumPy/tensor support'
             },
