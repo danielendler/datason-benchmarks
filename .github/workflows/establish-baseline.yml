@@ -1,0 +1,272 @@
+name: 📊 Establish Performance Baseline
+
+on:
+  workflow_dispatch:
+    inputs:
+      datason_version:
+        description: 'DataSON version to baseline (e.g., 0.12.0 or latest)'
+        required: false
+        default: 'latest'
+        type: string
+      update_strategy:
+        description: 'How to handle existing baseline'
+        required: true
+        default: 'create_if_missing'
+        type: choice
+        options:
+          - create_if_missing  # Only create if no baseline exists
+          - force_update       # Always update, even if exists
+          - archive_and_update # Archive old baseline before updating
+      commit_baseline:
+        description: 'Commit baseline to repository'
+        required: true
+        default: true
+        type: boolean
+  
+  # Also run on push to main to keep baseline current
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/**'
+      - 'benchmarks/**'
+      - 'requirements.txt'
+  
+  # Weekly update to catch any drift
+  schedule:
+    - cron: '0 2 * * 1'  # Every Monday at 2 AM UTC
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  establish-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0  # Need full history for potential archiving
+    
+    - name: 🐍 Setup Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+    
+    - name: 💾 Cache dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: baseline-${{ runner.os }}-py3.11-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          baseline-${{ runner.os }}-py3.11-
+    
+    - name: 📦 Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+        # Install specific DataSON version if requested
+        if [ "${{ github.event.inputs.datason_version }}" != "" ] && [ "${{ github.event.inputs.datason_version }}" != "latest" ]; then
+          echo "📌 Installing specific DataSON version: ${{ github.event.inputs.datason_version }}"
+          pip install datason==${{ github.event.inputs.datason_version }}
+        else
+          echo "📦 Installing latest DataSON version"
+          pip install --upgrade datason
+        fi
+        
+        # Verify installation
+        python -c "import datason; print(f'✅ DataSON {datason.__version__} installed')"
+    
+    - name: 🔍 Check existing baseline
+      id: check_baseline
+      run: |
+        if [ -f data/results/datason_baseline.json ]; then
+          echo "📊 Existing baseline found"
+          echo "baseline_exists=true" >> $GITHUB_OUTPUT
+          
+          # Extract version from existing baseline
+          EXISTING_VERSION=$(python -c "
+          import json
+          with open('data/results/datason_baseline.json') as f:
+              data = json.load(f)
+              print(data.get('baseline_metadata', {}).get('datason_version', 'unknown'))
+          " 2>/dev/null || echo "unknown")
+          
+          echo "existing_version=$EXISTING_VERSION" >> $GITHUB_OUTPUT
+          echo "📌 Existing baseline version: $EXISTING_VERSION"
+        else
+          echo "📝 No existing baseline found"
+          echo "baseline_exists=false" >> $GITHUB_OUTPUT
+          echo "existing_version=none" >> $GITHUB_OUTPUT
+        fi
+        
+        # Get current DataSON version
+        CURRENT_VERSION=$(python -c "import datason; print(datason.__version__)")
+        echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+        echo "📦 Current DataSON version: $CURRENT_VERSION"
+    
+    - name: 📁 Archive existing baseline (if needed)
+      if: |
+        steps.check_baseline.outputs.baseline_exists == 'true' && 
+        (github.event.inputs.update_strategy == 'archive_and_update' || 
+         github.event.inputs.update_strategy == 'force_update')
+      run: |
+        TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+        VERSION=${{ steps.check_baseline.outputs.existing_version }}
+        ARCHIVE_NAME="data/results/archived/baseline_${VERSION}_${TIMESTAMP}.json"
+        
+        echo "📁 Archiving existing baseline to $ARCHIVE_NAME"
+        mkdir -p data/results/archived
+        cp data/results/datason_baseline.json "$ARCHIVE_NAME"
+        
+        # Keep only last 10 archived baselines
+        cd data/results/archived
+        ls -t baseline_*.json 2>/dev/null | tail -n +11 | xargs -r rm
+        cd -
+        
+        echo "✅ Baseline archived"
+    
+    - name: 🚀 Establish new baseline
+      id: establish
+      run: |
+        SHOULD_UPDATE=false
+        
+        # Determine if we should update
+        if [ "${{ steps.check_baseline.outputs.baseline_exists }}" == "false" ]; then
+          echo "📝 No baseline exists, creating new one"
+          SHOULD_UPDATE=true
+        elif [ "${{ github.event.inputs.update_strategy }}" == "force_update" ]; then
+          echo "🔄 Force update requested"
+          SHOULD_UPDATE=true
+        elif [ "${{ github.event.inputs.update_strategy }}" == "archive_and_update" ]; then
+          echo "📁 Archive and update requested"
+          SHOULD_UPDATE=true
+        elif [ "${{ steps.check_baseline.outputs.existing_version }}" != "${{ steps.check_baseline.outputs.current_version }}" ]; then
+          echo "🔄 Version change detected, updating baseline"
+          SHOULD_UPDATE=true
+        fi
+        
+        if [ "$SHOULD_UPDATE" == "true" ]; then
+          echo "🚀 Establishing baseline with DataSON ${{ steps.check_baseline.outputs.current_version }}"
+          
+          # Run baseline establishment with more iterations for stable results
+          python scripts/establish_datason_baseline.py \
+            --output data/results/datason_baseline.json \
+            --iterations 20 \
+            --force
+          
+          # Create symlink for compatibility
+          cd data/results
+          ln -sf datason_baseline.json latest.json
+          cd -
+          
+          echo "baseline_updated=true" >> $GITHUB_OUTPUT
+          echo "✅ Baseline established successfully"
+        else
+          echo "ℹ️ Baseline is up to date, no changes needed"
+          echo "baseline_updated=false" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: 📊 Generate baseline report
+      if: steps.establish.outputs.baseline_updated == 'true'
+      run: |
+        # Generate a readable report of the baseline
+        python -c "
+        import json
+        from datetime import datetime
+        
+        with open('data/results/datason_baseline.json') as f:
+            data = json.load(f)
+        
+        print('# 📊 DataSON Performance Baseline Report')
+        print(f'Generated: {datetime.now().isoformat()}')
+        print()
+        
+        if 'baseline_metadata' in data:
+            meta = data['baseline_metadata']
+            print('## Metadata')
+            print(f'- DataSON Version: {meta.get(\"datason_version\", \"unknown\")}')
+            print(f'- Established: {meta.get(\"established_at\", \"unknown\")}')
+            print(f'- Iterations: {meta.get(\"iterations\", \"unknown\")}')
+            print()
+        
+        if 'summary' in data:
+            summary = data['summary']
+            print('## Performance Summary')
+            print(f'- Total Scenarios: {summary.get(\"total_scenarios\", 0)}')
+            print(f'- Success Rate: {summary.get(\"success_rate\", 0):.1f}%')
+            print(f'- Avg Serialization: {summary.get(\"avg_serialization_ms\", 0):.3f}ms')
+            print(f'- Avg Deserialization: {summary.get(\"avg_deserialization_ms\", 0):.3f}ms')
+            print()
+        
+        if 'scenario_results' in data:
+            print('## Scenario Performance')
+            for scenario, results in data['scenario_results'].items():
+                if isinstance(results, dict) and 'timings' in results:
+                    timings = results['timings']
+                    print(f'- **{scenario}**:')
+                    print(f'  - Serialization: {timings.get(\"serialization\", {}).get(\"mean\", 0)*1000:.3f}ms')
+                    print(f'  - Deserialization: {timings.get(\"deserialization\", {}).get(\"mean\", 0)*1000:.3f}ms')
+        " > baseline_report.md
+        
+        cat baseline_report.md >> $GITHUB_STEP_SUMMARY
+    
+    - name: 💾 Commit baseline to repository
+      if: |
+        steps.establish.outputs.baseline_updated == 'true' && 
+        (github.event.inputs.commit_baseline == 'true' || 
+         github.event_name == 'push' || 
+         github.event_name == 'schedule')
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        
+        # Add baseline files
+        git add data/results/datason_baseline.json
+        git add data/results/latest.json
+        
+        # Add archived baselines if any
+        if [ -d data/results/archived ]; then
+          git add data/results/archived/
+        fi
+        
+        # Commit with descriptive message
+        COMMIT_MSG="🤖 Update performance baseline to DataSON ${{ steps.check_baseline.outputs.current_version }}
+        
+        - Previous version: ${{ steps.check_baseline.outputs.existing_version }}
+        - New version: ${{ steps.check_baseline.outputs.current_version }}
+        - Environment: GitHub Actions (ubuntu-latest)
+        - Trigger: ${{ github.event_name }}
+        - Update strategy: ${{ github.event.inputs.update_strategy || 'automatic' }}
+        
+        This baseline will be used for regression detection in future PRs."
+        
+        git commit -m "$COMMIT_MSG" || echo "No changes to commit"
+        
+        # Push changes
+        git push origin main || echo "No changes to push"
+    
+    - name: 📤 Upload baseline artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: baseline-${{ github.run_id }}
+        path: |
+          data/results/datason_baseline.json
+          data/results/latest.json
+          data/results/archived/
+          baseline_report.md
+        retention-days: 90
+    
+    - name: ✅ Baseline establishment complete
+      run: |
+        if [ "${{ steps.establish.outputs.baseline_updated }}" == "true" ]; then
+          echo "✅ Baseline successfully updated to DataSON ${{ steps.check_baseline.outputs.current_version }}"
+          echo "📊 This baseline will be used for all future PR performance comparisons"
+        else
+          echo "ℹ️ Baseline unchanged - already up to date"
+        fi
