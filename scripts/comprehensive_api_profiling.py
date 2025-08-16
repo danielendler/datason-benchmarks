@@ -154,8 +154,9 @@ def benchmark_api(api_name: str, serialize_func, deserialize_func, data: Any,
 def profile_with_profiling_enabled(api_name: str, serialize_func, deserialize_func,
                                   data: Any) -> Dict[str, Any]:
     """Run with profiling enabled to get stage breakdown."""
-    import os
+    import os, importlib
     os.environ['DATASON_PROFILE'] = '1'
+    importlib.reload(datason)
     datason.profile_sink = []
 
     # Serialize
@@ -170,6 +171,7 @@ def profile_with_profiling_enabled(api_name: str, serialize_func, deserialize_fu
     deserialize_events = list(datason.profile_sink)
 
     os.environ.pop('DATASON_PROFILE', None)
+    importlib.reload(datason)
 
     return {
         'serialize_stages': serialize_events,

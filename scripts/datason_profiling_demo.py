@@ -7,6 +7,10 @@ Run from datason-benchmarks to profile DataSON performance.
 """
 
 import os
+import importlib
+# Ensure profiling hooks are enabled before importing datason
+os.environ.setdefault("DATASON_PROFILE", "1")
+
 import sys
 import time
 from datetime import datetime
@@ -14,6 +18,7 @@ from pathlib import Path
 
 # DataSON should already be installed via pip
 import datason
+importlib.reload(datason)
 
 
 def demo_basic_profiling():
@@ -28,6 +33,7 @@ def demo_basic_profiling():
 
     # Enable profiling
     os.environ["DATASON_PROFILE"] = "1"
+    importlib.reload(datason)
     datason.profile_sink = []
 
     print("\n✅ Profiling enabled")
@@ -211,10 +217,8 @@ def demo_environment_controls():
         print(f"\n--- Testing DATASON_RUST={setting} ---")
         os.environ["DATASON_RUST"] = setting
 
-        # Import config to check setting
-        from datason.config import get_accel_mode
-
-        accel_mode = get_accel_mode()
+        # Determine acceleration mode from environment
+        accel_mode = os.environ.get("DATASON_RUST", "<unknown>")
 
         print(f"   Environment: DATASON_RUST={setting}")
         print(f"   Acceleration mode: {accel_mode}")
