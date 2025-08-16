@@ -225,9 +225,10 @@ jobs:
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         
-        # Add baseline files
-        git add data/results/datason_baseline.json
-        git add data/results/latest.json
+        # Force-add baseline files (they're in .gitignore to prevent local commits)
+        # But CI-generated baselines are legitimate and should be committed
+        git add -f data/results/datason_baseline.json
+        git add -f data/results/latest.json
         
         # Add archived baselines if any
         if [ -d data/results/archived ]; then
