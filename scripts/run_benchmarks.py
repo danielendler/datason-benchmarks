@@ -359,6 +359,25 @@ class BenchmarkRunner:
         
         return trend_report
     
+    def run_comprehensive_api_profiling(self) -> Dict[str, Any]:
+        """Run the comprehensive API profiling harness across all DataSON APIs."""
+        logger.info("🔬 Running comprehensive API profiling across all DataSON APIs...")
+        try:
+            from scripts.comprehensive_api_profiling import main as comprehensive_main
+        except ImportError as e:
+            logger.error(f"Failed to import comprehensive API profiling script: {e}")
+            return {"error": "comprehensive profiling script not available"}
+        results = comprehensive_main()
+        # Save results to JSON
+        out_file = self.output_dir / f"comprehensive_api_profile_{int(time.time())}.json"
+        try:
+            import datason
+            out_file.write_text(datason.dumps_json(results))
+            logger.info(f"✅ Comprehensive API profiling results saved to: {out_file}")
+        except Exception as e:
+            logger.error(f"Failed to save comprehensive profiling results: {e}")
+        return results
+    
     def _get_typical_data_types_for_domain(self, domain: str) -> list:
         """Get typical data types used in each domain."""
         domain_data_types = {
@@ -655,6 +674,9 @@ def main():
     parser.add_argument('--phase4-trends', action='store_true',
                        help='Run Phase 4 trend analysis and regression detection')
     
+    # Comprehensive API profiling
+    parser.add_argument('--profile-apis', action='store_true',
+                       help='Run comprehensive API profiling across all DataSON APIs')
     # Output options
     parser.add_argument('--output', type=str,
                        help='Output file for results (optional)')
@@ -672,6 +694,10 @@ def main():
     runner = BenchmarkRunner()
     
     try:
+        # Comprehensive API profiling
+        if args.profile_apis:
+            runner.run_comprehensive_api_profiling()
+            return 0
         # Phase 4 options
         if args.phase4_report:
             report_path = runner.run_phase4_enhanced_report(args.phase4_report)
