@@ -153,15 +153,18 @@ class PerformanceRegressionDetector:
         if not os.path.exists(results_dir):
             return None
         
-        # Look for latest.json first
+        # Look for latest results files first (e.g., latest.json or latest_*.json)
         latest_file = os.path.join(results_dir, 'latest.json')
         if os.path.exists(latest_file):
             return latest_file
+        for fname in os.listdir(results_dir):
+            if fname.startswith('latest_') and fname.endswith('.json'):
+                return os.path.join(results_dir, fname)
         
-        # Fall back to most recent timestamped file
+        # Fall back to most recent full-run result (complete or comprehensive)
         result_files = []
         for file in os.listdir(results_dir):
-            if file.endswith('.json') and 'comprehensive' in file:
+            if file.endswith('.json') and ('comprehensive' in file or 'complete' in file):
                 result_files.append(os.path.join(results_dir, file))
         
         if result_files:

@@ -23,7 +23,8 @@ def demo_basic_profiling():
     print("=" * 60)
 
     print(f"DataSON Version: {datason.__version__}")
-    print(f"Rust Available: {datason.RUST_AVAILABLE}")
+    rust_avail = getattr(datason, 'RUST_AVAILABLE', False)
+    print(f"Rust Available: {rust_avail}")
 
     # Enable profiling
     os.environ["DATASON_PROFILE"] = "1"
@@ -52,9 +53,10 @@ def demo_basic_profiling():
     datason.profile_sink.clear()
 
     # Test serialization with profiling
-    print("\n🔄 Running save_string...")
+    print("\n🔄 Running save_string/serialize...")
+    save_func = getattr(datason, 'save_string', getattr(datason, 'serialize', datason.dumps_json))
     start = time.perf_counter()
-    json_result = datason.save_string(test_data)
+    json_result = save_func(test_data)
     save_time = time.perf_counter() - start
 
     save_events = list(datason.profile_sink)
@@ -66,9 +68,10 @@ def demo_basic_profiling():
     datason.profile_sink.clear()
 
     # Test deserialization with profiling
-    print("\n🔄 Running load_basic...")
+    print("\n🔄 Running load_basic/parse...")
+    load_func = getattr(datason, 'load_basic', getattr(datason, 'parse', datason.deserialize))
     start = time.perf_counter()
-    loaded_data = datason.load_basic(json_result)
+    loaded_data = load_func(json_result)
     load_time = time.perf_counter() - start
 
     load_events = list(datason.profile_sink)
@@ -144,16 +147,18 @@ def demo_performance_scenarios():
         datason.profile_sink.clear()
 
         # Measure serialization
+        save_func = getattr(datason, 'save_string', getattr(datason, 'serialize', datason.dumps_json))
         start = time.perf_counter()
-        json_str = datason.save_string(scenario["data"])
+        json_str = save_func(scenario["data"])
         save_time = time.perf_counter() - start
 
         save_events = len(datason.profile_sink)
         datason.profile_sink.clear()
 
         # Measure deserialization
+        load_func = getattr(datason, 'load_basic', getattr(datason, 'parse', datason.deserialize))
         start = time.perf_counter()
-        loaded = datason.load_basic(json_str)
+        loaded = load_func(json_str)
         load_time = time.perf_counter() - start
 
         load_events = len(datason.profile_sink)
@@ -213,9 +218,10 @@ def demo_environment_controls():
 
         print(f"   Environment: DATASON_RUST={setting}")
         print(f"   Acceleration mode: {accel_mode}")
-        print(f"   Rust available: {datason.RUST_AVAILABLE}")
+        rust_avail = getattr(datason, 'RUST_AVAILABLE', False)
+        print(f"   Rust available: {rust_avail}")
 
-        if datason.RUST_AVAILABLE:
+        if getattr(datason, 'RUST_AVAILABLE', False):
             print("   🦀 Rust acceleration would be active")
         else:
             print("   🐍 Using Python implementation")
@@ -245,7 +251,7 @@ def main():
         print("   ✅ Environment controls: Active")
         print("   ✅ CI integration: Ready")
 
-        if not datason.RUST_AVAILABLE:
+        if not getattr(datason, 'RUST_AVAILABLE', False):
             print("\n🦀 Rust Core Status:")
             print("   📋 Rust core not yet compiled")
             print("   ✅ Infrastructure ready for Rust integration")
@@ -255,7 +261,7 @@ def main():
         print("   1. Run this demo in CI to see automated profiling")
         print("   2. Create a PR to see performance analysis in action")
         print("   3. Use profiling to optimize performance-critical code")
-        if not datason.RUST_AVAILABLE:
+        if not getattr(datason, 'RUST_AVAILABLE', False):
             print("   4. Compile Rust core for acceleration (optional)")
 
     except Exception as e:

@@ -102,38 +102,43 @@ def parse_profiling_output(output: str) -> Dict[str, Any]:
 def format_pr_comment(metrics: Dict[str, Any], comparison_metrics: Dict[str, Any] = None) -> str:
     """Format metrics into a PR comment with actual performance numbers."""
 
-    comment = """# 🚀 DataSON PR Performance Analysis
+    # Header and system configuration
+    comment = f"""# 🚀 DataSON PR Performance Analysis
 
 ## 📊 Performance Metrics (Actual Numbers)
 
 ### System Configuration
-- **DataSON Version**: {version}
-- **Rust Acceleration**: {rust_status}
+- **DataSON Version**: {metrics.get("version", "Unknown")}
+- **Rust Acceleration**: {"🦀 Enabled" if metrics.get("rust_available") else "🐍 Python-only"}
 - **Profiling**: Enabled with nanosecond precision
+"""
 
-### 🎯 Basic Performance Test
-| Metric | Value |
-|--------|-------|
-| Dataset Size | {dataset_size} chars |
-| Serialization Time | **{save_ms:.2f}ms** |
-| Deserialization Time | **{load_ms:.2f}ms** |
-| JSON Output Size | {json_size:,} chars |
-| Profile Events (Save) | {save_events} |
-| Profile Events (Load) | {load_events} |
+    # Basic performance test section
+    comment += "\n### 🎯 Basic Performance Test\n"
+    basic = metrics.get("basic_test", {})
+    if basic.get("dataset_size") is not None and basic:
+        comment += (
+            "| Metric | Value |\n"
+            "|--------|-------|\n"
+            f"| Dataset Size | {basic.get('dataset_size')} chars |\n"
+            f"| Serialization Time | **{basic.get('save_ms', 0):.2f}ms** |\n"
+            f"| Deserialization Time | **{basic.get('load_ms', 0):.2f}ms** |\n"
+            f"| JSON Output Size | {basic.get('json_size', 0):,} chars |\n"
+            f"| Profile Events (Save) | {basic.get('save_events', 0)} |\n"
+            f"| Profile Events (Load) | {basic.get('load_events', 0)} |\n"
+        )
+    else:
+        comment += "_No basic profiling data available (profiling may have failed)_\n"
 
-### 📈 Performance Scenarios
-| Scenario | Size (chars) | Save (ms) | Load (ms) | Total Events | Throughput (ops/s) |
-|----------|-------------|-----------|-----------|--------------|-------------------|
-""".format(
-        version=metrics.get("version", "Unknown"),
-        rust_status="🦀 Enabled" if metrics.get("rust_available") else "🐍 Python-only",
-        dataset_size=metrics.get("basic_test", {}).get("dataset_size", 0),
-        save_ms=metrics.get("basic_test", {}).get("save_ms", 0),
-        load_ms=metrics.get("basic_test", {}).get("load_ms", 0),
-        json_size=metrics.get("basic_test", {}).get("json_size", 0),
-        save_events=metrics.get("basic_test", {}).get("save_events", 0),
-        load_events=metrics.get("basic_test", {}).get("load_events", 0),
-    )
+    # Performance scenarios section
+    comment += "\n### 📈 Performance Scenarios\n"
+    if metrics.get("scenarios"):
+        comment += (
+            "| Scenario | Size (chars) | Save (ms) | Load (ms) | Total Events | Throughput (ops/s) |\n"
+            "|----------|-------------|-----------|-----------|--------------|-------------------|\n"
+        )
+    else:
+        comment += "_No performance scenarios data_\n"
 
     # Add scenario details
     for scenario in metrics.get("scenarios", []):
