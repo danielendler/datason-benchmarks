@@ -636,8 +636,6 @@ def main():
                        help='Run quick enhanced benchmark (5 iterations)')
     parser.add_argument('--competitive', action='store_true',
                        help='Run enhanced competitive comparison')
-    parser.add_argument('--enhanced-competitive', action='store_true',
-                       help='Run enhanced multi-tier competitive comparison')
     parser.add_argument('--datason-showcase', action='store_true',
                        help='Showcase DataSON API methods')
     parser.add_argument('--configurations', action='store_true',
@@ -729,8 +727,7 @@ def main():
             results = runner.run_phase2_benchmark("complete")
         
         # Enhanced benchmark options
-        elif args.enhanced_competitive:
-            results = runner.run_enhanced_competitive_benchmark()
+        # (deprecated --enhanced-competitive flag removed)
         elif args.datason_showcase:
             results = runner.run_datason_api_showcase()
         elif args.quick:

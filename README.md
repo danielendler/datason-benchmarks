@@ -51,7 +51,7 @@ python scripts/run_benchmarks.py --competitive --generate-report
 python scripts/run_benchmarks.py --configurations --generate-report
 
 # Complete benchmark suite with interactive reports
-python scripts/run_benchmarks.py --all --generate-report
+python scripts/run_benchmarks.py --complete --generate-report
 
 # Comprehensive API profiling across all DataSON APIs
 python scripts/run_benchmarks.py --profile-apis

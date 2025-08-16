@@ -306,7 +306,7 @@ class OptimizedPRBenchmark:
                         "strings": {
                             "empty": "",
                             "unicode": "Hello 世界 🌍",
-                            "json_like": '{'''key''': '''value'''},
+                            "json_like": "{'key': 'value'}",
                             "special_chars": "Line1\nLine2\tTabbed"
                         },
                         # Container edge cases

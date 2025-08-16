@@ -68,6 +68,15 @@ jobs:
         
         # Run quick benchmark with report generation
         python scripts/run_benchmarks.py --quick --generate-report
+
+        # Run Rust-core micro-benchmark
+        DATASON_RUST=1 python scripts/bench_rust_core.py save_string --sizes 10k --shapes flat --repeat 1 --output rust_core_result.json
+
+    - name: 📦 Upload Rust-core results
+      uses: actions/upload-artifact@v4
+      with:
+        name: rust-core-results
+        path: rust_core_result.json
       env:
         GITHUB_SHA: ${{ github.sha }}
         GITHUB_REF: ${{ github.ref }}
