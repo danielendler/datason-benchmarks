@@ -362,7 +362,7 @@ class OptimizedPRBenchmark:
                     for i in range(iterations):
                         try:
                             start = time.perf_counter()
-                            deserialized = self.datason.loads(test_serialized)
+                            deserialized = self.datason.loads_json(test_serialized)
                             end = time.perf_counter()
                             deserialization_times.append((end - start) * 1000)  # Convert to ms
                         except Exception as e:

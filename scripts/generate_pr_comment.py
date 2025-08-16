@@ -94,7 +94,7 @@ def extract_datason_performance(results: Dict[str, Any]) -> Dict[str, Any]:
         # Check deserialization performance  
         if "deserialization" in scenario_data and "datason" in scenario_data["deserialization"]:
             deser_data = scenario_data["deserialization"]["datason"]
-            if "mean_ms" in deser_data and "error_count" not in deser_data:
+            if "mean_ms" in deser_data and deser_data.get("error_count", 0) == 0:
                 deserialization_times.append(deser_data["mean_ms"])
                 scenario_info["deserialization_ms"] = round(deser_data["mean_ms"], 3)
         
@@ -137,10 +137,10 @@ def compare_with_baseline(current: Dict[str, Any], baseline: Dict[str, Any]) -> 
                  / baseline_perf["serialization_avg_ms"] * 100)
         comparison["serialization_change"] = round(change, 1)
         
-        if change > 15:  # Regression threshold
+        if change > 10:  # Regression threshold (10% slower)
             comparison["regressions"].append(f"Serialization {change:.1f}% slower")
             comparison["regression_detected"] = True
-        elif change < -5:  # Improvement threshold
+        elif change < -2:  # Improvement threshold (2% faster - more sensitive)
             comparison["improvements"].append(f"Serialization {abs(change):.1f}% faster")
     
     # Compare deserialization performance
@@ -149,10 +149,10 @@ def compare_with_baseline(current: Dict[str, Any], baseline: Dict[str, Any]) -> 
                  / baseline_perf["deserialization_avg_ms"] * 100)
         comparison["deserialization_change"] = round(change, 1)
         
-        if change > 15:  # Regression threshold
+        if change > 10:  # Regression threshold (10% slower)
             comparison["regressions"].append(f"Deserialization {change:.1f}% slower")
             comparison["regression_detected"] = True
-        elif change < -5:  # Improvement threshold
+        elif change < -2:  # Improvement threshold (2% faster - more sensitive)
             comparison["improvements"].append(f"Deserialization {abs(change):.1f}% faster")
     
     # Compare success rate
@@ -252,10 +252,27 @@ def generate_pr_comment(pr_number: str, commit_sha: str, benchmark_type: str,
             comment_lines.append("")
         
         if not comparison["improvements"] and not comparison["regressions"]:
-            comment_lines.extend([
-                "✅ **No significant performance changes detected**",
-                ""
-            ])
+            # Show actual change percentages even if below thresholds
+            ser_change = comparison.get("serialization_change", 0)
+            deser_change = comparison.get("deserialization_change", 0)
+            
+            if ser_change != 0 or deser_change != 0:
+                comment_lines.extend([
+                    "### 📊 Performance Changes (Below Threshold)",
+                    ""
+                ])
+                if ser_change != 0:
+                    direction = "faster" if ser_change < 0 else "slower"
+                    comment_lines.append(f"- Serialization: {abs(ser_change):.1f}% {direction}")
+                if deser_change != 0:
+                    direction = "faster" if deser_change < 0 else "slower"
+                    comment_lines.append(f"- Deserialization: {abs(deser_change):.1f}% {direction}")
+                comment_lines.append("")
+            else:
+                comment_lines.extend([
+                    "✅ **Performance unchanged from baseline**",
+                    ""
+                ])
     else:
         comment_lines.extend([
             "## ℹ️ Baseline Status",
