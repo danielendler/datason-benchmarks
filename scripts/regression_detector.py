@@ -146,6 +146,115 @@ class PerformanceRegressionDetector:
                             metadata=result
                         ))
         
+        elif 'competitive' in data:
+            # Quick benchmark format (both old and new)
+            if 'tiers' in data['competitive']:
+                # New quick enhanced format with tiers
+                for tier_name, tier_data in data['competitive']['tiers'].items():
+                    if 'datasets' in tier_data:
+                        for dataset_name, dataset_data in tier_data['datasets'].items():
+                            if 'serialization' in dataset_data and 'datason' in dataset_data['serialization']:
+                                metrics = {}
+                                
+                                # Extract DataSON serialization metrics
+                                datason_ser = dataset_data['serialization']['datason']
+                                if 'mean' in datason_ser:
+                                    metrics['serialize_time'] = PerformanceMetric(
+                                        name='serialize_time',
+                                        value=datason_ser['mean'],
+                                        unit='seconds',
+                                        higher_is_better=False
+                                    )
+                                
+                                # Extract DataSON deserialization metrics if available
+                                if 'deserialization' in dataset_data and 'datason' in dataset_data['deserialization']:
+                                    datason_deser = dataset_data['deserialization']['datason']
+                                    if 'mean' in datason_deser:
+                                        metrics['deserialize_time'] = PerformanceMetric(
+                                            name='deserialize_time',
+                                            value=datason_deser['mean'],
+                                            unit='seconds',
+                                            higher_is_better=False
+                                        )
+                                
+                                if metrics:
+                                    results.append(BenchmarkResult(
+                                        name=f"{tier_name}_{dataset_name}",
+                                        metrics=metrics,
+                                        metadata=dataset_data
+                                    ))
+            else:
+                # Old quick format with direct datasets in competitive
+                for dataset_name, dataset_data in data['competitive'].items():
+                    if dataset_name == 'summary':  # Skip summary section
+                        continue
+                    if 'serialization' in dataset_data and 'datason' in dataset_data['serialization']:
+                        metrics = {}
+                        
+                        # Extract DataSON serialization metrics
+                        datason_ser = dataset_data['serialization']['datason']
+                        if 'mean' in datason_ser:
+                            metrics['serialize_time'] = PerformanceMetric(
+                                name='serialize_time',
+                                value=datason_ser['mean'],
+                                unit='seconds',
+                                higher_is_better=False
+                            )
+                        
+                        # Extract DataSON deserialization metrics if available
+                        if 'deserialization' in dataset_data and 'datason' in dataset_data['deserialization']:
+                            datason_deser = dataset_data['deserialization']['datason']
+                            if 'mean' in datason_deser:
+                                metrics['deserialize_time'] = PerformanceMetric(
+                                    name='deserialize_time',
+                                    value=datason_deser['mean'],
+                                    unit='seconds',
+                                    higher_is_better=False
+                                )
+                        
+                        if metrics:
+                            results.append(BenchmarkResult(
+                                name=dataset_name,
+                                metrics=metrics,
+                                metadata=dataset_data
+                            ))
+        
+        elif 'results_by_tier' in data:
+            # Tiered benchmark format (baseline format)
+            for tier_name, tier_data in data['results_by_tier'].items():
+                if 'datasets' in tier_data:
+                    for dataset_name, dataset_data in tier_data['datasets'].items():
+                        metrics = {}
+                        
+                        # Extract serialization metrics
+                        if 'serialization' in dataset_data:
+                            ser_data = dataset_data['serialization']
+                            if 'mean_ms' in ser_data:
+                                metrics['serialize_time'] = PerformanceMetric(
+                                    name='serialize_time',
+                                    value=ser_data['mean_ms'] / 1000.0,  # Convert ms to seconds
+                                    unit='seconds',
+                                    higher_is_better=False
+                                )
+                        
+                        # Extract deserialization metrics
+                        if 'deserialization' in dataset_data:
+                            deser_data = dataset_data['deserialization']
+                            if 'mean_ms' in deser_data:
+                                metrics['deserialize_time'] = PerformanceMetric(
+                                    name='deserialize_time',
+                                    value=deser_data['mean_ms'] / 1000.0,  # Convert ms to seconds
+                                    unit='seconds',
+                                    higher_is_better=False
+                                )
+                        
+                        if metrics:
+                            results.append(BenchmarkResult(
+                                name=f"{tier_name}_{dataset_name}",
+                                metrics=metrics,
+                                metadata=dataset_data
+                            ))
+        
         return results
     
     def find_baseline_file(self, results_dir: str = 'data/results') -> Optional[str]:
@@ -221,16 +330,60 @@ class PerformanceRegressionDetector:
             message=message
         )
     
+    def find_matching_baseline(self, current_name: str, baseline_results: List[BenchmarkResult]) -> Optional[BenchmarkResult]:
+        """Find the best matching baseline result for a current result"""
+        # Direct name match first
+        for baseline in baseline_results:
+            if baseline.name == current_name:
+                return baseline
+        
+        # Try to match dataset names across different formats
+        # Extract dataset name from different formats
+        current_dataset = current_name
+        if '_' in current_name:
+            # For formats like "json_safe_json_safe_simple" or "tier_dataset"
+            parts = current_name.split('_')
+            if len(parts) >= 2:
+                # Try last part first (most specific)
+                current_dataset = parts[-1]
+                # Also try combinations
+                if len(parts) >= 3:
+                    # Try last two parts joined
+                    current_dataset_alt = '_'.join(parts[-2:])
+                else:
+                    current_dataset_alt = None
+            else:
+                current_dataset_alt = None
+        else:
+            current_dataset_alt = None
+        
+        # Look for partial matches
+        for baseline in baseline_results:
+            baseline_dataset = baseline.name
+            
+            # Check if dataset names match (with some tolerance)
+            if (current_dataset in baseline_dataset or 
+                baseline_dataset in current_dataset or
+                (current_dataset_alt and (current_dataset_alt in baseline_dataset or baseline_dataset in current_dataset_alt))):
+                return baseline
+            
+            # Try fuzzy matching for common patterns
+            if ('simple' in current_dataset and 'simple' in baseline_dataset) or \
+               ('nested' in current_dataset and 'nested' in baseline_dataset) or \
+               ('datetime' in current_dataset and 'datetime' in baseline_dataset) or \
+               ('api' in current_dataset and 'api' in baseline_dataset) or \
+               ('response' in current_dataset and 'response' in baseline_dataset):
+                return baseline
+        
+        return None
+
     def compare_results(self, baseline_results: List[BenchmarkResult], 
                        current_results: List[BenchmarkResult]) -> List[RegressionResult]:
         """Compare current results against baseline"""
         regressions = []
         
-        # Create lookup for baseline results
-        baseline_lookup = {result.name: result for result in baseline_results}
-        
         for current_result in current_results:
-            baseline_result = baseline_lookup.get(current_result.name)
+            baseline_result = self.find_matching_baseline(current_result.name, baseline_results)
             if not baseline_result:
                 continue  # Skip if no baseline data
             
