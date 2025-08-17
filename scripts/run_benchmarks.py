@@ -617,6 +617,21 @@ class BenchmarkRunner:
                 # Dogfood DataSON v0.11.2 for JSON serialization
                 f.write(datason.dumps_json(results))
             logger.info(f"💾 Results saved to: {filepath}")
+            
+            # Also create/update latest_* symlink for PR workflow compatibility
+            # Map benchmark types to expected latest_* filenames
+            latest_type_mapping = {
+                "quick_enhanced": "quick",  # Map quick_enhanced -> latest_quick.json
+                "enhanced_competitive": "competitive",  # Map enhanced_competitive -> latest_competitive.json
+            }
+            latest_type = latest_type_mapping.get(benchmark_type, benchmark_type)
+            latest_filepath = self.output_dir / f"latest_{latest_type}.json"
+            
+            if latest_filepath.exists() or latest_filepath.is_symlink():
+                latest_filepath.unlink()  # Remove existing file/symlink
+            latest_filepath.symlink_to(filename)  # Create relative symlink
+            logger.info(f"🔗 Latest symlink updated: {latest_filepath}")
+            
         except Exception as e:
             logger.error(f"Failed to save results: {e}")
     
