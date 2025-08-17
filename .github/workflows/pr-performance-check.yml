@@ -40,6 +40,7 @@ env:
   PYTHONUNBUFFERED: 1
   CI: true
   GITHUB_ACTIONS: true
+  PYTHONPATH: .
 
 jobs:
   quick-benchmark:
@@ -178,6 +179,9 @@ jobs:
         
         # Ensure results directory exists
         mkdir -p data/results docs/results
+        
+        # Set Python path for proper module imports
+        export PYTHONPATH="$PWD:$PYTHONPATH"
         
         # Run quick benchmark with report generation
         python scripts/run_benchmarks.py --quick --generate-report
