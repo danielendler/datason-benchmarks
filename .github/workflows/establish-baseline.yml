@@ -245,9 +245,11 @@ jobs:
         # But CI-generated baselines are legitimate and should be committed
         git add -f data/results/datason_baseline.json
         git add -f data/results/latest.json
-        git add -f data/results/latest_competitive.json
-        git add -f data/results/latest_configuration.json  
-        git add -f data/results/latest_versioning.json
+        
+        # Add other baseline files if they exist
+        [ -f data/results/latest_competitive.json ] && git add -f data/results/latest_competitive.json
+        [ -f data/results/latest_configuration.json ] && git add -f data/results/latest_configuration.json  
+        [ -f data/results/latest_versioning.json ] && git add -f data/results/latest_versioning.json
         
         # Add archived baselines if any
         if [ -d data/results/archived ]; then
@@ -277,10 +279,7 @@ jobs:
         name: baseline-${{ github.run_id }}
         path: |
           data/results/datason_baseline.json
-          data/results/latest.json
-          data/results/latest_competitive.json
-          data/results/latest_configuration.json
-          data/results/latest_versioning.json
+          data/results/latest*.json
           data/results/archived/
           baseline_report.md
         retention-days: 90
