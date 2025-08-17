@@ -60,14 +60,25 @@ def demo_basic_profiling():
 
     # Test serialization with profiling
     print("\n🔄 Running save_string/serialize...")
-    save_func = getattr(datason, 'save_string', getattr(datason, 'serialize', datason.dumps_json))
+    
+    # Use save_string if available, otherwise fallback with proper format handling
+    if hasattr(datason, 'save_string'):
+        save_func = datason.save_string
+        load_func = getattr(datason, 'load_basic', datason.loads_json)
+    elif hasattr(datason, 'dumps'):
+        save_func = datason.dumps
+        load_func = datason.loads
+    else:
+        save_func = datason.dumps_json
+        load_func = datason.loads_json
+    
     start = time.perf_counter()
     json_result = save_func(test_data)
     save_time = time.perf_counter() - start
 
     save_events = list(datason.profile_sink)
     print(f"   Completed in {save_time * 1000:.2f}ms")
-    print(f"   JSON size: {len(json_result):,} characters")
+    print(f"   JSON size: {len(str(json_result)):,} characters")
     print(f"   Profile events captured: {len(save_events)}")
 
     # Clear events for load test
@@ -75,15 +86,21 @@ def demo_basic_profiling():
 
     # Test deserialization with profiling
     print("\n🔄 Running load_basic/parse...")
-    load_func = getattr(datason, 'load_basic', getattr(datason, 'parse', datason.deserialize))
     start = time.perf_counter()
-    loaded_data = load_func(json_result)
-    load_time = time.perf_counter() - start
+    try:
+        loaded_data = load_func(json_result)
+        load_time = time.perf_counter() - start
+        round_trip_success = loaded_data == test_data
+    except Exception as e:
+        load_time = time.perf_counter() - start
+        print(f"   Load error: {e}")
+        loaded_data = None
+        round_trip_success = False
 
     load_events = list(datason.profile_sink)
     print(f"   Completed in {load_time * 1000:.2f}ms")
     print(f"   Profile events captured: {len(load_events)}")
-    print(f"   Round-trip successful: {'✅' if loaded_data == test_data else '❌'}")
+    print(f"   Round-trip successful: {'✅' if round_trip_success else '❌'}")
 
     # Display profiling breakdown
     print("\n🔍 Serialization Profiling Breakdown:")

@@ -39,8 +39,10 @@ class OptimizedPRBenchmark:
             import datason
             self.datason = datason
             self.datason_available = True
-        except ImportError:
-            logger.error("DataSON not available")
+            logger.info(f"DataSON {getattr(datason, '__version__', 'unknown')} loaded successfully")
+            logger.info(f"Key methods available: save_string={hasattr(datason, 'save_string')}, load_basic={hasattr(datason, 'load_basic')}")
+        except ImportError as e:
+            logger.error(f"DataSON not available: {e}")
             self.datason_available = False
 
         # Optional ML libraries for enhanced testing
@@ -58,46 +60,77 @@ class OptimizedPRBenchmark:
         """
         if not self.datason_available:
             return {}
-        # Determine available serialization methods for in-memory operations
-        basic_ser = self.datason.save_string
+            
+        # Check for required methods and provide debugging info
+        if not hasattr(self.datason, 'save_string'):
+            logger.error(f"DataSON {getattr(self.datason, '__version__', 'unknown')} missing save_string method")
+            logger.error(f"Available methods: {[attr for attr in dir(self.datason) if not attr.startswith('_')][:10]}...")
+            # Try alternative method names
+            if hasattr(self.datason, 'dumps'):
+                logger.info("Using dumps as fallback for save_string")
+                basic_ser = lambda obj: self.datason.dumps(obj)
+            else:
+                logger.error("No suitable serialization method found")
+                return {}
+        else:
+            # Determine available serialization methods for in-memory operations
+            basic_ser = self.datason.save_string
+            
+        # Check for load_basic method
+        if not hasattr(self.datason, 'load_basic'):
+            logger.error(f"DataSON missing load_basic method")
+            basic_deser = self.datason.loads if hasattr(self.datason, 'loads') else None
+            if not basic_deser:
+                logger.error("No suitable deserialization method found")
+                return {}
+        else:
+            basic_deser = self.datason.load_basic
         
         # API-optimized: Use serialize with API config
         def api_serialize(obj):
-            config = self.datason.get_api_config()
-            return self.datason.dumps_json(self.datason.serialize(obj, config=config))
+            try:
+                config = self.datason.get_api_config()
+                return self.datason.dumps_json(self.datason.serialize(obj, config=config))
+            except Exception as e:
+                logger.warning(f"API serialize failed, using fallback: {e}")
+                return self.datason.dumps_json(obj)
         
         # Smart: Use dumps (in-memory version of dump)
-        smart_ser = self.datason.dumps
+        smart_ser = self.datason.dumps if hasattr(self.datason, 'dumps') else basic_ser
         
         # ML-optimized: Use serialize with ML config  
         def ml_serialize(obj):
-            config = self.datason.get_ml_config()
-            return self.datason.serialize(obj, config=config)
+            try:
+                config = self.datason.get_ml_config()
+                return self.datason.serialize(obj, config=config)
+            except Exception as e:
+                logger.warning(f"ML serialize failed, using fallback: {e}")
+                return basic_ser(obj)
 
         return {
             'basic': {
                 'serialize': basic_ser,
-                'deserialize': self.datason.load_basic,
+                'deserialize': basic_deser,
                 'description': 'Direct basic API - fastest baseline'
             },
             'api_optimized': {
                 'serialize': api_serialize,
-                'deserialize': self.datason.loads_json,  # Since api_serialize outputs JSON string
+                'deserialize': getattr(self.datason, 'loads_json', basic_deser),  # Since api_serialize outputs JSON string
                 'description': 'API-optimized - best for web services'
             },
             'smart': {
                 'serialize': smart_ser,
-                'deserialize': self.datason.loads,  # Matching deserializer for dumps
+                'deserialize': getattr(self.datason, 'loads', basic_deser),  # Matching deserializer for dumps
                 'description': 'Smart detection - type preservation'
             },
             'ml_optimized': {
                 'serialize': ml_serialize,
-                'deserialize': lambda x: x if isinstance(x, dict) else self.datason.loads(x),  # Handle dict outputs directly
+                'deserialize': lambda x: x if isinstance(x, dict) else getattr(self.datason, 'loads', basic_deser)(x),  # Handle dict outputs directly
                 'description': 'ML-optimized - NumPy/tensor support'
             },
             'compatibility': {
-                'serialize': self.datason.dumps_json,
-                'deserialize': self.datason.loads_json,
+                'serialize': getattr(self.datason, 'dumps_json', basic_ser),
+                'deserialize': getattr(self.datason, 'loads_json', basic_deser),
                 'description': 'Stdlib compatible - legacy support'
             }
         }
