@@ -76,7 +76,12 @@ def extract_datason_performance(results: Dict[str, Any]) -> Dict[str, Any]:
     total_tests = 0
     
     for scenario_name, scenario_data in test_data.items():
-        if not isinstance(scenario_data, dict):
+        # Skip metadata/summary entries that aren't actual test scenarios
+        if not isinstance(scenario_data, dict) or scenario_name in ['summary', 'competitors', 'methodology']:
+            continue
+        
+        # Skip entries that don't have the expected test structure
+        if not any(k in scenario_data for k in ["serialization", "deserialization", "description"]):
             continue
             
         performance["total_scenarios"] += 1
@@ -196,16 +201,43 @@ def generate_pr_comment(pr_number: str, commit_sha: str, benchmark_type: str,
         ""
     ]
     
-    # Performance summary table
+    # Performance summary table with baseline comparison
     comment_lines.extend([
         "### 🎯 DataSON Performance Summary",
         "",
-        "| Metric | Result | Benchmark Details | Status |",
-        "|--------|--------|-------------------|--------|",
-        f"| Serialization (avg) | **{performance['serialization_avg_ms']:.3f} ms** | {len([s for s in performance['scenarios'] if 'serialization_ms' in s])} measurements across {performance['tests_run']} scenarios | {'✅' if performance['serialization_avg_ms'] > 0 else '❌'} |",
-        f"| Deserialization (avg) | **{performance['deserialization_avg_ms']:.3f} ms** | {len([s for s in performance['scenarios'] if 'deserialization_ms' in s])} measurements | {'✅' if performance['deserialization_avg_ms'] > 0 else '❌'} |",
-        f"| Success Rate | **{performance['success_rate']:.1f}%** | {performance['tests_run']} scenarios tested with 5 iterations each | {'✅' if performance['success_rate'] > 90 else '⚠️' if performance['success_rate'] > 70 else '❌'} |",
-        f"| Performance Range | {performance['fastest_scenario']:.3f} - {performance['slowest_scenario']:.3f} ms | Min to max serialization times | {'✅' if performance['slowest_scenario'] < 100 else '⚠️'} |",
+        "| Metric | Current Result | Baseline | Change | Status |",
+        "|--------|----------------|----------|--------|--------|"
+    ])
+    
+    # Add baseline comparison data if available
+    if comparison and comparison["has_baseline"]:
+        baseline_perf = extract_datason_performance(baseline) if baseline else {}
+        
+        # Serialization row
+        ser_baseline = f"{baseline_perf.get('serialization_avg_ms', 0):.3f} ms" if baseline_perf.get('serialization_avg_ms', 0) > 0 else "N/A"
+        ser_change = f"{comparison['serialization_change']:+.1f}%" if comparison.get('serialization_change', 0) != 0 else "No change"
+        comment_lines.append(f"| Serialization (avg) | **{performance['serialization_avg_ms']:.3f} ms** | {ser_baseline} | {ser_change} | {'✅' if performance['serialization_avg_ms'] > 0 else '❌'} |")
+        
+        # Deserialization row  
+        deser_baseline = f"{baseline_perf.get('deserialization_avg_ms', 0):.3f} ms" if baseline_perf.get('deserialization_avg_ms', 0) > 0 else "N/A"
+        deser_change = f"{comparison['deserialization_change']:+.1f}%" if comparison.get('deserialization_change', 0) != 0 else "No change"
+        comment_lines.append(f"| Deserialization (avg) | **{performance['deserialization_avg_ms']:.3f} ms** | {deser_baseline} | {deser_change} | {'✅' if performance['deserialization_avg_ms'] > 0 else '❌'} |")
+        
+        # Success rate row
+        success_baseline = f"{baseline_perf.get('success_rate', 0):.1f}%" if baseline_perf.get('success_rate', 0) > 0 else "N/A"
+        success_change = f"{comparison.get('success_rate_change', 0):+.1f}%" if comparison.get('success_rate_change', 0) != 0 else "No change"
+        comment_lines.append(f"| Success Rate | **{performance['success_rate']:.1f}%** | {success_baseline} | {success_change} | {'✅' if performance['success_rate'] > 90 else '⚠️' if performance['success_rate'] > 70 else '❌'} |")
+        
+    else:
+        # No baseline available - show current values only
+        comment_lines.extend([
+            f"| Serialization (avg) | **{performance['serialization_avg_ms']:.3f} ms** | No baseline | First run | {'✅' if performance['serialization_avg_ms'] > 0 else '❌'} |",
+            f"| Deserialization (avg) | **{performance['deserialization_avg_ms']:.3f} ms** | No baseline | First run | {'✅' if performance['deserialization_avg_ms'] > 0 else '❌'} |",
+            f"| Success Rate | **{performance['success_rate']:.1f}%** | No baseline | First run | {'✅' if performance['success_rate'] > 90 else '⚠️' if performance['success_rate'] > 70 else '❌'} |"
+        ])
+    
+    comment_lines.extend([
+        f"| Performance Range | {performance['fastest_scenario']:.3f} - {performance['slowest_scenario']:.3f} ms | Min to max serialization times | N/A | {'✅' if performance['slowest_scenario'] < 100 else '⚠️'} |",
         ""
     ])
     
