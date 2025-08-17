@@ -82,11 +82,9 @@ def aggregate_events(events: Iterable[dict], bucket: Dict[str, List[float]]) -> 
             or ev.get("elapsed")
             or 0
         )
-        # Convert nanoseconds to milliseconds if the value looks large.
-        if duration > 1e5:
-            duration_ms = duration / 1_000_000.0
-        else:
-            duration_ms = float(duration)
+        # Convert nanoseconds to milliseconds.
+        # DataSON profiling always outputs nanoseconds, so always convert
+        duration_ms = duration / 1_000_000.0
         bucket.setdefault(stage, []).append(duration_ms)
 
 

@@ -116,43 +116,61 @@ def format_pr_comment(metrics: Dict[str, Any], comparison_metrics: Dict[str, Any
     # Basic performance test section
     comment += "\n### 🎯 Basic Performance Test\n"
     basic = metrics.get("basic_test", {})
+    benchmark_basic = comparison_metrics.get("basic_test", {}) if comparison_metrics else None
     if basic.get("dataset_size") is not None and basic:
-        comment += (
-            "| Metric | Value |\n"
-            "|--------|-------|\n"
-            f"| Dataset Size | {basic.get('dataset_size')} chars |\n"
-            f"| Serialization Time | **{basic.get('save_ms', 0):.2f}ms** |\n"
-            f"| Deserialization Time | **{basic.get('load_ms', 0):.2f}ms** |\n"
-            f"| JSON Output Size | {basic.get('json_size', 0):,} chars |\n"
-            f"| Profile Events (Save) | {basic.get('save_events', 0)} |\n"
-            f"| Profile Events (Load) | {basic.get('load_events', 0)} |\n"
-        )
+        # Show PR vs Benchmark if baseline provided
+        if benchmark_basic:
+            comment += (
+                "| Metric | Benchmark | PR Version |\n"
+                "|--------|-----------|------------|\n"
+                f"| Dataset Size | {benchmark_basic.get('dataset_size')} chars | {basic.get('dataset_size')} chars |\n"
+                f"| Serialization Time | {benchmark_basic.get('save_ms', 0):.2f}ms | {basic.get('save_ms', 0):.2f}ms |\n"
+                f"| Deserialization Time | {benchmark_basic.get('load_ms', 0):.2f}ms | {basic.get('load_ms', 0):.2f}ms |\n"
+                f"| JSON Output Size | {benchmark_basic.get('json_size', 0):,} chars | {basic.get('json_size', 0):,} chars |\n"
+                f"| Profile Events (Save) | {benchmark_basic.get('save_events', 0)} | {basic.get('save_events', 0)} |\n"
+                f"| Profile Events (Load) | {benchmark_basic.get('load_events', 0)} | {basic.get('load_events', 0)} |\n"
+            )
+        else:
+            comment += (
+                "| Metric | Value |\n"
+                "|--------|-------|\n"
+                f"| Dataset Size | {basic.get('dataset_size')} chars |\n"
+                f"| Serialization Time | **{basic.get('save_ms', 0):.2f}ms** |\n"
+                f"| Deserialization Time | **{basic.get('load_ms', 0):.2f}ms** |\n"
+                f"| JSON Output Size | {basic.get('json_size', 0):,} chars |\n"
+                f"| Profile Events (Save) | {basic.get('save_events', 0)} |\n"
+                f"| Profile Events (Load) | {basic.get('load_events', 0)} |\n"
+            )
     else:
         comment += "_No basic profiling data available (profiling may have failed)_\n"
 
     # Performance scenarios section
     comment += "\n### 📈 Performance Scenarios\n"
-    if metrics.get("scenarios"):
-        comment += (
-            "| Scenario | Size (chars) | Save (ms) | Load (ms) | Total Events | Throughput (ops/s) |\n"
-            "|----------|-------------|-----------|-----------|--------------|-------------------|\n"
-        )
+    if comparison_metrics and comparison_metrics.get("scenarios"):
+        # Show PR vs Benchmark comparison for scenarios
+        comment += format_comparison_section(metrics, comparison_metrics)
     else:
-        comment += "_No performance scenarios data_\n"
+        if metrics.get("scenarios"):
+            comment += (
+                "| Scenario | Size (chars) | Save (ms) | Load (ms) | Total Events | Throughput (ops/s) |\n"
+                "|----------|-------------|-----------|-----------|--------------|-------------------|\n"
+            )
+        else:
+            comment += "_No performance scenarios data_\n"
 
-    # Add scenario details
-    for scenario in metrics.get("scenarios", []):
-        throughput = (
-            1000 / (scenario["save_ms"] + scenario["load_ms"]) if (scenario["save_ms"] + scenario["load_ms"]) > 0 else 0
-        )
-        comment += "| {name} | {size:,} | **{save:.2f}** | **{load:.2f}** | {events} | {throughput:.1f} |\n".format(
-            name=scenario["name"],
-            size=scenario["json_size"],
-            save=scenario["save_ms"],
-            load=scenario["load_ms"],
-            events=scenario["total_events"],
-            throughput=throughput,
-        )
+        # Add scenario details
+        for scenario in metrics.get("scenarios", []):
+            throughput = (
+                1000 / (scenario["save_ms"] + scenario["load_ms"]) if (scenario["save_ms"] + scenario["load_ms"]) > 0 else 0
+            )
+            comment += "| {name} | {size:,} | **{save:.2f}** | **{load:.2f}** | {events} | {throughput:.1f} |\n".format(
+                name=scenario["name"],
+                size=scenario["json_size"],
+                save=scenario["save_ms"],
+                load=scenario["load_ms"],
+                events=scenario["total_events"],
+                throughput=throughput,
+            )
 
     # Add stage timing breakdown if available
     if metrics.get("stage_timings"):

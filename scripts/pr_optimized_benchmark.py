@@ -58,11 +58,21 @@ class OptimizedPRBenchmark:
         """
         if not self.datason_available:
             return {}
-        # Determine available serialization methods, with fallbacks
-        basic_ser = getattr(self.datason, 'save_string', self.datason.dumps_json)
-        api_ser = getattr(self.datason, 'save_api', getattr(self.datason, 'dump_api', basic_ser))
-        smart_ser = getattr(self.datason, 'dump', getattr(self.datason, 'save_chunked', basic_ser))
-        ml_ser = getattr(self.datason, 'dump_ml', getattr(self.datason, 'save_ml', smart_ser))
+        # Determine available serialization methods for in-memory operations
+        basic_ser = self.datason.save_string
+        
+        # API-optimized: Use serialize with API config
+        def api_serialize(obj):
+            config = self.datason.get_api_config()
+            return self.datason.dumps_json(self.datason.serialize(obj, config=config))
+        
+        # Smart: Use dumps (in-memory version of dump)
+        smart_ser = self.datason.dumps
+        
+        # ML-optimized: Use serialize with ML config  
+        def ml_serialize(obj):
+            config = self.datason.get_ml_config()
+            return self.datason.serialize(obj, config=config)
 
         return {
             'basic': {
@@ -71,18 +81,18 @@ class OptimizedPRBenchmark:
                 'description': 'Direct basic API - fastest baseline'
             },
             'api_optimized': {
-                'serialize': api_ser,
-                'deserialize': self.datason.load_basic,
+                'serialize': api_serialize,
+                'deserialize': self.datason.loads_json,  # Since api_serialize outputs JSON string
                 'description': 'API-optimized - best for web services'
             },
             'smart': {
                 'serialize': smart_ser,
-                'deserialize': self.datason.load_smart,
+                'deserialize': self.datason.loads,  # Matching deserializer for dumps
                 'description': 'Smart detection - type preservation'
             },
             'ml_optimized': {
-                'serialize': ml_ser,
-                'deserialize': self.datason.load_smart,
+                'serialize': ml_serialize,
+                'deserialize': lambda x: x if isinstance(x, dict) else self.datason.loads(x),  # Handle dict outputs directly
                 'description': 'ML-optimized - NumPy/tensor support'
             },
             'compatibility': {

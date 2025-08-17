@@ -554,8 +554,22 @@ class CompetitiveBenchmarkSuite:
                         "size_bytes": smallest[1]
                     }
             
-            # DataSON specific performance
+            # Enhanced DataSON API variants analysis
             datason_variants = [name for name in ser_results.keys() if name.startswith("datason")]
+            if datason_variants and "datason_api_analysis" not in summary:
+                summary["datason_api_analysis"] = {
+                    "variants_tested": len(datason_variants),
+                    "performance_by_variant": {},
+                    "api_recommendations": {},
+                    "performance_ranking": {},
+                    "api_showcase_summary": {
+                        "methodology": "DataSON API variants tested as separate competitors",
+                        "fairness": "Each API variant optimized for different use cases",
+                        "variants_description": {variant: self._get_api_description(variant) for variant in datason_variants},
+                        "use_case_mapping": {variant: self._get_api_use_cases(variant) for variant in datason_variants}
+                    }
+                }
+            
             for variant in datason_variants:
                 if variant in ser_results and isinstance(ser_results[variant], dict):
                     datason_ser = ser_results[variant].get("mean", 0) * 1000
@@ -563,12 +577,228 @@ class CompetitiveBenchmarkSuite:
                     if variant in deser_results and isinstance(deser_results[variant], dict):
                         datason_deser = deser_results[variant].get("mean", 0) * 1000
                     
+                    # Legacy format for compatibility
                     if variant not in summary["datason_performance"]:
                         summary["datason_performance"][variant] = {}
-                    
                     summary["datason_performance"][variant][dataset_name] = {
                         "serialization_ms": datason_ser,
                         "deserialization_ms": datason_deser
                     }
+                    
+                    # Enhanced API analysis
+                    if variant not in summary["datason_api_analysis"]["performance_by_variant"]:
+                        summary["datason_api_analysis"]["performance_by_variant"][variant] = {
+                            "description": self._get_api_description(variant),
+                            "use_cases": self._get_api_use_cases(variant),
+                            "datasets": {}
+                        }
+                    
+                    summary["datason_api_analysis"]["performance_by_variant"][variant]["datasets"][dataset_name] = {
+                        "serialization_ms": datason_ser,
+                        "deserialization_ms": datason_deser,
+                        "total_ms": datason_ser + datason_deser
+                    }
+        
+        # Generate API rankings and recommendations
+        if "datason_api_analysis" in summary:
+            summary["datason_api_analysis"]["performance_ranking"] = self._rank_datason_apis(summary["datason_api_analysis"]["performance_by_variant"])
+            summary["datason_api_analysis"]["api_recommendations"] = self._generate_api_recommendations(summary["datason_api_analysis"]["performance_by_variant"])
         
         return summary 
+    
+    def _get_api_description(self, variant: str) -> str:
+        """Get description for DataSON API variant."""
+        descriptions = {
+            "datason": "Standard DataSON API - balanced features and performance",
+            "datason_api": "API-optimized - designed for web services and REST APIs", 
+            "datason_ml": "ML-optimized - enhanced support for NumPy, tensors, and ML objects",
+            "datason_fast": "Performance-optimized - maximum speed with minimal features",
+            "datason_secure": "Security-enhanced - includes PII redaction and data sanitization",
+            "datason_smart": "Smart detection - advanced type inference and preservation",
+            "datason_perfect": "Perfect fidelity - maximum type preservation and round-trip accuracy"
+        }
+        return descriptions.get(variant, "DataSON variant with specialized optimizations")
+    
+    def _get_api_use_cases(self, variant: str):
+        """Get recommended use cases for DataSON API variant.""" 
+        use_cases = {
+            "datason": ["General purpose", "Balanced workloads", "Default choice"],
+            "datason_api": ["REST APIs", "Web services", "API responses", "Client-server communication"],
+            "datason_ml": ["Machine learning", "Data science", "NumPy arrays", "Model serialization"],
+            "datason_fast": ["High-throughput systems", "Performance-critical applications", "Batch processing"],
+            "datason_secure": ["Sensitive data", "PII handling", "Compliance requirements", "Data anonymization"],
+            "datason_smart": ["Type preservation", "Complex objects", "Schema inference", "Data migration"],
+            "datason_perfect": ["Exact round-trips", "Critical data integrity", "Schema validation", "Data archival"]
+        }
+        return use_cases.get(variant, ["Specialized applications"])
+    
+    def _rank_datason_apis(self, performance_data):
+        """Rank DataSON APIs by performance across datasets."""
+        variant_averages = {}
+        
+        for variant, data in performance_data.items():
+            total_times = []
+            for dataset_name, metrics in data["datasets"].items():
+                total_times.append(metrics["total_ms"])
+            
+            if total_times:
+                variant_averages[variant] = {
+                    "average_total_ms": sum(total_times) / len(total_times),
+                    "datasets_tested": len(total_times)
+                }
+        
+        # Rank by average performance
+        sorted_variants = sorted(
+            variant_averages.items(),
+            key=lambda x: x[1]["average_total_ms"]
+        )
+        
+        ranking = {}
+        for i, (variant, metrics) in enumerate(sorted_variants, 1):
+            ranking[variant] = {
+                "rank": i,
+                "average_total_ms": metrics["average_total_ms"],
+                "performance_category": self._get_performance_category(i, len(sorted_variants))
+            }
+        
+        return ranking
+    
+    def _get_performance_category(self, rank: int, total: int) -> str:
+        """Categorize performance based on ranking."""
+        if rank == 1:
+            return "🥇 Fastest"
+        elif rank <= total * 0.3:
+            return "🚀 High Performance"
+        elif rank <= total * 0.7:
+            return "⚖️ Balanced" 
+        else:
+            return "🔧 Feature-Rich"
+    
+    def _generate_api_recommendations(self, performance_data):
+        """Generate recommendations for when to use each DataSON API."""
+        recommendations = {
+            "speed_focused": [],
+            "feature_focused": [], 
+            "balanced": [],
+            "specialized": []
+        }
+        
+        # Analyze performance characteristics
+        speed_ranking = []
+        for variant, data in performance_data.items():
+            avg_times = []
+            for dataset_metrics in data["datasets"].values():
+                avg_times.append(dataset_metrics["total_ms"])
+            
+            if avg_times:
+                avg_total = sum(avg_times) / len(avg_times)
+                speed_ranking.append((variant, avg_total))
+        
+        speed_ranking.sort(key=lambda x: x[1])
+        
+        # Categorize based on performance and features
+        for i, (variant, avg_time) in enumerate(speed_ranking):
+            if i < len(speed_ranking) * 0.3:  # Top 30%
+                recommendations["speed_focused"].append({
+                    "variant": variant,
+                    "description": self._get_api_description(variant),
+                    "avg_time_ms": avg_time,
+                    "use_when": "Performance is the primary concern"
+                })
+            elif variant in ["datason_secure", "datason_perfect", "datason_smart"]:
+                recommendations["feature_focused"].append({
+                    "variant": variant,
+                    "description": self._get_api_description(variant),
+                    "avg_time_ms": avg_time,
+                    "use_when": "Advanced features outweigh performance considerations"
+                })
+            elif variant in ["datason", "datason_api"]:
+                recommendations["balanced"].append({
+                    "variant": variant,
+                    "description": self._get_api_description(variant),
+                    "avg_time_ms": avg_time,
+                    "use_when": "Good balance of features and performance needed"
+                })
+            else:
+                recommendations["specialized"].append({
+                    "variant": variant,
+                    "description": self._get_api_description(variant),
+                    "avg_time_ms": avg_time,
+                    "use_when": "Specific use case requirements"
+                })
+        
+        return recommendations
+
+    def print_enhanced_api_summary(self, results: Dict[str, Any]) -> None:
+        """Print an enhanced summary highlighting DataSON API variants."""
+        print("\n" + "="*80)
+        print("🚀 DATASON API VARIANTS PERFORMANCE ANALYSIS")
+        print("="*80)
+        
+        if "summary" not in results or "datason_api_analysis" not in results["summary"]:
+            print("❌ No DataSON API analysis available in results")
+            return
+        
+        api_analysis = results["summary"]["datason_api_analysis"]
+        
+        # Performance ranking
+        if "performance_ranking" in api_analysis:
+            print("\n🏆 PERFORMANCE RANKING (Fastest to Slowest):")
+            print("-" * 50)
+            ranking = api_analysis["performance_ranking"]
+            for variant, data in sorted(ranking.items(), key=lambda x: x[1]["rank"]):
+                rank = data["rank"]
+                category = data["performance_category"]
+                avg_ms = data["average_total_ms"]
+                description = self._get_api_description(variant)
+                
+                print(f"{rank:2}. {variant:15} {avg_ms:8.3f}ms  {category}")
+                print(f"    {description}")
+                print()
+        
+        # API recommendations by category
+        if "api_recommendations" in api_analysis:
+            print("\n💡 RECOMMENDED USE CASES:")
+            print("-" * 50)
+            recommendations = api_analysis["api_recommendations"]
+            
+            for category, recs in recommendations.items():
+                if recs:
+                    print(f"\n{category.replace('_', ' ').title()}:")
+                    for rec in recs:
+                        variant = rec["variant"]
+                        use_when = rec["use_when"]
+                        avg_time = rec["avg_time_ms"]
+                        use_cases = self._get_api_use_cases(variant)
+                        
+                        print(f"  • {variant} ({avg_time:.3f}ms) - {use_when}")
+                        print(f"    Best for: {', '.join(use_cases[:3])}")
+        
+        # Performance insights
+        print(f"\n📊 PERFORMANCE INSIGHTS:")
+        print("-" * 50)
+        if "performance_ranking" in api_analysis:
+            ranking = api_analysis["performance_ranking"]
+            if ranking:
+                fastest = min(ranking.values(), key=lambda x: x["average_total_ms"])
+                slowest = max(ranking.values(), key=lambda x: x["average_total_ms"])
+                
+                speed_ratio = slowest["average_total_ms"] / fastest["average_total_ms"]
+                
+                print(f"⚡ Performance spread: {speed_ratio:.1f}x difference between fastest and slowest")
+                print(f"🥇 Fastest API: {[k for k, v in ranking.items() if v['rank'] == 1][0]}")
+                print(f"🎯 Most balanced: APIs in 'Balanced' category offer good speed/feature trade-offs")
+                
+                # Specific recommendations
+                print(f"\n🎯 QUICK RECOMMENDATIONS:")
+                speed_focused = [k for k, v in ranking.items() if v["performance_category"] == "🥇 Fastest"]
+                balanced = [k for k, v in ranking.items() if v["performance_category"] == "⚖️ Balanced"]
+                
+                if speed_focused:
+                    print(f"   For speed: {', '.join(speed_focused)}")
+                if balanced:
+                    print(f"   For general use: {', '.join(balanced)}")
+                print(f"   For security: datason_secure (includes PII redaction)")
+                print(f"   For ML workflows: datason_ml (NumPy/Pandas optimized)")
+        
+        print("\n" + "="*80)

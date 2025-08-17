@@ -11,25 +11,57 @@
 - 📖 **[DataSON Documentation](https://datason.readthedocs.io/en/latest/)** - Full API docs and guides  
 - 📊 **[Live Benchmark Results](https://danielendler.github.io/datason-benchmarks/)** - Interactive performance reports
 - 🧪 **[This Benchmarks Repository](https://github.com/danielendler/datason-benchmarks)** - Benchmarking infrastructure
+- 🚀 **[DataSON API Performance Guide](docs/DATASON_API_PERFORMANCE_GUIDE.md)** - **NEW!** Comprehensive guide to API variants and performance characteristics
 
 ## 🎯 Overview
 
-This repository provides **transparent, reproducible benchmarks** for [DataSON](https://github.com/danielendler/datason) against major serialization libraries. Using GitHub Actions for zero-cost infrastructure, we deliver accurate competitive analysis and deep optimization insights that help users make informed decisions.
+This repository provides **transparent, reproducible benchmarks** for [DataSON](https://github.com/danielendler/datason) using a **dual benchmark system** designed to serve different performance analysis needs. Using GitHub Actions for zero-cost infrastructure, we deliver accurate competitive analysis and deep optimization insights.
+
+## 🏗️ Benchmark Architecture
+
+We maintain **two complementary benchmark systems** that serve different purposes:
+
+### 🏆 **System A: Competitive Benchmarks** 
+*Daily/Weekly Market Position Analysis*
+
+**Purpose**: Compare DataSON against external serialization libraries  
+**Used by**: Daily benchmarks, weekly reports, market analysis  
+**Script**: `run_benchmarks.py` → `CompetitiveBenchmarkSuite`  
+**Data Format**: `competitive → tiers → datasets`
+
+- **Competitors**: orjson, ujson, json, pickle, jsonpickle, msgpack
+- **DataSON Variants**: All API levels tested as separate "competitors"
+- **Fairness**: Multi-tier testing (JSON-safe, object-enhanced, ML-complex)
+- **Focus**: External market position and competitiveness
+
+### 🔧 **System B: Optimization Benchmarks**
+*Internal Performance Optimization & Regression Detection*
+
+**Purpose**: Validate DataSON optimizations and detect performance regressions  
+**Used by**: PR performance checks, optimization validation, baseline comparison  
+**Script**: `pr_optimized_benchmark.py`  
+**Data Format**: `results_by_tier → tiers → datasets`
+
+- **API Tiers**: Basic, API-optimized, Smart, ML-optimized, Compatibility  
+- **Profiling Integration**: Detailed optimization validation
+- **Focus**: Internal optimization effectiveness and regression prevention
+- **Baseline**: Tracks performance improvements over time
+
+> **💡 Why Two Systems?** Each system is optimized for its specific purpose. Competitive benchmarks need fair external comparisons, while optimization benchmarks need detailed internal analysis. This separation provides cleaner insights and more focused reporting.
 
 ### Key Features
 
 - **🏆 Competitive Analysis**: Head-to-head comparison with 6-8 major serialization libraries
-- **🔧 Deep Optimization Analysis**: DataSON configuration optimization with API-level insights  
+- **🔧 Deep Optimization Analysis**: DataSON API-level performance insights and regression detection  
 - **📊 Version Evolution Tracking**: Performance analysis across DataSON versions
-- **🤖 Enhanced CI/CD Integration**: Smart PR performance checks with regression detection
+- **🤖 Enhanced CI/CD Integration**: Smart PR performance checks with dual benchmark validation
 - **🎨 Phase 4 Enhanced Reports**: **NEW!** Interactive reports with comprehensive performance tables, smart units (μs/ms/s), ML compatibility matrix
 - **📈 Interactive Reports**: Beautiful charts and visualizations with GitHub Pages hosting
 - **🚀 Community Friendly**: Easy setup, contribution guidelines, free infrastructure
 
 ## 🚀 Quick Start
 
-### Run Benchmarks Locally
-
+### Setup
 ```bash
 # Clone the repository
 git clone https://github.com/danielendler/datason-benchmarks.git
@@ -37,24 +69,50 @@ cd datason-benchmarks
 
 # Install dependencies
 pip install -r requirements.txt
+```
 
-# Quick competitive comparison (3-4 libraries)
+### 🏆 Competitive Benchmarks (System A)
+*Compare DataSON against external libraries*
+
+```bash
+# Quick competitive comparison (3-4 libraries, fast)
 python scripts/run_benchmarks.py --quick --generate-report
-
-# DataSON version evolution analysis
-python scripts/run_benchmarks.py --versioning --generate-report
 
 # Full competitive analysis (all available libraries)
 python scripts/run_benchmarks.py --competitive --generate-report
 
+# Complete competitive suite with reports
+python scripts/run_benchmarks.py --complete --generate-report
+
+# DataSON version evolution analysis
+python scripts/run_benchmarks.py --versioning --generate-report
+```
+
+### 🔧 Optimization Benchmarks (System B)  
+*Validate DataSON optimizations and detect regressions*
+
+```bash
+# PR optimization validation (fast, 5 datasets × 5 API tiers)
+python scripts/pr_optimized_benchmark.py --output results/optimization_check.json
+
+# Establish new performance baseline
+python scripts/pr_optimized_benchmark.py --iterations 20 --output data/results/new_baseline.json
+
+# Optimization-specific validation suite
+python benchmarks/optimization_validation.py
+```
+
+### 🔬 Advanced Analysis
+
+```bash
+# Comprehensive API profiling across all DataSON APIs
+python scripts/run_benchmarks.py --profile-apis
+
 # DataSON configuration optimization testing
 python scripts/run_benchmarks.py --configurations --generate-report
 
-# Complete benchmark suite with interactive reports
-python scripts/run_benchmarks.py --complete --generate-report
-
-# Comprehensive API profiling across all DataSON APIs
-python scripts/run_benchmarks.py --profile-apis
+# Detailed profiling analysis (requires DATASON_PROFILE=1)
+DATASON_PROFILE=1 python scripts/profile_stages.py --with-rust off --runs 5
 ```
 
 ### Rust Core Benchmarks (experimental)
@@ -144,6 +202,8 @@ python scripts/analyze_trends.py --input-dir data/results --lookback-weeks 12
 ### DataSON Configuration Deep Dive
 
 Our enhanced benchmarking system now provides **deep API analysis** of [DataSON's](https://github.com/danielendler/datason) optimization configurations:
+
+📋 **[View Complete API Performance Guide →](docs/DATASON_API_PERFORMANCE_GUIDE.md)**
 
 #### Available Optimization Configs
 - **`get_performance_config()`** - Speed-optimized settings (`UNIX` dates, `VALUES` orient, no type hints)

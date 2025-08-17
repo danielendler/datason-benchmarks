@@ -78,16 +78,23 @@ class BenchmarkRunner:
         from benchmarks.competitive.competitive_suite import CompetitiveBenchmarkSuite
         competitive_suite = CompetitiveBenchmarkSuite()
         
-        # Test only DataSON variants on different data types
-        datason_variants = ["datason", "datason_api", "datason_ml", "datason_fast"]
+        # Test comprehensive DataSON variants including new APIs
+        datason_variants = ["datason", "datason_api", "datason_ml", "datason_fast", 
+                           "datason_secure", "datason_smart", "datason_perfect"]
+        
+        api_results = competitive_suite.run_competitive_comparison(
+            competitors=datason_variants, iterations=10
+        )
         
         results = {
             "suite_type": "datason_api_showcase",
             "metadata": self.metadata,
-            "api_comparison": competitive_suite.run_competitive_comparison(
-                competitors=datason_variants, iterations=10
-            )
+            "api_comparison": api_results
         }
+        
+        # Print enhanced API analysis summary
+        if api_results and "summary" in api_results and "datason_api_analysis" in api_results["summary"]:
+            competitive_suite.print_enhanced_api_summary(api_results)
         
         self._save_results(results, "datason_api_showcase")
         logger.info("✅ DataSON API showcase completed")
