@@ -67,19 +67,28 @@ jobs:
     - name: 📦 Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
         
-        # Install specific DataSON version if requested
+        # Install specific DataSON version if requested, otherwise install latest
         if [ "${{ github.event.inputs.datason_version }}" != "" ] && [ "${{ github.event.inputs.datason_version }}" != "latest" ]; then
           echo "📌 Installing specific DataSON version: ${{ github.event.inputs.datason_version }}"
-          pip install datason==${{ github.event.inputs.datason_version }}
+          pip install datason==${{ github.event.inputs.datason_version }} --force-reinstall --no-cache-dir
         else
           echo "📦 Installing latest DataSON version"
-          pip install --upgrade datason
+          pip install --upgrade datason --force-reinstall --no-cache-dir
         fi
         
-        # Verify installation
-        python -c "import datason; print(f'✅ DataSON {datason.__version__} installed')"
+        # Install remaining dependencies
+        pip install -r requirements.txt
+        
+        # Verify installation with detailed method check
+        python -c "
+        import datason
+        print(f'✅ DataSON {datason.__version__} installed')
+        print(f'📋 save_string available: {hasattr(datason, \"save_string\")}')
+        print(f'📋 load_basic available: {hasattr(datason, \"load_basic\")}')
+        if not hasattr(datason, 'save_string'):
+            print('⚠️ Available methods:', [attr for attr in dir(datason) if not attr.startswith('_')][:10])
+        "
     
     - name: 🔍 Check existing baseline
       id: check_baseline
@@ -155,6 +164,9 @@ jobs:
           
           # Ensure results directory exists
           mkdir -p data/results
+          
+          # Set Python path for proper module imports
+          export PYTHONPATH="$PWD:$PYTHONPATH"
           
           # 1. Run tiered baseline (for complete benchmarks)
           echo "📊 Creating tiered baseline for complete/PR-optimized benchmarks..."
