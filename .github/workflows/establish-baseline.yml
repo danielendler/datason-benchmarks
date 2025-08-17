@@ -130,7 +130,7 @@ jobs:
         
         echo "✅ Baseline archived"
     
-    - name: 🚀 Establish new baseline
+    - name: 🚀 Establish new baselines
       id: establish
       run: |
         SHOULD_UPDATE=false
@@ -151,23 +151,39 @@ jobs:
         fi
         
         if [ "$SHOULD_UPDATE" == "true" ]; then
-          echo "🚀 Establishing baseline with DataSON ${{ steps.check_baseline.outputs.current_version }}"
+          echo "🚀 Establishing multiple baselines with DataSON ${{ steps.check_baseline.outputs.current_version }}"
           
-          # Run baseline establishment with more iterations for stable results
+          # Ensure results directory exists
+          mkdir -p data/results
+          
+          # 1. Run tiered baseline (for complete benchmarks)
+          echo "📊 Creating tiered baseline for complete/PR-optimized benchmarks..."
           python scripts/establish_datason_baseline.py \
             --output data/results/datason_baseline.json \
             --iterations 20 \
             --force
           
-          # Create symlink for compatibility
+          # 2. Run competitive baseline (for quick/competitive benchmarks) 
+          echo "🏁 Creating competitive baseline for quick/competitive benchmarks..."
+          python scripts/run_benchmarks.py --competitive
+          
+          # 3. Run configuration baseline (for configuration benchmarks)
+          echo "⚙️ Creating configuration baseline for configuration benchmarks..."
+          python scripts/run_benchmarks.py --configurations
+          
+          # 4. Run versioning baseline (for versioning benchmarks)
+          echo "📈 Creating versioning baseline for versioning benchmarks..."
+          python scripts/run_benchmarks.py --versioning
+          
+          # Create symlinks for compatibility
           cd data/results
           ln -sf datason_baseline.json latest.json
           cd -
           
           echo "baseline_updated=true" >> $GITHUB_OUTPUT
-          echo "✅ Baseline established successfully"
+          echo "✅ All baselines established successfully"
         else
-          echo "ℹ️ Baseline is up to date, no changes needed"
+          echo "ℹ️ Baselines are up to date, no changes needed"
           echo "baseline_updated=false" >> $GITHUB_OUTPUT
         fi
     
@@ -229,6 +245,9 @@ jobs:
         # But CI-generated baselines are legitimate and should be committed
         git add -f data/results/datason_baseline.json
         git add -f data/results/latest.json
+        git add -f data/results/latest_competitive.json
+        git add -f data/results/latest_configuration.json  
+        git add -f data/results/latest_versioning.json
         
         # Add archived baselines if any
         if [ -d data/results/archived ]; then
@@ -259,6 +278,9 @@ jobs:
         path: |
           data/results/datason_baseline.json
           data/results/latest.json
+          data/results/latest_competitive.json
+          data/results/latest_configuration.json
+          data/results/latest_versioning.json
           data/results/archived/
           baseline_report.md
         retention-days: 90

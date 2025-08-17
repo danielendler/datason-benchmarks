@@ -214,13 +214,34 @@ jobs:
         fi
         
         if [ -f data/results/latest_quick.json ]; then
-          python scripts/generate_pr_comment.py \
-            --pr-number "$PR_NUMBER" \
-            --commit-sha "$COMMIT_SHA" \
-            --benchmark-type "$BENCHMARK_TYPE" \
-            --result-file data/results/latest_quick.json \
-            --baseline-file data/results/latest.json \
-            --output pr_comment.md
+          # Select appropriate baseline based on benchmark type
+          BASELINE_FILE=""
+          if [ -f data/results/latest_competitive.json ]; then
+            BASELINE_FILE="data/results/latest_competitive.json"
+          elif [ -f data/results/latest_quick.json ]; then
+            # Use previous quick benchmark as baseline if competitive not available
+            BASELINE_FILE="data/results/latest_quick.json"
+          elif [ -f data/results/latest.json ]; then
+            # Fallback to general baseline
+            BASELINE_FILE="data/results/latest.json"
+          fi
+          
+          if [ -n "$BASELINE_FILE" ]; then
+            python scripts/generate_pr_comment.py \
+              --pr-number "$PR_NUMBER" \
+              --commit-sha "$COMMIT_SHA" \
+              --benchmark-type "$BENCHMARK_TYPE" \
+              --result-file data/results/latest_quick.json \
+              --baseline-file "$BASELINE_FILE" \
+              --output pr_comment.md
+          else
+            python scripts/generate_pr_comment.py \
+              --pr-number "$PR_NUMBER" \
+              --commit-sha "$COMMIT_SHA" \
+              --benchmark-type "$BENCHMARK_TYPE" \
+              --result-file data/results/latest_quick.json \
+              --output pr_comment.md
+          fi
 
           cat pr_comment.md >> "$GITHUB_STEP_SUMMARY"
           echo "📊 PR comment generated"
