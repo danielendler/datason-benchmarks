@@ -1,0 +1,141 @@
+{
+  "suite_type": "optimization_validation",
+  "metadata": {
+    "timestamp": "2025-08-17T11:03:38",
+    "datason_version": "0.12.0",
+    "purpose": "Validate performance optimizations in critical bottlenecks branch"
+  },
+  "benchmarks": {
+    "homogeneous_arrays": {
+      "homogeneous_array_10": {
+        "size": 10,
+        "mean_ms": 0.0883250031620264,
+        "median_ms": 0.05791700095869601,
+        "min_ms": 0.053916999604552984,
+        "max_ms": 0.21387499873526394,
+        "json_size": 833,
+        "optimization_expected": true,
+        "performance_target_ms": 1.2
+      },
+      "homogeneous_array_50": {
+        "size": 50,
+        "mean_ms": 0.1454414043109864,
+        "median_ms": 0.14520800323225558,
+        "min_ms": 0.13995799235999584,
+        "max_ms": 0.15112498658709228,
+        "json_size": 4273,
+        "optimization_expected": true,
+        "performance_target_ms": 2.0
+      },
+      "homogeneous_array_100": {
+        "size": 100,
+        "mean_ms": 0.26420840295031667,
+        "median_ms": 0.25450001703575253,
+        "min_ms": 0.2519999979995191,
+        "max_ms": 0.29191700741648674,
+        "json_size": 8606,
+        "optimization_expected": true,
+        "performance_target_ms": 3.0
+      },
+      "homogeneous_array_200": {
+        "size": 200,
+        "mean_ms": 0.4911827971227467,
+        "median_ms": 0.49216600018553436,
+        "min_ms": 0.47870801063254476,
+        "max_ms": 0.5028329906053841,
+        "json_size": 17506,
+        "optimization_expected": true,
+        "performance_target_ms": 5.0
+      },
+      "homogeneous_array_500": {
+        "size": 500,
+        "mean_ms": 1.204474811675027,
+        "median_ms": 1.2032499944325536,
+        "min_ms": 1.1718330206349492,
+        "max_ms": 1.227833010489121,
+        "json_size": 44206,
+        "optimization_expected": true,
+        "performance_target_ms": 11.0
+      }
+    },
+    "nested_structures": {
+      "nested_structure": {
+        "mean_ms": 0.16503770020790398,
+        "median_ms": 0.16420899191871285,
+        "min_ms": 0.15220898785628378,
+        "max_ms": 0.18900001305155456,
+        "json_size": 2691,
+        "optimization_expected": true,
+        "performance_target_ms": 3.0
+      }
+    },
+    "string_interning": {
+      "string_interning_25": {
+        "size": 25,
+        "mean_ms": 0.131966604385525,
+        "median_ms": 0.13295799726620317,
+        "min_ms": 0.12583300122059882,
+        "max_ms": 0.1390830148011446,
+        "json_size": 4255,
+        "optimization_expected": true,
+        "performance_target_ms": 2.25
+      },
+      "string_interning_50": {
+        "size": 50,
+        "mean_ms": 0.2250581979751587,
+        "median_ms": 0.2278749889228493,
+        "min_ms": 0.2148750063497573,
+        "max_ms": 0.2328749978914857,
+        "json_size": 8530,
+        "optimization_expected": true,
+        "performance_target_ms": 3.0
+      },
+      "string_interning_100": {
+        "size": 100,
+        "mean_ms": 0.40853340178728104,
+        "median_ms": 0.3997499879915267,
+        "min_ms": 0.39775000186637044,
+        "max_ms": 0.42466699960641563,
+        "json_size": 17080,
+        "optimization_expected": true,
+        "performance_target_ms": 4.5
+      },
+      "string_interning_200": {
+        "size": 200,
+        "mean_ms": 0.8036917948629707,
+        "median_ms": 0.8041669789236039,
+        "min_ms": 0.7647080055903643,
+        "max_ms": 0.8400839869864285,
+        "json_size": 34380,
+        "optimization_expected": true,
+        "performance_target_ms": 7.5
+      }
+    },
+    "mixed_optimizations": {
+      "mixed_optimizations": {
+        "mean_ms": 0.45046680024825037,
+        "median_ms": 0.45187499199528247,
+        "min_ms": 0.413333997130394,
+        "max_ms": 0.47833399730734527,
+        "json_size": 9296,
+        "optimization_expected": true,
+        "performance_target_ms": 5.0
+      }
+    },
+    "profiling_overhead": {
+      "profiling_overhead": {
+        "mean_ms_no_profile": 0.2661958016688004,
+        "mean_ms_with_profile": 0.26044570258818567,
+        "overhead_percentage": -2.1601013406548732,
+        "optimization_expected": true,
+        "performance_target_overhead_pct": 30.0,
+        "profile_events_captured": 0
+      }
+    }
+  },
+  "optimization_summary": {
+    "total_tests": 12,
+    "passed_tests": 12,
+    "optimization_effectiveness": 100.0
+  }
+}

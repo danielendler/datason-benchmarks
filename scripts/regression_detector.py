@@ -428,7 +428,10 @@ def main():
     
     if args.pr_comment:
         comment = detector.generate_pr_comment(regressions)
-        os.makedirs(os.path.dirname(args.pr_comment), exist_ok=True)
+        # Only create directory if there's a directory component
+        comment_dir = os.path.dirname(args.pr_comment)
+        if comment_dir:
+            os.makedirs(comment_dir, exist_ok=True)
         with open(args.pr_comment, 'w') as f:
             f.write(comment)
         print(f"PR comment saved to: {args.pr_comment}")

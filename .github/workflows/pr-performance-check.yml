@@ -229,11 +229,15 @@ jobs:
         # Install regression detection dependencies if needed
         pip install pandas matplotlib 2>/dev/null || true
         
-        # Run comprehensive regression detection
-        if [ -f data/results/latest.json ]; then
+        # Find actual benchmark result files
+        RESULT_FILES=$(find data/results -name "latest_*.json" -not -name "latest.json" 2>/dev/null | head -5)
+        
+        if [ -f data/results/latest.json ] && [ -n "$RESULT_FILES" ]; then
           echo "📊 Running advanced regression detection..."
+          echo "Found result files: $RESULT_FILES"
+          
           python scripts/regression_detector.py \
-            data/results/latest_competitive_*.json \
+            $RESULT_FILES \
             --baseline data/results/latest.json \
             --output data/results/pr_regression_report.json \
             --pr-comment pr_regression_comment.md \
@@ -252,12 +256,21 @@ jobs:
           fi
           
         else
-          echo "📝 No baseline found - this will become the new baseline"
+          echo "📝 No baseline or benchmark results found - creating baseline comment"
           echo "PERFORMANCE_REGRESSION=false" >> $GITHUB_ENV
           echo "🔄 **Performance Baseline**" > pr_regression_comment.md
           echo "" >> pr_regression_comment.md
-          echo "This is the first benchmark run or no previous results were found." >> pr_regression_comment.md
+          echo "This is the first benchmark run or no previous baseline was found." >> pr_regression_comment.md
           echo "Future PRs will be compared against this baseline." >> pr_regression_comment.md
+          echo "" >> pr_regression_comment.md
+          echo "**Available Results:**" >> pr_regression_comment.md
+          if [ -n "$RESULT_FILES" ]; then
+            for file in $RESULT_FILES; do
+              echo "- $(basename $file)" >> pr_regression_comment.md
+            done
+          else
+            echo "- No benchmark result files found" >> pr_regression_comment.md
+          fi
         fi
 
 
