@@ -216,14 +216,23 @@ jobs:
         if [ -f data/results/latest_quick.json ]; then
           # Select appropriate baseline based on benchmark type
           BASELINE_FILE=""
-          if [ -f data/results/latest_competitive.json ]; then
+          if [ -f data/results/latest_competitive.json ] && [ ! -L data/results/latest_competitive.json -o -e data/results/latest_competitive.json ]; then
             BASELINE_FILE="data/results/latest_competitive.json"
-          elif [ -f data/results/latest_quick.json ]; then
-            # Use previous quick benchmark as baseline if competitive not available
-            BASELINE_FILE="data/results/latest_quick.json"
-          elif [ -f data/results/latest.json ]; then
-            # Fallback to general baseline
-            BASELINE_FILE="data/results/latest.json"
+          else
+            # Find most recent competitive baseline file
+            RECENT_COMPETITIVE=$(find data/results -name "*competitive*.json" -not -name "latest_competitive.json" | sort -r | head -1)
+            if [ -n "$RECENT_COMPETITIVE" ]; then
+              BASELINE_FILE="$RECENT_COMPETITIVE"
+              echo "📊 Using recent competitive baseline: $(basename $BASELINE_FILE)"
+            elif [ -f data/results/latest_quick.json ]; then
+              # Use previous quick benchmark as baseline if competitive not available
+              BASELINE_FILE="data/results/latest_quick.json"
+              echo "⚠️ Warning: Using quick baseline instead of competitive baseline"
+            elif [ -f data/results/latest.json ]; then
+              # Fallback to general baseline (different format - may not be ideal)
+              BASELINE_FILE="data/results/latest.json" 
+              echo "⚠️ Warning: Using tiered baseline - format mismatch possible"
+            fi
           fi
           
           if [ -n "$BASELINE_FILE" ]; then
@@ -257,18 +266,40 @@ jobs:
         # Find actual benchmark result files
         RESULT_FILES=$(find data/results -name "latest_*.json" -not -name "latest.json" 2>/dev/null | head -5)
         
-        if [ -f data/results/latest.json ] && [ -n "$RESULT_FILES" ]; then
+        if [ -n "$RESULT_FILES" ]; then
           echo "📊 Running advanced regression detection..."
           echo "Found result files: $RESULT_FILES"
           
-          # Run regression detection on the primary benchmark result
-          python scripts/regression_detector.py \
-            data/results/latest_quick.json \
-            --baseline data/results/latest.json \
-            --output data/results/pr_regression_report.json \
-            --pr-comment pr_regression_comment.md \
-            --fail-threshold 0.25 \
-            --warn-threshold 0.10
+          # Use same smart baseline selection as PR comment generation
+          REGRESSION_BASELINE=""
+          if [ -f data/results/latest_competitive.json ] && [ ! -L data/results/latest_competitive.json -o -e data/results/latest_competitive.json ]; then
+            REGRESSION_BASELINE="data/results/latest_competitive.json"
+          else
+            # Find most recent competitive baseline file
+            RECENT_COMPETITIVE=$(find data/results -name "*competitive*.json" -not -name "latest_competitive.json" | sort -r | head -1)
+            if [ -n "$RECENT_COMPETITIVE" ]; then
+              REGRESSION_BASELINE="$RECENT_COMPETITIVE"
+              echo "📊 Using recent competitive baseline for regression detection: $(basename $REGRESSION_BASELINE)"
+            elif [ -f data/results/latest.json ]; then
+              REGRESSION_BASELINE="data/results/latest.json"
+              echo "⚠️ Warning: Using tiered baseline for regression detection - format mismatch possible"
+            fi
+          fi
+          
+          if [ -n "$REGRESSION_BASELINE" ]; then
+            # Run regression detection with correct baseline
+            python scripts/regression_detector.py \
+              data/results/latest_quick.json \
+              --baseline "$REGRESSION_BASELINE" \
+              --output data/results/pr_regression_report.json \
+              --pr-comment pr_regression_comment.md \
+              --fail-threshold 0.25 \
+              --warn-threshold 0.10
+          else
+            echo "⚠️ No suitable baseline found for regression detection"
+            echo "🔄 **No Baseline Available**" > pr_regression_comment.md
+            echo "No suitable baseline found for performance comparison." >> pr_regression_comment.md
+          fi
           
           REGRESSION_EXIT_CODE=$?
           echo "REGRESSION_EXIT_CODE=$REGRESSION_EXIT_CODE" >> $GITHUB_ENV
