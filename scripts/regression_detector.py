@@ -55,6 +55,48 @@ class PerformanceRegressionDetector:
     def __init__(self, thresholds: Optional[RegressionThresholds] = None):
         self.thresholds = thresholds or RegressionThresholds()
     
+    def format_time_value(self, value_seconds: float) -> Tuple[str, str]:
+        """
+        Format a time value in seconds to the most appropriate unit.
+        Returns (formatted_value, unit_name) tuple.
+        """
+        # Convert to different units and find the most readable one
+        if value_seconds >= 1.0:
+            return f"{value_seconds:.3f}", "s"
+        elif value_seconds >= 0.001:
+            return f"{value_seconds * 1000:.3f}", "ms"
+        elif value_seconds >= 0.000001:
+            return f"{value_seconds * 1000000:.3f}", "μs"
+        else:
+            return f"{value_seconds * 1000000000:.3f}", "ns"
+    
+    def format_comparison_values(self, baseline_seconds: float, current_seconds: float) -> Tuple[str, str]:
+        """
+        Format baseline and current values using the same unit for comparison.
+        Chooses the unit based on the larger of the two values for better readability.
+        """
+        # Choose unit based on the larger value
+        larger_value = max(abs(baseline_seconds), abs(current_seconds))
+        
+        if larger_value >= 1.0:
+            # Use seconds
+            baseline_str = f"{baseline_seconds:.3f}s"
+            current_str = f"{current_seconds:.3f}s"
+        elif larger_value >= 0.001:
+            # Use milliseconds
+            baseline_str = f"{baseline_seconds * 1000:.3f}ms"
+            current_str = f"{current_seconds * 1000:.3f}ms"
+        elif larger_value >= 0.000001:
+            # Use microseconds
+            baseline_str = f"{baseline_seconds * 1000000:.3f}μs"
+            current_str = f"{current_seconds * 1000000:.3f}μs"
+        else:
+            # Use nanoseconds
+            baseline_str = f"{baseline_seconds * 1000000000:.3f}ns"
+            current_str = f"{current_seconds * 1000000000:.3f}ns"
+        
+        return baseline_str, current_str
+    
     def load_benchmark_results(self, file_path: str) -> List[BenchmarkResult]:
         """Load benchmark results from JSON file"""
         if not os.path.exists(file_path):
@@ -434,8 +476,10 @@ class PerformanceRegressionDetector:
             comment_parts.append("| Metric | Baseline | Current | Change |")
             comment_parts.append("|--------|----------|---------|--------|")
             for r in failures:
+                # Use smart unit formatting for time values
+                baseline_str, current_str = self.format_comparison_values(r.baseline_value, r.current_value)
                 comment_parts.append(
-                    f"| {r.metric_name} | {r.baseline_value:.3f} | {r.current_value:.3f} | **{r.change_percent:+.1%}** |"
+                    f"| {r.metric_name} | {baseline_str} | {current_str} | **{r.change_percent:+.1%}** |"
                 )
             comment_parts.append("")
         
@@ -445,8 +489,10 @@ class PerformanceRegressionDetector:
             comment_parts.append("| Metric | Baseline | Current | Change |")
             comment_parts.append("|--------|----------|---------|--------|")
             for r in warnings:
+                # Use smart unit formatting for time values
+                baseline_str, current_str = self.format_comparison_values(r.baseline_value, r.current_value)
                 comment_parts.append(
-                    f"| {r.metric_name} | {r.baseline_value:.3f} | {r.current_value:.3f} | **{r.change_percent:+.1%}** |"
+                    f"| {r.metric_name} | {baseline_str} | {current_str} | **{r.change_percent:+.1%}** |"
                 )
             comment_parts.append("")
         
@@ -456,8 +502,10 @@ class PerformanceRegressionDetector:
             comment_parts.append("| Metric | Baseline | Current | Change |")
             comment_parts.append("|--------|----------|---------|--------|")
             for r in improvements:
+                # Use smart unit formatting for time values
+                baseline_str, current_str = self.format_comparison_values(r.baseline_value, r.current_value)
                 comment_parts.append(
-                    f"| {r.metric_name} | {r.baseline_value:.3f} | {r.current_value:.3f} | **{r.change_percent:+.1%}** |"
+                    f"| {r.metric_name} | {baseline_str} | {current_str} | **{r.change_percent:+.1%}** |"
                 )
             comment_parts.append("")
         
