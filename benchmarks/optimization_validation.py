@@ -1,371 +1,249 @@
 #!/usr/bin/env python3
 """
-Optimization Validation Benchmark Suite
-=======================================
+Optimization validation script to ensure DataSON performance improvements are consistent.
 
-This benchmark suite specifically tests the performance optimizations implemented
-in the performance/investigate-critical-bottlenecks branch:
-
-1. Homogeneous array optimization
-2. Nested structure optimization  
-3. String interning for repeated values
-4. Reduced profiling overhead
-
-These tests are designed to detect performance regressions in the optimization
-code paths and validate that the improvements are working as expected.
+This script validates that the performance optimizations implemented in the 
+performance/investigate-critical-bottlenecks branch are working correctly and
+delivering the expected improvements.
 """
 
+import os
 import time
 import statistics
-from typing import Dict, List, Any
-import json
+from typing import Dict, List
+import datason
+
+# Ensure profiling is enabled
+os.environ['DATASON_PROFILE'] = '1'
 
 
-def time_operation(func, *args, **kwargs):
-    """Time a function call and return duration in milliseconds."""
-    start = time.perf_counter()
-    result = func(*args, **kwargs)
-    end = time.perf_counter()
-    return (end - start) * 1000, result
-
-
-class OptimizationValidationSuite:
-    """Test suite for validation optimization performance improvements."""
-
-    def __init__(self):
-        try:
-            import datason
-            self.datason = datason
-            self.available = True
-        except ImportError:
-            self.available = False
-
-    def generate_homogeneous_array_data(self, size: int) -> List[Dict[str, Any]]:
-        """Generate data that should trigger homogeneous array optimization."""
-        return [
-            {
-                "id": i,
-                "name": f"user_{i}",
-                "active": True,
-                "score": i * 1.5,
-                "category": "standard"
-            }
-            for i in range(size)
-        ]
-
-    def generate_nested_structure_data(self) -> Dict[str, Any]:
-        """Generate data that should trigger nested structure optimization."""
-        return {
-            "users": [
-                {"id": i, "name": f"user_{i}", "role": "member"}
-                for i in range(50)
-            ],
-            "metadata": {
-                "total": 50,
-                "status": "active",
-                "version": "1.0",
-                "config": {
-                    "max_users": 1000,
-                    "timeout": 30,
-                    "debug": False
-                }
-            },
-            "api_settings": {
-                "endpoint": "https://api.example.com",
-                "auth_method": "bearer",
-                "rate_limit": 1000,
-                "retry_attempts": 3
-            }
-        }
-
-    def generate_string_interning_data(self, size: int) -> List[Dict[str, Any]]:
-        """Generate data with repeated strings that should benefit from interning."""
-        return [
-            {
-                "id": i,
-                "status": "active",        # Repeated string
-                "type": "user",           # Repeated string
-                "plan": "premium",        # Repeated string
-                "region": "us-east-1" if i < size // 2 else "us-west-2",  # Semi-repeated
-                "tags": ["important", "verified", "premium"],  # Repeated values
-                "unique_field": f"unique_value_{i}"
-            }
-            for i in range(size)
-        ]
-
-    def generate_mixed_optimization_data(self) -> Dict[str, Any]:
-        """Generate data that should trigger multiple optimizations."""
-        return {
-            "homogeneous_users": [
-                {"id": i, "name": f"user_{i}", "active": True}
-                for i in range(100)
-            ],
-            "homogeneous_products": [
-                {"sku": f"PROD-{i:04d}", "price": 19.99, "available": True}
-                for i in range(75)
-            ],
-            "metadata": {
-                "api_version": "v2.1",
-                "status": "success",
-                "timestamp": "2025-01-15T10:30:00Z",
-                "request_id": "req_12345",
-                "config": {
-                    "cache_enabled": True,
-                    "timeout": 5000,
-                    "retry_policy": "exponential"
-                }
-            },
-            "repeated_config": {
-                "environment": "production",  # Repeated across different sections
-                "debug": False,               # Repeated
-                "log_level": "info"           # Repeated
-            }
-        }
-
-    def benchmark_homogeneous_arrays(self) -> Dict[str, Any]:
-        """Benchmark homogeneous array optimization."""
-        if not self.available:
-            return {"error": "DataSON not available"}
-
-        results = {}
+def benchmark_scenario(data, description: str, runs: int = 5) -> Dict:
+    """Benchmark a specific data scenario multiple times"""
+    
+    serialize_times = []
+    deserialize_times = []
+    event_counts = []
+    
+    print(f"\n=== {description} ===")
+    
+    for run in range(runs):
+        # Clear profile sink
+        datason.profile_sink = []
         
-        # Test different array sizes to see scaling
-        for size in [10, 50, 100, 200, 500]:
-            data = self.generate_homogeneous_array_data(size)
+        # Test serialization
+        start_time = time.perf_counter()
+        json_str = datason.save_string(data)
+        serialize_time = time.perf_counter() - start_time
+        
+        # Count serialization events
+        serialize_events = len(datason.profile_sink)
+        datason.profile_sink = []
+        
+        # Test deserialization
+        start_time = time.perf_counter()
+        loaded = datason.load_basic(json_str)
+        deserialize_time = time.perf_counter() - start_time
+        
+        # Count deserialization events
+        deserialize_events = len(datason.profile_sink)
+        total_events = serialize_events + deserialize_events
+        
+        # Validate round-trip
+        if loaded != data:
+            print(f"  ❌ Run {run+1}: Round-trip failed!")
+            continue
             
-            # Run multiple iterations for statistical accuracy
-            durations = []
-            for _ in range(5):
-                duration_ms, json_str = time_operation(self.datason.save_string, data)
-                loaded = self.datason.load_basic(json_str)
-                assert loaded == data  # Correctness check
-                durations.append(duration_ms)
-            
-            results[f"homogeneous_array_{size}"] = {
-                "size": size,
-                "mean_ms": statistics.mean(durations),
-                "median_ms": statistics.median(durations),
-                "min_ms": min(durations),
-                "max_ms": max(durations),
-                "json_size": len(json_str),
-                "optimization_expected": True,
-                "performance_target_ms": size * 0.02 + 1.0  # 0.02ms per item + 1ms overhead
-            }
-
-        return results
-
-    def benchmark_nested_structures(self) -> Dict[str, Any]:
-        """Benchmark nested structure optimization."""
-        if not self.available:
-            return {"error": "DataSON not available"}
-
-        data = self.generate_nested_structure_data()
-        
-        # Run multiple iterations
-        durations = []
-        for _ in range(10):
-            duration_ms, json_str = time_operation(self.datason.save_string, data)
-            loaded = self.datason.load_basic(json_str)
-            assert loaded == data
-            durations.append(duration_ms)
-
-        return {
-            "nested_structure": {
-                "mean_ms": statistics.mean(durations),
-                "median_ms": statistics.median(durations),
-                "min_ms": min(durations),
-                "max_ms": max(durations),
-                "json_size": len(json_str),
-                "optimization_expected": True,
-                "performance_target_ms": 3.0  # Should complete in under 3ms
-            }
-        }
-
-    def benchmark_string_interning(self) -> Dict[str, Any]:
-        """Benchmark string interning optimization."""
-        if not self.available:
-            return {"error": "DataSON not available"}
-
-        results = {}
-        
-        # Test different sizes to see string interning benefits
-        for size in [25, 50, 100, 200]:
-            data = self.generate_string_interning_data(size)
-            
-            durations = []
-            for _ in range(5):
-                duration_ms, json_str = time_operation(self.datason.save_string, data)
-                loaded = self.datason.load_basic(json_str)
-                assert loaded == data
-                durations.append(duration_ms)
-
-            results[f"string_interning_{size}"] = {
-                "size": size,
-                "mean_ms": statistics.mean(durations),
-                "median_ms": statistics.median(durations),
-                "min_ms": min(durations),
-                "max_ms": max(durations),
-                "json_size": len(json_str),
-                "optimization_expected": True,
-                "performance_target_ms": size * 0.03 + 1.5  # Should benefit from string interning
-            }
-
-        return results
-
-    def benchmark_mixed_optimizations(self) -> Dict[str, Any]:
-        """Benchmark data that should trigger multiple optimizations."""
-        if not self.available:
-            return {"error": "DataSON not available"}
-
-        data = self.generate_mixed_optimization_data()
-        
-        durations = []
-        for _ in range(10):
-            duration_ms, json_str = time_operation(self.datason.save_string, data)
-            loaded = self.datason.load_basic(json_str)
-            assert loaded == data
-            durations.append(duration_ms)
-
-        return {
-            "mixed_optimizations": {
-                "mean_ms": statistics.mean(durations),
-                "median_ms": statistics.median(durations),
-                "min_ms": min(durations),
-                "max_ms": max(durations),
-                "json_size": len(json_str),
-                "optimization_expected": True,
-                "performance_target_ms": 5.0  # Complex data but should be optimized
-            }
-        }
-
-    def benchmark_profiling_overhead(self) -> Dict[str, Any]:
-        """Benchmark profiling system overhead."""
-        if not self.available:
-            return {"error": "DataSON not available"}
-
-        # Test data
-        data = self.generate_homogeneous_array_data(100)
-
-        # Test without profiling
-        import os
-        os.environ.pop('DATASON_PROFILE', None)
-        
-        durations_no_profile = []
-        for _ in range(10):
-            duration_ms, json_str = time_operation(self.datason.save_string, data)
-            durations_no_profile.append(duration_ms)
-
-        # Test with profiling enabled
-        os.environ['DATASON_PROFILE'] = '1'
-        self.datason.profile_sink = []
-        
-        durations_with_profile = []
-        for _ in range(10):
-            duration_ms, json_str = time_operation(self.datason.save_string, data)
-            durations_with_profile.append(duration_ms)
-
-        # Calculate overhead
-        mean_no_profile = statistics.mean(durations_no_profile)
-        mean_with_profile = statistics.mean(durations_with_profile)
-        overhead_pct = ((mean_with_profile - mean_no_profile) / mean_no_profile) * 100
-
-        return {
-            "profiling_overhead": {
-                "mean_ms_no_profile": mean_no_profile,
-                "mean_ms_with_profile": mean_with_profile,
-                "overhead_percentage": overhead_pct,
-                "optimization_expected": True,
-                "performance_target_overhead_pct": 30.0,  # Should be under 30% overhead
-                "profile_events_captured": len(self.datason.profile_sink)
-            }
-        }
-
-    def run_full_optimization_suite(self) -> Dict[str, Any]:
-        """Run the complete optimization validation benchmark suite."""
-        if not self.available:
-            return {"error": "DataSON not available"}
-
-        print("🚀 Running Optimization Validation Benchmark Suite...")
-        
-        results = {
-            "suite_type": "optimization_validation",
-            "metadata": {
-                "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
-                "datason_version": getattr(self.datason, '__version__', 'unknown'),
-                "purpose": "Validate performance optimizations in critical bottlenecks branch"
-            },
-            "benchmarks": {}
-        }
-
-        # Run each benchmark
-        print("  📊 Testing homogeneous array optimization...")
-        results["benchmarks"]["homogeneous_arrays"] = self.benchmark_homogeneous_arrays()
-        
-        print("  📊 Testing nested structure optimization...")
-        results["benchmarks"]["nested_structures"] = self.benchmark_nested_structures()
-        
-        print("  📊 Testing string interning optimization...")
-        results["benchmarks"]["string_interning"] = self.benchmark_string_interning()
-        
-        print("  📊 Testing mixed optimizations...")
-        results["benchmarks"]["mixed_optimizations"] = self.benchmark_mixed_optimizations()
-        
-        print("  📊 Testing profiling overhead...")
-        results["benchmarks"]["profiling_overhead"] = self.benchmark_profiling_overhead()
-
-        # Performance analysis
-        print("  🔍 Analyzing optimization effectiveness...")
-        total_tests = 0
-        passed_tests = 0
-        
-        for benchmark_name, benchmark_data in results["benchmarks"].items():
-            if isinstance(benchmark_data, dict) and "error" not in benchmark_data:
-                for test_name, test_data in benchmark_data.items():
-                    if isinstance(test_data, dict) and "performance_target_ms" in test_data:
-                        total_tests += 1
-                        if test_data["mean_ms"] <= test_data["performance_target_ms"]:
-                            passed_tests += 1
-                        else:
-                            print(f"    ⚠️  {benchmark_name}.{test_name}: {test_data['mean_ms']:.2f}ms > {test_data['performance_target_ms']:.2f}ms target")
-                    elif isinstance(test_data, dict) and "performance_target_overhead_pct" in test_data:
-                        total_tests += 1
-                        if test_data["overhead_percentage"] <= test_data["performance_target_overhead_pct"]:
-                            passed_tests += 1
-                        else:
-                            print(f"    ⚠️  {benchmark_name}.{test_name}: {test_data['overhead_percentage']:.1f}% > {test_data['performance_target_overhead_pct']:.1f}% target")
-
-        results["optimization_summary"] = {
-            "total_tests": total_tests,
-            "passed_tests": passed_tests,
-            "optimization_effectiveness": (passed_tests / total_tests) * 100 if total_tests > 0 else 0
-        }
-
-        print(f"  ✅ Optimization validation: {passed_tests}/{total_tests} tests passed ({results['optimization_summary']['optimization_effectiveness']:.1f}%)")
-        
-        return results
+        serialize_times.append(serialize_time * 1000)  # Convert to ms
+        deserialize_times.append(deserialize_time * 1000)  # Convert to ms
+        event_counts.append(total_events)
+    
+    if not serialize_times:
+        return None
+    
+    # Calculate statistics
+    serialize_stats = {
+        'mean': statistics.mean(serialize_times),
+        'median': statistics.median(serialize_times),
+        'min': min(serialize_times),
+        'max': max(serialize_times),
+        'stdev': statistics.stdev(serialize_times) if len(serialize_times) > 1 else 0
+    }
+    
+    deserialize_stats = {
+        'mean': statistics.mean(deserialize_times),
+        'median': statistics.median(deserialize_times),
+        'min': min(deserialize_times),
+        'max': max(deserialize_times),
+        'stdev': statistics.stdev(deserialize_times) if len(deserialize_times) > 1 else 0
+    }
+    
+    event_stats = {
+        'mean': statistics.mean(event_counts),
+        'median': statistics.median(event_counts),
+        'min': min(event_counts),
+        'max': max(event_counts)
+    }
+    
+    print(f"  Serialization: {serialize_stats['median']:.3f}ms median ({serialize_stats['min']:.3f}-{serialize_stats['max']:.3f}ms range)")
+    print(f"  Deserialization: {deserialize_stats['median']:.3f}ms median ({deserialize_stats['min']:.3f}-{deserialize_stats['max']:.3f}ms range)")
+    print(f"  Events: {event_stats['median']:.0f} median ({event_stats['min']:.0f}-{event_stats['max']:.0f} range)")
+    print(f"  Output size: {len(json_str):,} chars")
+    
+    return {
+        'serialize': serialize_stats,
+        'deserialize': deserialize_stats,
+        'events': event_stats,
+        'output_size': len(json_str),
+        'runs': len(serialize_times)
+    }
 
 
 def main():
-    """Run the optimization validation suite."""
-    suite = OptimizationValidationSuite()
-    results = suite.run_full_optimization_suite()
+    print(f"DataSON Optimization Validation v{datason.__version__}")
+    print("=" * 60)
     
-    # Save results
-    output_file = f"optimization_validation_{int(time.time())}.json"
-    with open(output_file, 'w') as f:
-        json.dump(results, f, indent=2)
+    # Test scenarios that match benchmark data
+    scenarios = [
+        # API Response scenario (matches benchmark api_response)
+        {
+            'name': 'API Response',
+            'data': {
+                'status': 'success',
+                'data': {
+                    'users': [
+                        {
+                            'id': i,
+                            'username': f'user_{i}',
+                            'email': f'user{i}@example.com',
+                            'active': i % 2 == 0,
+                            'balance': i * 10.5,
+                            'created_at': f'2024-01-{(i % 28) + 1:02d}T12:00:00Z'
+                        }
+                        for i in range(25)
+                    ],
+                    'pagination': {
+                        'page': 1,
+                        'per_page': 25,
+                        'total': 1000,
+                        'has_next': True,
+                        'has_prev': False
+                    }
+                },
+                'timestamp': '2024-01-01T12:00:00Z'
+            },
+            'expected_serialize_max': 1.0,  # ms
+            'expected_deserialize_max': 0.5,  # ms
+            'expected_events_max': 200
+        },
+        
+        # Simple Objects scenario (matches benchmark simple_objects)
+        {
+            'name': 'Simple Objects',
+            'data': {
+                'string_field': 'hello world',
+                'int_field': 42,
+                'float_field': 3.14159,
+                'bool_field': True,
+                'null_field': None,
+                'list_field': [1, 2, 3, 'four', 5.0],
+                'dict_field': {
+                    'nested_string': 'nested value',
+                    'nested_int': 123,
+                    'nested_list': ['a', 'b', 'c']
+                }
+            },
+            'expected_serialize_max': 0.5,  # ms
+            'expected_deserialize_max': 0.1,  # ms
+            'expected_events_max': 50
+        },
+        
+        # Nested Structures scenario (matches benchmark nested_structures)
+        {
+            'name': 'Nested Structures',
+            'data': {
+                'level1': {
+                    'data': 'level1_value',
+                    'level2': {
+                        'data': 'level2_value',
+                        'items': [
+                            {
+                                'id': i,
+                                'level3': {
+                                    'data': f'level3_value_{i}',
+                                    'level4': {
+                                        'final_data': f'final_{i}',
+                                        'metadata': {
+                                            'created': f'2024-01-{i+1:02d}',
+                                            'active': i % 2 == 0
+                                        }
+                                    }
+                                }
+                            }
+                            for i in range(10)
+                        ]
+                    }
+                }
+            },
+            'expected_serialize_max': 0.8,  # ms
+            'expected_deserialize_max': 0.3,  # ms
+            'expected_events_max': 150
+        }
+    ]
     
-    print(f"📁 Results saved to: {output_file}")
+    results = {}
+    validation_passed = True
     
-    if "optimization_summary" in results:
-        effectiveness = results["optimization_summary"]["optimization_effectiveness"]
-        if effectiveness >= 80:
-            print("🎉 Optimization validation PASSED! Performance improvements working as expected.")
+    for scenario in scenarios:
+        result = benchmark_scenario(scenario['data'], scenario['name'], runs=5)
+        if result is None:
+            print(f"  ❌ {scenario['name']}: Benchmark failed")
+            validation_passed = False
+            continue
+            
+        results[scenario['name']] = result
+        
+        # Validate performance expectations
+        serialize_ok = result['serialize']['max'] <= scenario['expected_serialize_max']
+        deserialize_ok = result['deserialize']['max'] <= scenario['expected_deserialize_max']
+        events_ok = result['events']['max'] <= scenario['expected_events_max']
+        
+        status = "✅" if (serialize_ok and deserialize_ok and events_ok) else "⚠️"
+        print(f"  {status} Performance validation: ", end="")
+        
+        issues = []
+        if not serialize_ok:
+            issues.append(f"serialize {result['serialize']['max']:.3f}ms > {scenario['expected_serialize_max']}ms")
+        if not deserialize_ok:
+            issues.append(f"deserialize {result['deserialize']['max']:.3f}ms > {scenario['expected_deserialize_max']}ms")  
+        if not events_ok:
+            issues.append(f"events {result['events']['max']} > {scenario['expected_events_max']}")
+        
+        if issues:
+            print(f"ISSUES: {', '.join(issues)}")
+            validation_passed = False
         else:
-            print(f"⚠️  Optimization validation PARTIAL: {effectiveness:.1f}% effectiveness")
+            print("PASSED")
     
-    return results
+    # Summary
+    print("\n" + "=" * 60)
+    print("OPTIMIZATION VALIDATION SUMMARY")
+    print("=" * 60)
+    
+    if validation_passed:
+        print("✅ ALL TESTS PASSED - Optimizations are working correctly!")
+        print("\nPerformance Summary:")
+        for name, result in results.items():
+            serialize_ms = result['serialize']['median']
+            deserialize_ms = result['deserialize']['median'] 
+            events = result['events']['median']
+            print(f"  {name:20s}: {serialize_ms:6.3f}ms serialize, {deserialize_ms:6.3f}ms deserialize, {events:3.0f} events")
+    else:
+        print("❌ VALIDATION FAILED - Some tests did not meet performance expectations")
+        return 1
+    
+    return 0
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    exit_code = main()
+    exit(exit_code)
