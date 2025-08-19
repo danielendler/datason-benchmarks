@@ -492,12 +492,14 @@ def run_workflow_integration_tests():
         if result.failures:
             print("\nFailures:")
             for test, traceback in result.failures:
-                print(f"  - {test}: {traceback.split('AssertionError: ')[-1].split('\\n')[0]}")
+                error_msg = traceback.split('AssertionError: ')[-1].split('\n')[0]
+                print(f"  - {test}: {error_msg}")
         
         if result.errors:
             print("\nErrors:")  
             for test, traceback in result.errors:
-                print(f"  - {test}: {traceback.split('\\n')[-2]}")
+                error_msg = traceback.split('\n')[-2]
+                print(f"  - {test}: {error_msg}")
     
     return result.wasSuccessful()
 
