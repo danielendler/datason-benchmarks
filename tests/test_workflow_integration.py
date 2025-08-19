@@ -263,28 +263,28 @@ class TestWorkflowIntegration(unittest.TestCase):
                 self.assertIn('ubuntu', job['runs-on'], 
                             f"Job {job_name} should use ubuntu runner")
     
-    def test_workflow_trigger_paths(self):
-        """Test that workflows trigger on appropriate file changes."""
+    def test_workflow_only_external_triggers(self):
+        """Test that pr-performance-check only triggers externally, not on internal PRs."""
         workflow_name = "pr-performance-check"
         if workflow_name not in self.workflows:
             self.skipTest(f"Workflow {workflow_name} not found")
             
         workflow = self.workflows[workflow_name]['content']
         
-        # Check pull_request trigger has correct paths (YAML parser converts 'on' to True)
+        # Check triggers (YAML parser converts 'on' to True)
         on_section = workflow.get(True, {})
-        if 'pull_request' in on_section:
-            pr_config = on_section['pull_request']
-            
-            if isinstance(pr_config, dict) and 'paths' in pr_config:
-                paths = pr_config['paths']
-                
-                # Should trigger on key directories
-                expected_paths = ['scripts/**', 'benchmarks/**', 'requirements.txt']
-                
-                for expected_path in expected_paths:
-                    self.assertIn(expected_path, paths,
-                                f"PR trigger should include path {expected_path}")
+        
+        # Should NOT have pull_request trigger (this workflow is for external DataSON PRs only)
+        self.assertNotIn('pull_request', on_section,
+                        "pr-performance-check should NOT trigger on internal PRs - only external workflow_dispatch")
+        
+        # Should ONLY have workflow_dispatch trigger
+        self.assertIn('workflow_dispatch', on_section,
+                     "pr-performance-check should have workflow_dispatch for external integration")
+        
+        # Should be the only trigger
+        self.assertEqual(len(on_section), 1,
+                        f"pr-performance-check should only have workflow_dispatch trigger, found: {list(on_section.keys())}")
     
     def test_secret_access_configuration(self):
         """Test that workflows properly access required secrets."""
