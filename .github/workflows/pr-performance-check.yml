@@ -212,8 +212,8 @@ jobs:
           if [ -f data/results/latest_competitive.json ] && [ ! -L data/results/latest_competitive.json -o -e data/results/latest_competitive.json ]; then
             BASELINE_FILE="data/results/latest_competitive.json"
           else
-            # Find most recent competitive baseline file
-            RECENT_COMPETITIVE=$(find data/results -name "*competitive*.json" -not -name "latest_competitive.json" | sort -r | head -1)
+            # Find most recent competitive baseline file by modification time
+            RECENT_COMPETITIVE=$(find data/results -name "*competitive*.json" -not -name "latest_competitive.json" -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -1 | cut -d' ' -f2- || find data/results -name "*competitive*.json" -not -name "latest_competitive.json" -exec ls -t {} + 2>/dev/null | head -1)
             if [ -n "$RECENT_COMPETITIVE" ]; then
               BASELINE_FILE="$RECENT_COMPETITIVE"
               echo "📊 Using recent competitive baseline: $(basename $BASELINE_FILE)"
@@ -268,8 +268,8 @@ jobs:
           if [ -f data/results/latest_competitive.json ] && [ ! -L data/results/latest_competitive.json -o -e data/results/latest_competitive.json ]; then
             REGRESSION_BASELINE="data/results/latest_competitive.json"
           else
-            # Find most recent competitive baseline file
-            RECENT_COMPETITIVE=$(find data/results -name "*competitive*.json" -not -name "latest_competitive.json" | sort -r | head -1)
+            # Find most recent competitive baseline file by modification time
+            RECENT_COMPETITIVE=$(find data/results -name "*competitive*.json" -not -name "latest_competitive.json" -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -1 | cut -d' ' -f2- || find data/results -name "*competitive*.json" -not -name "latest_competitive.json" -exec ls -t {} + 2>/dev/null | head -1)
             if [ -n "$RECENT_COMPETITIVE" ]; then
               REGRESSION_BASELINE="$RECENT_COMPETITIVE"
               echo "📊 Using recent competitive baseline for regression detection: $(basename $REGRESSION_BASELINE)"

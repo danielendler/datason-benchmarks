@@ -258,9 +258,14 @@ jobs:
         git add -f data/results/datason_baseline.json
         git add -f data/results/latest.json
         
-        # Add other baseline files if they exist
+        # Add competitive baseline files if they exist
         [ -f data/results/latest_competitive.json ] && git add -f data/results/latest_competitive.json
-        [ -f data/results/latest_configuration.json ] && git add -f data/results/latest_configuration.json  
+        find data/results -name "*competitive*.json" -not -name "latest_competitive.json" -newer data/results/datason_baseline.json -exec git add -f {} + 2>/dev/null || true
+        
+        # Add other baseline files created by benchmarks  
+        find data/results -name "*configurations*.json" -newer data/results/datason_baseline.json -exec git add -f {} + 2>/dev/null || true
+        find data/results -name "*versioning*.json" -newer data/results/datason_baseline.json -exec git add -f {} + 2>/dev/null || true
+        [ -f data/results/latest_configuration.json ] && git add -f data/results/latest_configuration.json
         [ -f data/results/latest_versioning.json ] && git add -f data/results/latest_versioning.json
         
         # Add archived baselines if any
