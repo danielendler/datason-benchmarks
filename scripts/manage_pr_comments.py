@@ -71,9 +71,32 @@ class PRCommentManager:
         data = {'body': new_body}
         
         try:
+            # First, get the current comment for debugging
+            get_response = requests.get(url, headers=self.headers)
+            if get_response.status_code == 200:
+                current_comment = get_response.json()
+                current_body = current_comment.get('body', '')
+                print(f"🔍 Current comment length: {len(current_body)} characters")
+                print(f"🔍 New comment length: {len(new_body)} characters")
+            
             response = requests.patch(url, headers=self.headers, json=data)
             response.raise_for_status()
-            print(f"✅ Updated comment {comment_id}")
+            
+            # Verify the update
+            verify_response = requests.get(url, headers=self.headers)
+            if verify_response.status_code == 200:
+                updated_comment = verify_response.json()
+                updated_body = updated_comment.get('body', '')
+                print(f"✅ Updated comment {comment_id} (new length: {len(updated_body)} characters)")
+                
+                # Quick check that the update actually took
+                if new_body[:50] in updated_body:
+                    print("🎯 Verification: New content is present in updated comment")
+                else:
+                    print("⚠️ Warning: New content may not have been properly updated")
+            else:
+                print(f"✅ Updated comment {comment_id} (verification failed)")
+            
             return True
         except requests.RequestException as e:
             print(f"Error updating comment {comment_id}: {e}")
@@ -123,6 +146,8 @@ class PRCommentManager:
         if update_strategy == "update":
             # Update the most recent comment
             latest_comment = max(existing_comments, key=lambda c: c['updated_at'])
+            print(f"🔄 Found {len(existing_comments)} existing benchmark comments")
+            print(f"📝 Updating most recent comment: {latest_comment['id']} (updated: {latest_comment['updated_at']})")
             return self.update_comment(latest_comment['id'], new_comment_body)
         
         elif update_strategy == "mark_outdated":
