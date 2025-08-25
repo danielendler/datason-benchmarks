@@ -337,9 +337,9 @@ jobs:
           TARGET_REPO="${{ github.event.inputs.datason_repo }}"
         fi
         
-        # Clean slate: remove any previous comment files to prevent old content
-        echo "🧹 Cleaning up previous comment files..."
-        rm -f pr_regression_comment.md pr_comment.md final_pr_comment.md
+        # Initialize final comment (don't delete existing comment files - we need them!)
+        echo "🧹 Starting with clean final comment file..."
+        rm -f final_pr_comment.md
         
         # Generate comprehensive comment by merging all available content
         echo "📝 Generating final PR comment..."
