@@ -48,21 +48,21 @@ jobs:
     - name: 📥 Checkout repository
       uses: actions/checkout@v4
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.BASELINE_COMMIT_TOKEN || secrets.GITHUB_TOKEN }}
         fetch-depth: 0  # Need full history for potential archiving
     
-    - name: 🐍 Setup Python 3.11
+    - name: 🐍 Setup Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: "3.11"
+        python-version: "3.12"
     
     - name: 💾 Cache dependencies
       uses: actions/cache@v4
       with:
         path: ~/.cache/pip
-        key: baseline-${{ runner.os }}-py3.11-${{ hashFiles('requirements.txt') }}
+        key: baseline-${{ runner.os }}-py3.12-${{ hashFiles('requirements.txt') }}
         restore-keys: |
-          baseline-${{ runner.os }}-py3.11-
+          baseline-${{ runner.os }}-py3.12-
     
     - name: 📦 Install dependencies
       run: |
