@@ -201,8 +201,9 @@ class PerformanceRegressionDetector:
                                 # Extract DataSON serialization metrics
                                 datason_ser = dataset_data['serialization']['datason']
                                 if 'mean' in datason_ser:
-                                    metrics['serialize_time'] = PerformanceMetric(
-                                        name='serialize_time',
+                                    serialize_metric_name = f"{dataset_name}_serialize_time"
+                                    metrics[serialize_metric_name] = PerformanceMetric(
+                                        name=serialize_metric_name,
                                         value=datason_ser['mean'],
                                         unit='seconds',
                                         higher_is_better=False
@@ -212,8 +213,9 @@ class PerformanceRegressionDetector:
                                 if 'deserialization' in dataset_data and 'datason' in dataset_data['deserialization']:
                                     datason_deser = dataset_data['deserialization']['datason']
                                     if 'mean' in datason_deser:
-                                        metrics['deserialize_time'] = PerformanceMetric(
-                                            name='deserialize_time',
+                                        deserialize_metric_name = f"{dataset_name}_deserialize_time"
+                                        metrics[deserialize_metric_name] = PerformanceMetric(
+                                            name=deserialize_metric_name,
                                             value=datason_deser['mean'],
                                             unit='seconds',
                                             higher_is_better=False
@@ -236,8 +238,9 @@ class PerformanceRegressionDetector:
                         # Extract DataSON serialization metrics
                         datason_ser = dataset_data['serialization']['datason']
                         if 'mean' in datason_ser:
-                            metrics['serialize_time'] = PerformanceMetric(
-                                name='serialize_time',
+                            serialize_metric_name = f"{dataset_name}_serialize_time"
+                            metrics[serialize_metric_name] = PerformanceMetric(
+                                name=serialize_metric_name,
                                 value=datason_ser['mean'],
                                 unit='seconds',
                                 higher_is_better=False
@@ -247,8 +250,9 @@ class PerformanceRegressionDetector:
                         if 'deserialization' in dataset_data and 'datason' in dataset_data['deserialization']:
                             datason_deser = dataset_data['deserialization']['datason']
                             if 'mean' in datason_deser:
-                                metrics['deserialize_time'] = PerformanceMetric(
-                                    name='deserialize_time',
+                                deserialize_metric_name = f"{dataset_name}_deserialize_time"
+                                metrics[deserialize_metric_name] = PerformanceMetric(
+                                    name=deserialize_metric_name,
                                     value=datason_deser['mean'],
                                     unit='seconds',
                                     higher_is_better=False
