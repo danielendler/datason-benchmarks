@@ -80,22 +80,7 @@ jobs:
           timeout 300 dagger call validate-system --source=. || {
             echo "⚠️ System validation failed or timed out"
             echo "📋 Running basic validation instead..."
-            python -c "
-import sys, os
-sys.path.append('.')
-try:
-    from dagger.benchmark_pipeline import BenchmarkPipeline
-    print('✅ Dagger module imports successfully')
-    print('✅ BenchmarkPipeline class available')
-    print('✅ Basic validation passed')
-except ImportError as e:
-    print(f'⚠️ Import failed: {e}')
-    print('📋 Testing individual components...')
-    import dagger
-    print('✅ Base dagger module available')
-except Exception as e:
-    print(f'❌ Validation error: {e}')
-"
+            python -c "import sys; sys.path.append('.'); from dagger.benchmark_pipeline import BenchmarkPipeline; print('✅ Dagger module imports successfully'); print('✅ BenchmarkPipeline class available')" || echo "⚠️ Basic validation failed"
           }
         env:
           DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN || '' }}
