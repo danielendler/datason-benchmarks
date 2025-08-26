@@ -1,4 +1,12 @@
 name: 🧪 Dagger Pipeline Validation
+# 
+# This workflow validates Dagger pipelines without requiring Dagger Cloud registration.
+# The DAGGER_CLOUD_TOKEN is optional - only needed for:
+# - Cloud-based caching and tracing 
+# - Advanced performance insights
+# - Team collaboration features
+# 
+# For basic CI/CD pipeline validation, no token is required.
 
 on:
   pull_request:
@@ -49,6 +57,13 @@ jobs:
           export DAGGER_CACHE_FROM=""
           export DAGGER_CACHE_TO=""
           
+          # Check if cloud token is available
+          if [ -n "$DAGGER_CLOUD_TOKEN" ]; then
+            echo "📊 Dagger Cloud token available - enabling tracing"
+          else
+            echo "ℹ️ No Dagger Cloud token - running without cloud features"
+          fi
+          
           # Try with timeout and retry logic
           timeout 300 dagger call test-pipeline --source=. || {
             echo "⚠️ Test pipeline failed or timed out"
@@ -56,7 +71,7 @@ jobs:
             python -m pytest tests/test_dagger_pipelines.py::TestDaggerWorkflowFeatureParity -v
           }
         env:
-          DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
+          DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN || '' }}
           
       - name: 🔍 Run system validation
         run: |
@@ -83,7 +98,7 @@ except Exception as e:
 "
           }
         env:
-          DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
+          DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN || '' }}
         continue-on-error: true
         
       - name: 📋 Run fallback tests
