@@ -1,0 +1,58 @@
+name: 🗓️ Weekly Benchmarks (Dagger)
+
+on:
+  schedule:
+    - cron: '30 6 * * 1'  # Weekly on Monday at 6:30 AM UTC
+  workflow_dispatch:
+    inputs:
+      benchmark_type:
+        description: 'Benchmark type'
+        required: false
+        default: 'comprehensive'
+        type: choice
+        options:
+          - comprehensive
+          - api_modes
+          - competitive
+          - versions
+
+jobs:
+  weekly-benchmarks:
+    runs-on: ubuntu-latest
+    name: 🎯 Run weekly ${{ github.event.inputs.benchmark_type || 'comprehensive' }} benchmarks
+    
+    steps:
+      - name: 🔄 Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+          
+      - name: 📦 Install Dagger
+        run: pip install dagger-io
+        
+      - name: 🎯 Run Weekly Benchmarks with Dagger
+        run: |
+          dagger call weekly-benchmarks \
+            --source=. \
+            --benchmark-type="${{ github.event.inputs.benchmark_type || 'comprehensive' }}"
+        env:
+          DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
+          
+      - name: 💾 Commit and push results
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          git add data/results/ docs/results/
+          
+          if ! git diff --staged --quiet; then
+            echo "📝 Committing weekly ${{ github.event.inputs.benchmark_type || 'comprehensive' }} benchmark results..."
+            git commit -m "📊 Weekly ${{ github.event.inputs.benchmark_type || 'comprehensive' }} Benchmarks - $(date -u '+%Y-%m-%d')"
+            git push origin HEAD
+            echo "✅ Results committed and pushed successfully"
+          else
+            echo "ℹ️ No changes to commit"
+          fi

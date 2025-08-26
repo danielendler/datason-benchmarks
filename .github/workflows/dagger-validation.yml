@@ -1,0 +1,40 @@
+name: 🧪 Dagger Pipeline Validation
+
+on:
+  pull_request:
+    paths:
+      - 'dagger/**'
+      - 'scripts/improved_*'
+      - 'tests/test_improved_*'
+  workflow_dispatch:
+
+jobs:
+  validate-pipelines:
+    runs-on: ubuntu-latest
+    name: 🔍 Validate Dagger pipelines
+    
+    steps:
+      - name: 🔄 Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+          
+      - name: 📦 Install Dagger
+        run: pip install dagger-io
+        
+      - name: 🧪 Run test pipeline
+        run: |
+          echo "🧪 Running Dagger test pipeline..."
+          dagger call test-pipeline --source=.
+        env:
+          DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
+          
+      - name: 🔍 Run system validation
+        run: |
+          echo "🔍 Running complete system validation..."
+          dagger call validate-system --source=.
+        env:
+          DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
