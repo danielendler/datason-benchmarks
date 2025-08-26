@@ -137,6 +137,32 @@ Configuration notes:
   skips `--with-rust on` runs.
 - Output files are JSON and can be merged or inspected directly.
 
+### 🎯 **NEW: Dagger-Based CI/CD Pipelines**
+*Reliable, Testable, and Maintainable Automation*
+
+**Latest Addition**: Hybrid Dagger + GitHub Actions approach eliminates YAML complexity:
+
+```bash
+# Install Dagger CLI and Python SDK
+curl -fsSL https://dl.dagger.io/dagger/install.sh | BIN_DIR=$HOME/.local/bin sh
+pip install dagger-io
+
+# Test pipelines locally (instant feedback vs 10+ minute CI cycles)
+dagger call daily-benchmarks --source=. --focus-area=api_modes
+dagger call weekly-benchmarks --source=. --benchmark-type=comprehensive
+dagger call validate-system --source=.
+
+# Run comprehensive test suite
+dagger call test-pipeline --source=.
+```
+
+**Benefits**:
+- ✅ **Zero YAML syntax errors** - Complex logic moved to Python
+- ⚡ **Local testing** - 30-second iterations vs 10+ minute CI cycles  
+- 🔧 **IDE support** - Full autocomplete, debugging, type safety
+- 📊 **Same functionality** - All benchmark features preserved
+- 🚀 **Better reliability** - Container-based execution
+
 ### Phase 4: Enhanced Reporting & Visualization 🎨
 
 **NEW:** Interactive reports with comprehensive performance tables and smart unit formatting:
@@ -314,10 +340,18 @@ Our enhanced PR workflow now provides:
 
 ### GitHub Actions Workflows
 
+#### 🎯 **Dagger-Based Pipelines** (NEW - Recommended)
+- **[Dagger Daily Benchmarks](.github/workflows/dagger-daily-benchmarks.yml)** - Minimal YAML + Python pipeline logic
+- **[Dagger Weekly Benchmarks](.github/workflows/dagger-weekly-benchmarks.yml)** - Comprehensive weekly analysis via Dagger
+- **[Dagger Validation](.github/workflows/dagger-validation.yml)** - Pipeline testing and validation
+
+#### 📊 **Legacy Workflows** (Maintained for compatibility)
 - **[PR Performance Check](.github/workflows/pr-performance-check.yml)** - Enhanced competitive check with regression analysis
 - **[Daily Benchmarks](.github/workflows/daily-benchmarks.yml)** - Comprehensive competitive + optimization analysis  
 - **[Weekly Benchmarks](.github/workflows/weekly-benchmarks.yml)** - 🆕 **Phase 2:** Complete automation with trend analysis
 - **Manual Triggers** - Run specific benchmark suites on demand
+
+**Migration Status**: New Dagger workflows are production-ready and eliminate the YAML complexity issues of legacy workflows.
 
 #### 🆕 Phase 2 Automation Features
 
@@ -463,26 +497,41 @@ Phase 2 creates the foundation for **Phase 3: Polish** with:
 
 ```
 datason-benchmarks/
-├── .github/workflows/          # Enhanced GitHub Actions automation
-├── benchmarks/                 # Core benchmark suites
+├── .github/workflows/          # Hybrid GitHub Actions + Dagger automation
+│   ├── dagger-*.yml           # NEW: Minimal Dagger-based workflows (recommended)
+│   └── *.yml                  # Legacy YAML workflows (maintained)
+├── dagger/                    # NEW: Python-based CI/CD pipeline logic
+│   ├── benchmark_pipeline.py  # Main pipeline functions (daily/weekly/test)
+│   └── __init__.py           # Dagger module exports
+├── benchmarks/                # Core benchmark suites
 │   ├── competitive/           # Competitor comparison tests
 │   ├── configurations/        # DataSON config testing
 │   ├── versioning/            # Version evolution analysis (NEW)
 │   └── regression/            # Performance regression detection
 ├── competitors/               # Competitor library adapters
-├── data/                     # Test datasets and results
+├── data/                      # Test datasets and results
 │   ├── results/              # CI-only historical results  
 │   ├── synthetic/            # Generated test data
 │   └── configs/              # Test configurations
-├── scripts/                  # Enhanced automation and utilities
+├── scripts/                   # Enhanced automation and utilities
 │   ├── run_benchmarks.py     # Main benchmark runner
+│   ├── improved_*.py         # Enhanced benchmark & reporting system
 │   └── generate_report.py    # Interactive report generator (ENHANCED)
-└── docs/                     # Documentation and live reports
-    └── results/              # GitHub Pages hosted reports
+├── docs/                      # Documentation and live reports
+│   └── results/              # GitHub Pages hosted reports
+├── dagger.json               # Dagger project configuration
+└── requirements-dagger.txt   # Dagger-specific dependencies
 ```
 
 ### Enhanced Core Components
 
+#### 🎯 **Dagger Pipeline Components** (NEW)
+- **BenchmarkPipeline** - Python-based CI/CD automation with type safety
+- **daily_benchmarks()** - Focus area benchmarking (api_modes, competitive, versions)
+- **weekly_benchmarks()** - Comprehensive analysis with enhanced test data  
+- **validate_system()** - End-to-end validation and testing
+
+#### 📊 **Legacy Core Components** (Maintained)
 - **DataSONVersionManager** - Version switching and API compatibility testing
 - **OptimizationAnalyzer** - Deep configuration parameter analysis
 - **EnhancedReportGenerator** - Interactive charts with Plotly.js
