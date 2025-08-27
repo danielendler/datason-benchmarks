@@ -59,6 +59,52 @@ We maintain **two complementary benchmark systems** that serve different purpose
 - **📈 Interactive Reports**: Beautiful charts and visualizations with GitHub Pages hosting
 - **🚀 Community Friendly**: Easy setup, contribution guidelines, free infrastructure
 
+## 🔧 Workflow Management
+
+This repository uses a **Python-to-YAML workflow generation system** for maintainable GitHub Actions workflows:
+
+### How to Change CI Workflows
+
+**✅ Recommended: Edit Python Models**
+```bash
+# 1. Edit the workflow definitions
+vim tools/gen_workflows.py
+
+# 2. Generate updated YAML files  
+make workflows
+
+# 3. Commit both Python and generated YAML
+git add tools/ .github/workflows/
+git commit -m "Update CI workflows"
+```
+
+**❌ Don't: Edit YAML Files Directly**
+- YAML files in `.github/workflows/` are **generated artifacts**
+- Manual edits will be overwritten on next generation
+- Always edit the Python models instead
+
+### Workflow Development
+```bash
+# Generate workflows from Python models
+make workflows
+
+# Validate generated workflows  
+make validate-workflows
+
+# Run workflow generator tests
+make test-workflows
+
+# Set up development environment (includes pre-commit hooks)
+make setup
+```
+
+### Benefits of This Approach
+- **🔒 Type Safety**: Python models with full IDE support
+- **🧪 Testable**: Unit tests for workflow logic
+- **📝 DRY**: Reusable components and patterns
+- **✅ Validated**: Schema validation and actionlint integration
+- **🤖 AI-Friendly**: Edit structured code, not whitespace-sensitive YAML
+
 ## 🚀 Quick Start
 
 ### Setup

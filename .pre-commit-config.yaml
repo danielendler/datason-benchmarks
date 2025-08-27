@@ -1,0 +1,42 @@
+repos:
+  # YAML Schema validation for GitHub Actions workflows
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.28.0
+    hooks:
+      - id: check-github-workflows
+        name: Validate GitHub Actions workflows
+        description: Validates .github/workflows/*.yml against SchemaStore
+        
+  # Python code quality
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        name: Lint Python code with Ruff
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+        name: Format Python code with Ruff
+        
+  # General file quality
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+        name: Check YAML syntax
+        exclude: ^\.github/workflows/.*\.yml$  # Skip workflow files (validated separately)
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      
+  # Ensure generated workflows are up-to-date
+  - repo: local
+    hooks:
+      - id: generate-workflows
+        name: Generate GitHub Actions workflows
+        entry: python -m tools.gen_workflows
+        language: system
+        files: ^tools/.*\.py$
+        pass_filenames: false
+        always_run: false
