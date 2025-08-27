@@ -33,7 +33,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: 📦 Install test dependencies
-        run: "python -m pip install --upgrade pip\npip install pytest pyyaml"
+        run: "python -m pip install --upgrade pip\npip install pytest pyyaml ruamel.yaml"
       - name: 🔍 Run comprehensive workflow validation tests
         run: "echo \"🔍 Running comprehensive workflow validation tests...\"\npython -m pytest tests/test_workflow_integration.py -v --tb=short"
         env:
@@ -51,7 +51,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
       - name: 📦 Install dependencies
-        run: pip install --upgrade pip && pip install -r requirements.txt
+        run: pip install --upgrade pip && pip install -r requirements.txt && pip install -r requirements-dev.txt
       - name: 🧪 Run Python tests
         run: python -m pytest tests/ -v --tb=short -x
       - name: 📊 Test benchmark runners
@@ -77,7 +77,7 @@ jobs:
           python-version: '3.12'
           cache: pip
       - name: 📦 Install dependencies
-        run: pip install --upgrade pip && pip install -r requirements.txt
+        run: pip install --upgrade pip && pip install -r requirements.txt && pip install -r requirements-dev.txt
       - name: 🔍 Validate script structure
         run: for script in scripts/*.py; do python -m py_compile "$script"; done
       - name: 📋 Check script imports

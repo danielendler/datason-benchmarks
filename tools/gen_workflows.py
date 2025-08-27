@@ -72,7 +72,7 @@ def create_ci_workflow() -> Workflow:
                     ),
                     Step(
                         "📦 Install test dependencies",
-                        run="python -m pip install --upgrade pip\npip install pytest pyyaml"
+                        run="python -m pip install --upgrade pip\npip install pytest pyyaml ruamel.yaml"
                     ),
                     Step(
                         "🔍 Run comprehensive workflow validation tests",
@@ -101,7 +101,10 @@ def create_ci_workflow() -> Workflow:
                             "cache": "pip"
                         }
                     ),
-                    install_deps_step(),
+                    Step(
+                        "📦 Install dependencies",
+                        run="pip install --upgrade pip && pip install -r requirements.txt && pip install -r requirements-dev.txt"
+                    ),
                     Step(
                         "🧪 Run Python tests",
                         run="python -m pytest tests/ -v --tb=short -x"
@@ -119,7 +122,10 @@ def create_ci_workflow() -> Workflow:
                 steps=[
                     checkout_step(),
                     setup_python_step("3.12"),
-                    install_deps_step(),
+                    Step(
+                        "📦 Install dependencies",
+                        run="pip install --upgrade pip && pip install -r requirements.txt && pip install -r requirements-dev.txt"
+                    ),
                     Step(
                         "🔍 Validate script structure",
                         run="for script in scripts/*.py; do python -m py_compile \"$script\"; done"
