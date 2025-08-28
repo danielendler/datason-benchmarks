@@ -51,6 +51,7 @@ class TestGitHubActionsIntegration(unittest.TestCase):
         self.assertIn('suite_type', quick_data)
         self.assertEqual(quick_data['suite_type'], 'quick')
     
+    @unittest.skipIf(os.environ.get('CI') == 'true', "Complete benchmarks too slow for CI - use quick benchmarks instead")
     def test_complete_benchmark_works_locally(self):
         """Test that complete benchmark works locally (may be slow)"""
         
