@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataSON Benchmark Report - Api_Modes</title>
+    
+        <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6; margin: 0; padding: 20px; background: #f8f9fa; color: #333;
+        }
+        .container { max-width: 1400px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .header { text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 2px solid #e9ecef; }
+        .header h1 { color: #2c3e50; font-size: 2.5em; margin: 0; }
+        .header .subtitle { color: #6c757d; font-size: 1.1em; margin: 10px 0; }
+        .metadata { background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0; font-size: 0.9em; }
+        .metadata strong { color: #495057; }
+        
+        .section { margin: 40px 0; }
+        .section-header { display: flex; align-items: center; margin-bottom: 20px; }
+        .section-header h2 { margin: 0; color: #2c3e50; }
+        .section-header .badge { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.8em; margin-left: 12px; }
+        
+        .performance-table { width: 100%; border-collapse: collapse; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .performance-table th, .performance-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #dee2e6; }
+        .performance-table th { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 600; }
+        .performance-table tbody tr:hover { background-color: #f8f9fa; }
+        .performance-table .numeric { text-align: right; font-family: Monaco, 'Courier New', monospace; }
+        
+        .comparison-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin: 20px 0; }
+        .comparison-card { background: white; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .comparison-card h3 { margin: 0 0 15px 0; color: #495057; font-size: 1.2em; }
+        .comparison-card .scenario-description { color: #6c757d; font-size: 0.9em; margin-bottom: 15px; font-style: italic; }
+        
+        .metric-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f1f3f4; }
+        .metric-row:last-child { border-bottom: none; }
+        .metric-label { font-weight: 500; color: #495057; }
+        .metric-value { font-family: Monaco, 'Courier New', monospace; color: #28a745; }
+        .metric-value.slow { color: #dc3545; }
+        .metric-value.medium { color: #ffc107; }
+        
+        .error-message { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; border-left: 4px solid #dc3545; }
+        .success-message { background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; border-left: 4px solid #28a745; }
+        
+        .performance-bars { margin: 15px 0; }
+        .performance-bar { background: #e9ecef; height: 20px; border-radius: 10px; margin: 8px 0; position: relative; overflow: hidden; }
+        .performance-bar-fill { height: 100%; border-radius: 10px; transition: width 0.3s ease; }
+        .performance-bar-label { position: absolute; left: 8px; top: 2px; font-size: 0.8em; font-weight: 500; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        
+        .datason-fill { background: linear-gradient(90deg, #28a745, #20c997); }
+        .competitor-fill { background: linear-gradient(90deg, #007bff, #6610f2); }
+        .fast-fill { background: linear-gradient(90deg, #28a745, #20c997); }
+        .medium-fill { background: linear-gradient(90deg, #ffc107, #fd7e14); }
+        .slow-fill { background: linear-gradient(90deg, #dc3545, #e83e8c); }
+        
+        .summary-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .stat-card { background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 20px; border-radius: 8px; text-align: center; }
+        .stat-number { font-size: 2.5em; font-weight: bold; color: #495057; display: block; }
+        .stat-label { color: #6c757d; font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid #dee2e6; text-align: center; color: #6c757d; font-size: 0.9em; }
+        
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            .header h1 { font-size: 2em; }
+            .comparison-grid { grid-template-columns: 1fr; }
+            .performance-table { font-size: 0.9em; }
+            .performance-table th, .performance-table td { padding: 8px 10px; }
+        }
+        </style>
+        
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 DataSON Benchmark Report</h1>
+            <div class="subtitle">Comprehensive Performance Analysis - Api_Modes Suite</div>
+            <div class="subtitle">Generated on August 28, 2025 at 02:19 PM UTC</div>
+        </div>
+        
+        <div class="metadata">
+            <strong>Environment:</strong> Python 3.12.0 | 
+            <strong>DataSON:</strong> v0.13.0 | 
+            <strong>Framework:</strong> improved_v1 |
+            <strong>Scenarios:</strong> 5 tested
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2>📊 DataSON API Performance Matrix</h2>
+                <span class="badge">Method Comparison</span>
+            </div>
+            <p>Performance comparison across different DataSON API methods for real-world scenarios.</p>
+            
+            <table class="performance-table">
+                <thead>
+                    <tr>
+                        <th>Scenario</th>
+                        <th>deserialize</th><th>dump_json</th><th>dump_secure</th><th>load_basic</th><th>load_smart</th><th>loads_json</th><th>save_string</th><th>serialize</th>
+                    </tr>
+                </thead>
+                <tbody>
+        <tr><td><strong>Api Response Processing</strong></td><td class="error-message" title="N/A">Error</td><td class="error-message" title="dump_json() missing 1 required">Error</td><td class="error-message" title="N/A">Error</td><td class="error-message" title="N/A">Error</td><td class="error-message" title="N/A">Error</td><td class="error-message" title="the JSON object must be str, b">Error</td><td class="error-message" title="N/A">Error</td><td class="error-message" title="N/A">Error</td></tr><tr><td><strong>Secure Data Storage</strong></td><td class="error-message" title="N/A">Error</td><td class="error-message" title="dump_json() missing 1 required">Error</td><td class="error-message" title="N/A">Error</td><td class="error-message" title="N/A">Error</td><td class="error-message" title="N/A">Error</td><td class="error-message" title="the JSON object must be str, b">Error</td><td class="error-message" title="N/A">Error</td><td class="error-message" title="N/A">Error</td></tr><tr><td><strong>Ml Model Serialization</strong></td><td class="error-message" title="N/A">Error</td><td class="error-message" title="dump_json() missing 1 required">Error</td><td class="error-message" title="N/A">Error</td><td class="error-message" title="N/A">Error</td><td class="error-message" title="N/A">Error</td><td class="error-message" title="the JSON object must be str, b">Error</td><td class="error-message" title="N/A">Error</td><td class="error-message" title="N/A">Error</td></tr><tr><td><strong>Mobile App Sync</strong></td><td class="error-message" title="N/A">Error</td><td class="error-message" title="dump_json() missing 1 required">Error</td><td class="error-message" title="N/A">Error</td><td class="error-message" title="N/A">Error</td><td class="error-message" title="N/A">Error</td><td class="error-message" title="the JSON object must be str, b">Error</td><td class="error-message" title="N/A">Error</td><td class="error-message" title="N/A">Error</td></tr><tr><td><strong>Web Service Integration</strong></td><td class="error-message" title="N/A">Error</td><td class="error-message" title="dump_json() missing 1 required">Error</td><td class="error-message" title="N/A">Error</td><td class="error-message" title="N/A">Error</td><td class="error-message" title="N/A">Error</td><td class="error-message" title="the JSON object must be str, b">Error</td><td class="error-message" title="N/A">Error</td><td class="error-message" title="N/A">Error</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="section">
+            <div class="section-header">
+                <h2>🏁 Competitive Analysis</h2>
+                <span class="badge">vs Other Libraries</span>
+            </div>
+            <p>DataSON performance compared to other popular serialization libraries.</p>
+            
+            <div class="comparison-grid">
+        
+            <div class="comparison-card">
+                <h3>Api Response Processing</h3>
+                <div class="scenario-description">Competitive analysis for api_response_processing</div>
+            <h4>Serialization Performance:</h4><div class='performance-bars'></div><h4>Deserialization Performance:</h4><div class='performance-bars'></div><h4>Output Size Comparison:</h4><div class='metric-row'>
+                        <div class="metric-row">
+                            <span class="metric-label">datason:</span>
+                            <span class="metric-value">3 string chars</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">orjson:</span>
+                            <span class="metric-value">863 bytes</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">ujson:</span>
+                            <span class="metric-value">863 string chars</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">json:</span>
+                            <span class="metric-value">952 string chars</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">pickle:</span>
+                            <span class="metric-value">702 bytes</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">msgpack:</span>
+                            <span class="metric-value">682 bytes</span>
+                        </div></div></div>
+            <div class="comparison-card">
+                <h3>Secure Data Storage</h3>
+                <div class="scenario-description">Competitive analysis for secure_data_storage</div>
+            <h4>Serialization Performance:</h4><div class='performance-bars'></div><h4>Deserialization Performance:</h4><div class='performance-bars'></div><h4>Output Size Comparison:</h4><div class='metric-row'>
+                        <div class="metric-row">
+                            <span class="metric-label">datason:</span>
+                            <span class="metric-value">2 string chars</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">orjson:</span>
+                            <span class="metric-value">309 bytes</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">ujson:</span>
+                            <span class="metric-value">309 string chars</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">json:</span>
+                            <span class="metric-value">331 string chars</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">pickle:</span>
+                            <span class="metric-value">329 bytes</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">msgpack:</span>
+                            <span class="metric-value">258 bytes</span>
+                        </div></div></div>
+            <div class="comparison-card">
+                <h3>Ml Model Serialization</h3>
+                <div class="scenario-description">Competitive analysis for ml_model_serialization</div>
+            <h4>Serialization Performance:</h4><div class='performance-bars'></div><h4>Deserialization Performance:</h4><div class='performance-bars'></div><h4>Output Size Comparison:</h4><div class='metric-row'>
+                        <div class="metric-row">
+                            <span class="metric-label">datason:</span>
+                            <span class="metric-value">1 string chars</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">orjson:</span>
+                            <span class="metric-value">1,181 bytes</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">ujson:</span>
+                            <span class="metric-value">1,181 string chars</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">json:</span>
+                            <span class="metric-value">1,308 string chars</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">pickle:</span>
+                            <span class="metric-value">1,171 bytes</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">msgpack:</span>
+                            <span class="metric-value">1,113 bytes</span>
+                        </div></div></div>
+            <div class="comparison-card">
+                <h3>Mobile App Sync</h3>
+                <div class="scenario-description">Competitive analysis for mobile_app_sync</div>
+            <h4>Serialization Performance:</h4><div class='performance-bars'></div><h4>Deserialization Performance:</h4><div class='performance-bars'></div><h4>Output Size Comparison:</h4><div class='metric-row'>
+                        <div class="metric-row">
+                            <span class="metric-label">datason:</span>
+                            <span class="metric-value">1 string chars</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">orjson:</span>
+                            <span class="metric-value">937 bytes</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">ujson:</span>
+                            <span class="metric-value">937 string chars</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">json:</span>
+                            <span class="metric-value">1,002 string chars</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">pickle:</span>
+                            <span class="metric-value">928 bytes</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">msgpack:</span>
+                            <span class="metric-value">789 bytes</span>
+                        </div></div></div>
+            <div class="comparison-card">
+                <h3>Web Service Integration</h3>
+                <div class="scenario-description">Competitive analysis for web_service_integration</div>
+            <h4>Serialization Performance:</h4><div class='performance-bars'></div><h4>Deserialization Performance:</h4><div class='performance-bars'></div><h4>Output Size Comparison:</h4><div class='metric-row'>
+                        <div class="metric-row">
+                            <span class="metric-label">datason:</span>
+                            <span class="metric-value">1 string chars</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">orjson:</span>
+                            <span class="metric-value">341 bytes</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">ujson:</span>
+                            <span class="metric-value">345 string chars</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">json:</span>
+                            <span class="metric-value">374 string chars</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">pickle:</span>
+                            <span class="metric-value">358 bytes</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">msgpack:</span>
+                            <span class="metric-value">284 bytes</span>
+                        </div></div></div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header">
+                <h2>📈 Version Evolution Tracking</h2>
+                <span class="badge">v0.13.0</span>
+            </div>
+            <p>Performance baseline for DataSON v0.13.0 - future versions will be compared against these metrics.</p>
+            
+            <div class="summary-stats">
+        
+            <div class="stat-card">
+                <span class="stat-number">5</span>
+                <span class="stat-label">Scenarios Tested</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">0ms</span>
+                <span class="stat-label">Avg Serialize Time</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">0ms</span>
+                <span class="stat-label">Avg Deserialize Time</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">0/5</span>
+                <span class="stat-label">Success Rate</span>
+            </div>
+        </div>
+        
+        <table class="performance-table">
+            <thead>
+                <tr>
+                    <th>Scenario</th>
+                    <th>Serialize Time</th>
+                    <th>Deserialize Time</th>
+                    <th>Output Size</th>
+                </tr>
+            </thead>
+            <tbody>
+        
+            <tr>
+                <td><strong>Api Response Processing</strong></td>
+                <td class="numeric metric-value error">Error</td>
+                <td class="numeric metric-value error">Error</td>
+                <td class="numeric">3 chars</td>
+            </tr>
+            
+            <tr>
+                <td><strong>Secure Data Storage</strong></td>
+                <td class="numeric metric-value error">Error</td>
+                <td class="numeric metric-value error">Error</td>
+                <td class="numeric">2 chars</td>
+            </tr>
+            
+            <tr>
+                <td><strong>Ml Model Serialization</strong></td>
+                <td class="numeric metric-value error">Error</td>
+                <td class="numeric metric-value error">Error</td>
+                <td class="numeric">1 chars</td>
+            </tr>
+            
+            <tr>
+                <td><strong>Mobile App Sync</strong></td>
+                <td class="numeric metric-value error">Error</td>
+                <td class="numeric metric-value error">Error</td>
+                <td class="numeric">1 chars</td>
+            </tr>
+            
+            <tr>
+                <td><strong>Web Service Integration</strong></td>
+                <td class="numeric metric-value error">Error</td>
+                <td class="numeric metric-value error">Error</td>
+                <td class="numeric">1 chars</td>
+            </tr>
+            
+            </tbody>
+        </table>
+        </div>
+        
+        <div class="footer">
+            <p>Generated by DataSON Improved Benchmark Runner | <a href="https://github.com/danielendler/datason">DataSON Project</a></p>
+            <p>Report generated on August 28, 2025 at 02:19 PM UTC</p>
+        </div>
+    </div>
+</body>
+</html>
