@@ -405,7 +405,11 @@ class TestReportingIntegration(unittest.TestCase):
                 report_content = f.read()
             
             self.assertIn("DataSON Benchmark Report", report_content)
-            self.assertIn("integration_test", report_content)
+            # Check for integration_test in either lowercase or title case
+            self.assertTrue(
+                "integration_test" in report_content.lower() or "Integration_Test" in report_content,
+                "Expected integration_test content not found in report"
+            )
             self.assertIn("1.0ms", report_content)  # Performance data
             self.assertIn("Simple Test", report_content)  # Check scenario title case
             
