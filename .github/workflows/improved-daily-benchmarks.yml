@@ -1,0 +1,170 @@
+name: 📅 Improved Daily Benchmarks
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # Daily at 6:00 AM UTC
+  workflow_dispatch:
+    inputs:
+      focus_area:
+        description: 'Focus area for daily benchmarks'
+        required: false
+        default: 'api_modes'
+        type: choice
+        options:
+        - api_modes
+        - competitive
+        - versions
+        - comprehensive
+
+env:
+  PYTHON_VERSION: '3.12.0'
+
+jobs:
+  daily_benchmarks:
+    runs-on: ubuntu-latest
+    name: 📊 Daily benchmark analysis
+    
+    steps:
+    - name: 🔄 Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: 📦 Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install datason orjson ujson msgpack-python jsonpickle
+        
+        # Verify installation
+        python -c 'import datason; print(f"✅ DataSON v{getattr(datason, \"__version__\", \"unknown\")} installed")'
+    
+    - name: 📊 Run daily benchmarks
+      run: |
+        echo "🎯 Running daily benchmark analysis..."
+        
+        # Get focus area from workflow input with fallback
+        FOCUS_AREA="${{ github.event.inputs.focus_area || 'api_modes' }}"
+        echo "📋 Focus area: $FOCUS_AREA"
+        
+        # Generate timestamp for unique naming
+        TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+        OUTPUT_FILE="data/results/daily_${FOCUS_AREA}_${TIMESTAMP}.json"
+        
+        # Run focused analysis based on input
+        case "$FOCUS_AREA" in
+          "api_modes")
+            echo "🔍 Running DataSON API modes analysis..."
+            python scripts/improved_benchmark_runner.py \
+              --suite-type "api_modes" \
+              --output-dir "data/results" \
+              --output-file "daily_${FOCUS_AREA}_${TIMESTAMP}.json" \
+              --generate-report \
+              || echo "⚠️ API modes analysis failed"
+            ;;
+          "competitive")
+            echo "🏁 Running competitive analysis..."
+            python scripts/improved_benchmark_runner.py \
+              --suite-type "competitive" \
+              --output-dir "data/results" \
+              --output-file "daily_${FOCUS_AREA}_${TIMESTAMP}.json" \
+              --generate-report \
+              || echo "⚠️ Competitive analysis failed"
+            ;;
+          "versions")
+            echo "📈 Running version analysis..."
+            python scripts/improved_benchmark_runner.py \
+              --suite-type "versions" \
+              --output-dir "data/results" \
+              --output-file "daily_${FOCUS_AREA}_${TIMESTAMP}.json" \
+              --generate-report \
+              || echo "⚠️ Version analysis failed"
+            ;;
+          "comprehensive")
+            echo "🎯 Running comprehensive analysis..."
+            python scripts/improved_benchmark_runner.py \
+              --suite-type "comprehensive" \
+              --output-dir "data/results" \
+              --output-file "daily_${FOCUS_AREA}_${TIMESTAMP}.json" \
+              --generate-report \
+              || echo "⚠️ Comprehensive analysis failed"
+            ;;
+        esac
+        
+        # Verify output
+        if [ -f "$OUTPUT_FILE" ]; then
+          echo "✅ Daily benchmarks completed successfully"
+          echo "📁 Output: $OUTPUT_FILE"
+          ls -la "$OUTPUT_FILE"
+        else
+          echo "❌ Benchmark execution failed - no output file generated"
+          exit 1
+        fi
+        
+    - name: 📈 Generate HTML report
+      run: |
+        echo "🎨 Generating HTML report..."
+        
+        FOCUS_AREA="${{ github.event.inputs.focus_area || 'api_modes' }}"
+        TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+        
+        INPUT_FILE="data/results/daily_${FOCUS_AREA}_${TIMESTAMP}.json"
+        REPORT_FILE="docs/results/daily_${FOCUS_AREA}_${TIMESTAMP}_report.html"
+        
+        if [ -f "$INPUT_FILE" ]; then
+          python scripts/improved_report_generator.py \
+            "$INPUT_FILE" \
+            --output-file "$REPORT_FILE" || echo "⚠️ HTML report generation failed"
+            
+          if [ -f "$REPORT_FILE" ]; then
+            echo "✅ HTML report generated: $REPORT_FILE"
+          fi
+        else
+          echo "⚠️ No input file found for HTML generation"
+        fi
+    
+    - name: 🌐 Update GitHub Pages
+      run: |
+        echo "📝 Updating GitHub Pages..."
+        
+        # Update the main results index
+        python scripts/generate_github_pages.py || echo "⚠️ GitHub Pages update had issues"
+        
+        echo "✅ GitHub Pages updated"
+
+    - name: 💾 Commit daily results
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        
+        echo "📁 Staging daily results..."
+        
+        # Add daily results
+        git add data/results/daily_*.json 2>/dev/null || true
+        
+        # Add HTML reports  
+        git add docs/results/daily_*_report.html 2>/dev/null || true
+        
+        # Add updated pages
+        git add docs/results/index.html 2>/dev/null || true
+        
+        # Commit if there are changes
+        if ! git diff --staged --quiet; then
+          FOCUS_AREA="${{ github.event.inputs.focus_area || 'api_modes' }}"
+          echo "📝 Committing daily $FOCUS_AREA results..."
+          git commit -m "📊 Daily $FOCUS_AREA Benchmarks - $(date -u '+%Y-%m-%d')"
+          git push origin HEAD
+          echo "✅ Daily results committed successfully"
+        else
+          echo "ℹ️ No changes to commit"
+        fi
+
+    - name: 📤 Upload daily results
+      uses: actions/upload-artifact@v4
+      with:
+        name: daily-results-${{ github.run_id }}
+        path: |
+          data/results/daily_*.json
+          docs/results/daily_*_report.html

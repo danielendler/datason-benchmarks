@@ -1,0 +1,176 @@
+name: 🗓️ Improved Weekly Benchmarks
+
+on:
+  schedule:
+    - cron: '30 6 * * 1'  # Every Monday at 6:30 AM UTC
+  workflow_dispatch:
+    inputs:
+      benchmark_type:
+        description: 'Benchmark type'
+        required: false
+        default: 'comprehensive'
+        type: choice
+        options:
+        - comprehensive
+        - api_modes
+        - competitive  
+        - versions
+
+env:
+  PYTHON_VERSION: '3.12.0'
+  WEEKLY_DIR: 'data/results/weekly'
+
+jobs:
+  enhanced_test_data:
+    runs-on: ubuntu-latest
+    name: 📊 Generate enhanced test data
+    
+    steps:
+    - name: 🔄 Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: 📦 Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install datason orjson ujson msgpack-python jsonpickle
+        
+    - name: 🏗️ Generate enhanced test scenarios
+      run: |
+        mkdir -p data/synthetic/weekly
+        python -c 'import json; from pathlib import Path; version_scenarios = {"large_nested_structures": {"description": "Complex nested data structures for version comparison", "data": {"levels": [{"level": i, "data": {f"key_{j}": f"value_{j}" for j in range(10)}} for i in range(20)]}}, "high_frequency_serialization": {"description": "Repetitive serialization tasks", "data": [{"id": i, "payload": f"data_{i}" * 100} for i in range(100)]}}; Path("data/synthetic/weekly").mkdir(exist_ok=True); json.dump(version_scenarios, open("data/synthetic/weekly/version_comparison_data.json", "w"), indent=2); print("✅ Enhanced test data generated")'
+    
+    - name: 📤 Upload enhanced test data
+      uses: actions/upload-artifact@v4
+      with:
+        name: enhanced-test-data
+        path: data/synthetic/weekly/
+
+  comprehensive_analysis:
+    runs-on: ubuntu-latest
+    needs: enhanced_test_data
+    name: 🎯 Comprehensive weekly analysis
+    
+    steps:
+    - name: 🔄 Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: 📦 Install all competitive libraries
+      run: |
+        pip install --upgrade pip
+        
+        # Core competitive libraries
+        pip install datason orjson ujson msgpack-python jsonpickle
+        
+        # Optional high-performance libraries  
+        pip install cbor2 pickle5 dill cloudpickle || echo "⚠️ Some optional libraries unavailable"
+        
+        # Verify core installations
+        python -c 'print("📋 Verifying competitive library installations..."); import datason, orjson, ujson, json, pickle, msgpack, jsonpickle; print("🏁 Core competitive libraries verified successfully")'
+    
+    - name: ⬇️ Download test data
+      uses: actions/download-artifact@v4
+      with:
+        name: enhanced-test-data
+        path: data/synthetic/
+    
+    - name: 📊 Run comprehensive weekly benchmarks
+      run: |
+        echo "🎯 Running comprehensive weekly benchmark analysis..."
+        mkdir -p "$WEEKLY_DIR"
+        
+        # Get benchmark type from workflow input with fallback  
+        BENCHMARK_TYPE="${{ github.event.inputs.benchmark_type || 'comprehensive' }}"
+        echo "📋 Benchmark type: $BENCHMARK_TYPE"
+        
+        # Run comprehensive analysis with all components
+        if python scripts/improved_benchmark_runner.py \
+            --suite-type "comprehensive" \
+            --output-dir "$WEEKLY_DIR" \
+            --output-file "weekly_comprehensive_$(date +%Y%m%d_%H%M%S).json" \
+            --generate-report; then
+          echo "✅ Comprehensive weekly benchmarks completed successfully"
+        else
+          echo "⚠️ Comprehensive benchmarks failed, continuing with available data"
+          exit 1
+        fi
+        
+        # List results
+        echo "📋 Generated weekly results:"
+        ls -la "$WEEKLY_DIR"/ || echo "⚠️ No results found"
+        
+    - name: 📈 Generate comprehensive HTML reports
+      run: |
+        echo "🎨 Generating enhanced HTML reports..."
+        
+        # Generate reports for all weekly result files
+        for result_file in "$WEEKLY_DIR"/*.json; do
+          if [ -f "$result_file" ]; then
+            echo "📊 Processing: $(basename "$result_file")"
+            
+            output_name=$(basename "$result_file" .json)
+            python scripts/improved_report_generator.py \
+              "$result_file" \
+              --output-file "docs/results/${output_name}_report.html" || echo "⚠️ Report generation failed for $result_file"
+          fi
+        done
+        
+        echo "✅ HTML report generation completed"
+    
+    - name: 🌐 Update GitHub Pages
+      run: |
+        echo "📝 Updating GitHub Pages with comprehensive results..."
+        
+        # Update the main results index
+        python scripts/generate_github_pages.py || echo "⚠️ GitHub Pages update had issues"
+        
+        # Ensure docs directory structure exists
+        mkdir -p docs/weekly-reports docs/results
+        
+        echo "✅ GitHub Pages structure updated"
+
+    - name: 💾 Commit comprehensive results
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        
+        echo "📁 Staging comprehensive weekly results..."
+        
+        # Add weekly results
+        git add data/results/weekly/ 2>/dev/null || true
+        git add data/results/latest_weekly.json 2>/dev/null || true
+        
+        # Add HTML reports
+        find docs/results -name "weekly_*_report.html" -exec git add -f {} \; 2>/dev/null || true
+        find docs/results -name "weekly_comprehensive_*.html" -exec git add -f {} \; 2>/dev/null || true
+        
+        # Add updated pages
+        git add docs/results/index.html docs/index.md 2>/dev/null || true
+        
+        # Commit if there are changes
+        if ! git diff --staged --quiet; then
+          echo "📝 Committing comprehensive weekly results..."
+          git commit -m "📊 Weekly Comprehensive Benchmarks - $(date -u '+%Y-%m-%d')"
+          git push origin HEAD
+          echo "✅ Comprehensive results committed successfully"
+        else
+          echo "ℹ️ No changes to commit"
+        fi
+
+    - name: 📤 Upload comprehensive weekly results
+      uses: actions/upload-artifact@v4
+      with:
+        name: weekly-comprehensive-results-${{ github.run_id }}
+        path: |
+          data/results/weekly/
+          docs/results/weekly_*.html
+          docs/results/index.html
