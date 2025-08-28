@@ -165,6 +165,10 @@ jobs:
         if ! git diff --staged --quiet; then
           echo "📝 Committing comprehensive weekly results..."
           git commit -m "📊 Weekly Comprehensive Benchmarks - $(date -u '+%Y-%m-%d')"
+          
+          # Pull and push with retry to handle concurrent workflows
+          echo "🔄 Pulling latest changes before push..."
+          git pull --rebase origin main || echo "⚠️ Pull failed, attempting push anyway"
           git push origin HEAD
           echo "✅ Comprehensive results committed successfully"
         else

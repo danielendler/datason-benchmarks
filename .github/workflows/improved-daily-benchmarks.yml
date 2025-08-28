@@ -160,6 +160,10 @@ jobs:
           FOCUS_AREA="${{ github.event.inputs.focus_area || 'api_modes' }}"
           echo "📝 Committing daily $FOCUS_AREA results..."
           git commit -m "📊 Daily $FOCUS_AREA Benchmarks - $(date -u '+%Y-%m-%d')"
+          
+          # Pull and push with retry to handle concurrent workflows
+          echo "🔄 Pulling latest changes before push..."
+          git pull --rebase origin main || echo "⚠️ Pull failed, attempting push anyway"
           git push origin HEAD
           echo "✅ Daily results committed successfully"
         else
