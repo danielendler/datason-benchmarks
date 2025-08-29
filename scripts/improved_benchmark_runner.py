@@ -77,16 +77,16 @@ class ImprovedBenchmarkRunner:
             "focus": "api_modes_competitors_versions"
         }
         
-        # Define DataSON API methods to test
+        # Define DataSON API methods to test (only methods that actually exist)
         self.datason_methods = {
             'serialize': {'func': 'serialize', 'type': 'basic_serialization'},
             'dump_secure': {'func': 'dump_secure', 'type': 'secure_serialization'},
-            'save_string': {'func': 'save_string', 'type': 'string_serialization'},
+            'dump_fast': {'func': 'dump_fast', 'type': 'fast_serialization'},
             'deserialize': {'func': 'deserialize', 'type': 'basic_deserialization'},
             'load_basic': {'func': 'load_basic', 'type': 'fast_deserialization'},
             'load_smart': {'func': 'load_smart', 'type': 'smart_deserialization'},
-            'dump_json': {'func': 'dump_json', 'type': 'json_compat_serialization'},
-            'loads_json': {'func': 'loads_json', 'type': 'json_compat_deserialization'}
+            'dumps': {'func': 'dumps', 'type': 'string_serialization'},
+            'loads': {'func': 'loads', 'type': 'string_deserialization'}
         }
         
         # Competitor libraries with fair comparison mapping
@@ -160,6 +160,10 @@ class ImprovedBenchmarkRunner:
         error_message = None
         output_size = None
         
+        # Debug logging for loads method
+        if hasattr(func, '__name__') and func.__name__ == 'loads':
+            logger.debug(f"_benchmark_method called with loads, data type: {type(data)}, data: {str(data)[:100]}...")
+        
         for i in range(iterations):
             try:
                 start_time = time.perf_counter()
@@ -179,7 +183,10 @@ class ImprovedBenchmarkRunner:
                 errors += 1
                 if error_message is None:
                     error_message = str(e)
-                logger.debug(f"Benchmark iteration {i} failed: {e}")
+                if hasattr(func, '__name__') and func.__name__ == 'loads':
+                    logger.error(f"loads benchmark iteration {i} failed: {e}, data type: {type(data)}")
+                else:
+                    logger.debug(f"Benchmark iteration {i} failed: {e}")
         
         if not times:
             return BenchmarkResult(
@@ -217,22 +224,54 @@ class ImprovedBenchmarkRunner:
             for method_name, method_info in self.datason_methods.items():
                 try:
                     func_name = method_info['func']
+                    logger.debug(f"Processing method: '{method_name}' with func: '{func_name}'")
                     if hasattr(datason, func_name):
                         func = getattr(datason, func_name)
                         
                         # Handle different method signatures
-                        if 'deserialize' in method_name or 'load' in method_name:
-                            # For deserialization, first serialize the data
+                        if method_name == 'loads':
+                            # loads expects JSON string, so use dumps first
                             try:
-                                serialized = datason.serialize(scenario_data)
-                                benchmark_result = self._benchmark_method(func, serialized)
+                                import json
+                                json_string = json.dumps(scenario_data)
+                                logger.debug(f"Method '{method_name}': Converting scenario_data to JSON string: {json_string[:50]}...")
+                                benchmark_result = self._benchmark_method(func, json_string)
                             except Exception as e:
+                                logger.error(f"Error in loads method '{method_name}': {e}")
                                 benchmark_result = BenchmarkResult(
                                     method=method_name, library="datason", scenario=scenario_name,
                                     mean_time=0, min_time=0, max_time=0, std_time=0,
                                     successful_runs=0, error_count=5,
-                                    error_message=f"Serialization failed: {e}"
+                                    error_message=f"JSON serialization failed: {e}"
                                 )
+                        elif 'deserialize' in method_name or 'load' in method_name:
+                            # For deserialization, first serialize the data  
+                            if method_name == 'loads':
+                                # loads expects JSON string, so use dumps first
+                                try:
+                                    import json
+                                    json_string = json.dumps(scenario_data)
+                                    logger.debug(f"Method '{method_name}': Converting scenario_data to JSON string: {json_string[:50]}...")
+                                    benchmark_result = self._benchmark_method(func, json_string)
+                                except Exception as e:
+                                    logger.error(f"Error in loads method '{method_name}': {e}")
+                                    benchmark_result = BenchmarkResult(
+                                        method=method_name, library="datason", scenario=scenario_name,
+                                        mean_time=0, min_time=0, max_time=0, std_time=0,
+                                        successful_runs=0, error_count=5,
+                                        error_message=f"JSON serialization failed: {e}"
+                                    )
+                            else:
+                                try:
+                                    serialized = datason.serialize(scenario_data)
+                                    benchmark_result = self._benchmark_method(func, serialized)
+                                except Exception as e:
+                                    benchmark_result = BenchmarkResult(
+                                        method=method_name, library="datason", scenario=scenario_name,
+                                        mean_time=0, min_time=0, max_time=0, std_time=0,
+                                        successful_runs=0, error_count=5,
+                                        error_message=f"Serialization failed: {e}"
+                                    )
                         else:
                             # For serialization
                             benchmark_result = self._benchmark_method(func, scenario_data)
