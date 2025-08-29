@@ -136,7 +136,7 @@ jobs:
         echo "📝 Updating GitHub Pages with comprehensive results..."
         
         # Update the main results index
-        python scripts/generate_github_pages.py || echo "⚠️ GitHub Pages update had issues"
+        python scripts/update_docs_index.py || echo "⚠️ GitHub Pages update had issues"
         
         # Ensure docs directory structure exists
         mkdir -p docs/weekly-reports docs/results
