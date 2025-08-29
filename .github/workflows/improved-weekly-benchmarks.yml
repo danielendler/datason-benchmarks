@@ -159,7 +159,7 @@ jobs:
         find docs/results -name "weekly_comprehensive_*.html" -exec git add -f {} \; 2>/dev/null || true
         
         # Add updated pages
-        git add docs/results/index.html docs/index.md 2>/dev/null || true
+        git add docs/index.md 2>/dev/null || true
         
         # Commit if there are changes
         if ! git diff --staged --quiet; then
