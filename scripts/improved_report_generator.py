@@ -157,7 +157,7 @@ class ImprovedReportGenerator:
             html += f"<tr><td><strong>{scenario_display}</strong></td>"
             
             for method in methods:
-                if method in scenario_data and 'error' not in scenario_data[method]:
+                if method in scenario_data and not scenario_data[method].get('error'):
                     mean_time = scenario_data[method]['mean']
                     formatted_time = self.format_time(mean_time)
                     perf_class = self.get_performance_class(mean_time)
