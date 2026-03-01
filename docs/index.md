@@ -1,6 +1,6 @@
 # DataSON Benchmarks - Live Results
 
-Last updated: 2026-03-01 04:14
+Last updated: 2026-03-01 06:43
 
 ## 📊 Available Benchmark Reports
 
@@ -9,13 +9,13 @@ Automated benchmark results from our CI system:
 
 - [📊 Daily Comprehensive 20250829 083521](results/daily_comprehensive_20250829_083521_report.html) - Daily benchmark analysis
 - [📊 Daily Comprehensive 20250829 091146](results/daily_comprehensive_20250829_091146_report.html) - Daily benchmark analysis
-- [📊 Daily Api Modes 20260227 065230](results/daily_api_modes_20260227_065230_report.html) - Daily benchmark analysis
+- [📊 Daily Api Modes 20260222 064529](results/daily_api_modes_20260222_064529_report.html) - Daily benchmark analysis
 
 ### 🗓️ Weekly Reports
 Comprehensive weekly benchmark analysis:
 
-- [📈 Weekly Comprehensive 20251215 065854](results/weekly_comprehensive_20251215_065854_report.html) - Weekly analysis
-- [📈 Weekly Comprehensive 20260105 070411](results/weekly_comprehensive_20260105_070411_report.html) - Weekly analysis
+- [📈 Weekly Comprehensive 20260223 073845](results/weekly_comprehensive_20260223_073845_report.html) - Weekly analysis
+- [📈 Weekly Comprehensive 20260216 073727](results/weekly_comprehensive_20260216_073727_report.html) - Weekly analysis
 
 ### 🔄 CI Integration Reports
 Historical CI benchmark results:
