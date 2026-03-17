@@ -1,0 +1,1547 @@
+{
+  "suite_type": "api_modes",
+  "metadata": {
+    "timestamp": "2026-03-17T07:02:24.246396",
+    "python_version": "3.12.0",
+    "datason_version": "0.13.0",
+    "benchmark_framework": "improved_v1",
+    "focus": "api_modes_competitors_versions"
+  },
+  "scenarios": [
+    "api_response_processing",
+    "secure_data_storage",
+    "ml_model_serialization",
+    "mobile_app_sync",
+    "web_service_integration"
+  ],
+  "timestamp": "2026-03-17T07:02:24.261921",
+  "datason_api_comparison": {
+    "type": "datason_api_comparison",
+    "description": "Performance comparison across DataSON API methods",
+    "results": {
+      "api_response_processing": {
+        "serialize": {
+          "mean": 0.00019461760000041294,
+          "min": 0.00010094900000012785,
+          "max": 0.0005027089999956047,
+          "std": 0.00017285111590458076,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.19461760000041295,
+          "error": null,
+          "output_size": 3
+        },
+        "dump_secure": {
+          "mean": 0.0005094016000015244,
+          "min": 0.00029076299999530875,
+          "max": 0.0012797700000035661,
+          "std": 0.00043128737875616394,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.5094016000015245,
+          "error": null,
+          "output_size": 2
+        },
+        "dump_fast": {
+          "mean": 0.00010749880000133771,
+          "min": 9.636000000057265e-05,
+          "max": 0.00012629600000479968,
+          "std": 1.2926142841209521e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.10749880000133771,
+          "error": null,
+          "output_size": 3
+        },
+        "deserialize": {
+          "mean": 0.00012824559999842223,
+          "min": 0.00011556699999459852,
+          "max": 0.00015266499999455618,
+          "std": 1.4984184421541351e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.12824559999842222,
+          "error": null,
+          "output_size": 3
+        },
+        "load_basic": {
+          "mean": 0.00012796479999934717,
+          "min": 0.00011657700000000659,
+          "max": 0.00015079100000292556,
+          "std": 1.3904076317167957e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.12796479999934718,
+          "error": null,
+          "output_size": 3
+        },
+        "load_smart": {
+          "mean": 0.00023680600000233198,
+          "min": 0.00020718700000088575,
+          "max": 0.00031355500000529446,
+          "std": 4.385780470640364e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.23680600000233198,
+          "error": null,
+          "output_size": 3
+        },
+        "dumps": {
+          "mean": 0.00010292839999976877,
+          "min": 9.543899999897576e-05,
+          "max": 0.00011272100000070395,
+          "std": 7.805331691346228e-06,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.10292839999976877,
+          "error": null,
+          "output_size": 3
+        },
+        "loads": {
+          "mean": 0.0004156523999995443,
+          "min": 0.0003657230000015943,
+          "max": 0.0005800739999983762,
+          "std": 9.249685312574301e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.4156523999995443,
+          "error": null,
+          "output_size": 3
+        }
+      },
+      "secure_data_storage": {
+        "serialize": {
+          "mean": 7.126300000237507e-05,
+          "min": 4.685700000095494e-05,
+          "max": 9.185200000416671e-05,
+          "std": 1.6124793534710418e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.07126300000237507,
+          "error": null,
+          "output_size": 2
+        },
+        "dump_secure": {
+          "mean": 0.00011774179999690659,
+          "min": 0.00010305299999657791,
+          "max": 0.00013658499999991136,
+          "std": 1.6490509065163155e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.1177417999969066,
+          "error": null,
+          "output_size": 2
+        },
+        "dump_fast": {
+          "mean": 3.6220199999092986e-05,
+          "min": 3.181000000296308e-05,
+          "max": 4.676799999714376e-05,
+          "std": 6.129734185805774e-06,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.036220199999092983,
+          "error": null,
+          "output_size": 2
+        },
+        "deserialize": {
+          "mean": 7.218060000155902e-05,
+          "min": 6.412900000185573e-05,
+          "max": 8.376600000303824e-05,
+          "std": 8.901018611000797e-06,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.07218060000155901,
+          "error": null,
+          "output_size": 2
+        },
+        "load_basic": {
+          "mean": 7.044180000264078e-05,
+          "min": 6.685400000350228e-05,
+          "max": 7.815699999724757e-05,
+          "std": 4.493791292032413e-06,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.07044180000264078,
+          "error": null,
+          "output_size": 2
+        },
+        "load_smart": {
+          "mean": 0.00025731679999978495,
+          "min": 0.00019709800000100586,
+          "max": 0.0002769770000057292,
+          "std": 3.386434314536136e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.25731679999978496,
+          "error": null,
+          "output_size": 2
+        },
+        "dumps": {
+          "mean": 6.443439999941347e-05,
+          "min": 5.626499999777934e-05,
+          "max": 6.952000000381986e-05,
+          "std": 6.045554344251459e-06,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.06443439999941347,
+          "error": null,
+          "output_size": 2
+        },
+        "loads": {
+          "mean": 0.00024398160000203007,
+          "min": 0.00022285600000060413,
+          "max": 0.0002735110000031682,
+          "std": 2.3077035595337502e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.24398160000203006,
+          "error": null,
+          "output_size": 2
+        }
+      },
+      "ml_model_serialization": {
+        "serialize": {
+          "mean": 0.00010659500000116395,
+          "min": 7.154400000075611e-05,
+          "max": 0.0001830620000049521,
+          "std": 4.840052865646641e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.10659500000116395,
+          "error": null,
+          "output_size": 1
+        },
+        "dump_secure": {
+          "mean": 0.0001984061999991127,
+          "min": 0.0001800960000011287,
+          "max": 0.0002180569999978843,
+          "std": 1.7198684345365746e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.1984061999991127,
+          "error": null,
+          "output_size": 2
+        },
+        "dump_fast": {
+          "mean": 8.017780000102448e-05,
+          "min": 7.081300000066904e-05,
+          "max": 9.542800000161833e-05,
+          "std": 9.787107626331617e-06,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.08017780000102448,
+          "error": null,
+          "output_size": 1
+        },
+        "deserialize": {
+          "mean": 0.00027010299999972174,
+          "min": 0.0002594850000008364,
+          "max": 0.0002860549999965656,
+          "std": 1.1971130250738207e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.27010299999972176,
+          "error": null,
+          "output_size": 1
+        },
+        "load_basic": {
+          "mean": 0.00027672480000262567,
+          "min": 0.0002650850000023297,
+          "max": 0.0003043580000010593,
+          "std": 1.629940327708052e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.27672480000262567,
+          "error": null,
+          "output_size": 1
+        },
+        "load_smart": {
+          "mean": 0.00028942640000053645,
+          "min": 0.0002674589999998034,
+          "max": 0.0003290240000026756,
+          "std": 2.4971194331456656e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.28942640000053643,
+          "error": null,
+          "output_size": 1
+        },
+        "dumps": {
+          "mean": 7.658320000132335e-05,
+          "min": 6.783700000312365e-05,
+          "max": 9.229300000157536e-05,
+          "std": 1.0819384972666622e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.07658320000132335,
+          "error": null,
+          "output_size": 1
+        },
+        "loads": {
+          "mean": 0.0006061201999983723,
+          "min": 0.0005800839999992036,
+          "max": 0.0006528600000024198,
+          "std": 2.791063124178769e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.6061201999983723,
+          "error": null,
+          "output_size": 1
+        }
+      },
+      "mobile_app_sync": {
+        "serialize": {
+          "mean": 8.999760000136803e-05,
+          "min": 5.565400000051568e-05,
+          "max": 0.0001346809999986931,
+          "std": 3.205753264485656e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.08999760000136803,
+          "error": null,
+          "output_size": 1
+        },
+        "dump_secure": {
+          "mean": 0.00020692440000118494,
+          "min": 0.00019313100000317718,
+          "max": 0.00022586200000063172,
+          "std": 1.2742272414501388e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.20692440000118495,
+          "error": null,
+          "output_size": 2
+        },
+        "dump_fast": {
+          "mean": 5.1439800000707694e-05,
+          "min": 4.674699999895893e-05,
+          "max": 6.157500000369964e-05,
+          "std": 6.005497957358227e-06,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.05143980000070769,
+          "error": null,
+          "output_size": 1
+        },
+        "deserialize": {
+          "mean": 0.0001249453999989214,
+          "min": 0.00011272099999359853,
+          "max": 0.00015300600000500708,
+          "std": 1.7112663992435275e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.12494539999892142,
+          "error": null,
+          "output_size": 1
+        },
+        "load_basic": {
+          "mean": 0.00011677620000085653,
+          "min": 0.00011225000000081309,
+          "max": 0.0001272679999999582,
+          "std": 6.1818359490296145e-06,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.11677620000085653,
+          "error": null,
+          "output_size": 1
+        },
+        "load_smart": {
+          "mean": 0.00019768519999843192,
+          "min": 0.00017815300000023626,
+          "max": 0.0002360909999978844,
+          "std": 2.3325084569399204e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.19768519999843193,
+          "error": null,
+          "output_size": 1
+        },
+        "dumps": {
+          "mean": 5.085899999812682e-05,
+          "min": 4.560499999683998e-05,
+          "max": 6.258700000216777e-05,
+          "std": 7.013307246509152e-06,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.05085899999812682,
+          "error": null,
+          "output_size": 1
+        },
+        "loads": {
+          "mean": 0.00032823680000149125,
+          "min": 0.000310138999999765,
+          "max": 0.0003492220000040902,
+          "std": 1.878419808783638e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.32823680000149125,
+          "error": null,
+          "output_size": 1
+        }
+      },
+      "web_service_integration": {
+        "serialize": {
+          "mean": 7.712379999844643e-05,
+          "min": 4.553499999815358e-05,
+          "max": 0.00011070600000095965,
+          "std": 2.8541805300543114e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.07712379999844643,
+          "error": null,
+          "output_size": 1
+        },
+        "dump_secure": {
+          "mean": 0.0001287806000007663,
+          "min": 0.00011446399999925916,
+          "max": 0.0001476460000020552,
+          "std": 1.7026578980996253e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.1287806000007663,
+          "error": null,
+          "output_size": 2
+        },
+        "dump_fast": {
+          "mean": 4.533259999845995e-05,
+          "min": 4.117699999994784e-05,
+          "max": 5.517199999616196e-05,
+          "std": 5.714724602877938e-06,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.045332599998459955,
+          "error": null,
+          "output_size": 1
+        },
+        "deserialize": {
+          "mean": 7.015880000267316e-05,
+          "min": 6.164500000238604e-05,
+          "max": 8.460800000165136e-05,
+          "std": 1.0367907174760231e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.07015880000267316,
+          "error": null,
+          "output_size": 1
+        },
+        "load_basic": {
+          "mean": 6.931919999715319e-05,
+          "min": 6.57119999942779e-05,
+          "max": 7.664299999987634e-05,
+          "std": 4.2461423332448036e-06,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.06931919999715319,
+          "error": null,
+          "output_size": 1
+        },
+        "load_smart": {
+          "mean": 0.00017264220000043907,
+          "min": 0.00015254399999520274,
+          "max": 0.0002328249999976606,
+          "std": 3.403587118944454e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.17264220000043906,
+          "error": null,
+          "output_size": 1
+        },
+        "dumps": {
+          "mean": 4.790739999975813e-05,
+          "min": 4.17179999985251e-05,
+          "max": 5.598399999939829e-05,
+          "std": 7.019591248736044e-06,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.04790739999975813,
+          "error": null,
+          "output_size": 1
+        },
+        "loads": {
+          "mean": 0.00025269019999853983,
+          "min": 0.00023898599999938597,
+          "max": 0.00027727799999865965,
+          "std": 1.5271714922707884e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.2526901999985398,
+          "error": null,
+          "output_size": 1
+        }
+      }
+    },
+    "methods_tested": [
+      "serialize",
+      "dump_secure",
+      "dump_fast",
+      "deserialize",
+      "load_basic",
+      "load_smart",
+      "dumps",
+      "loads"
+    ],
+    "metadata": {
+      "timestamp": "2026-03-17T07:02:24.246396",
+      "python_version": "3.12.0",
+      "datason_version": "0.13.0",
+      "benchmark_framework": "improved_v1",
+      "focus": "api_modes_competitors_versions"
+    }
+  },
+  "competitive_analysis": {
+    "type": "competitive_analysis",
+    "description": "DataSON vs other serialization libraries",
+    "results": {
+      "api_response_processing": {
+        "serialization": {
+          "datason": {
+            "mean": 0.00014433540000169387,
+            "min": 9.812300000078267e-05,
+            "max": 0.0002098920000008775,
+            "std": 5.8193949584052656e-05,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.14433540000169387,
+            "error": null,
+            "output_size": 3
+          },
+          "orjson": {
+            "mean": 1.8115999992573962e-06,
+            "min": 9.62000001436536e-07,
+            "max": 4.28899999604937e-06,
+            "std": 1.4170664401507166e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.0018115999992573961,
+            "error": null,
+            "output_size": 863
+          },
+          "ujson": {
+            "mean": 6.834799998500785e-06,
+            "min": 5.170000001442077e-06,
+            "max": 1.180200000305831e-05,
+            "std": 2.802385271957838e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.006834799998500785,
+            "error": null,
+            "output_size": 863
+          },
+          "json": {
+            "mean": 1.2014399999316083e-05,
+            "min": 9.446999996498562e-06,
+            "max": 1.8073999996204293e-05,
+            "std": 3.5515926411333004e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.012014399999316083,
+            "error": null,
+            "output_size": 952
+          },
+          "pickle": {
+            "mean": 5.057400001362566e-06,
+            "min": 3.0859999995414e-06,
+            "max": 1.0510000002739162e-05,
+            "std": 3.132227451325733e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.005057400001362566,
+            "error": null,
+            "output_size": 702
+          },
+          "msgpack": {
+            "mean": 8.659200000096234e-05,
+            "min": 7.779500000282269e-05,
+            "max": 0.00011240999999984069,
+            "std": 1.4688372067380566e-05,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.08659200000096234,
+            "error": null,
+            "output_size": 682
+          }
+        },
+        "deserialization": {
+          "datason": {
+            "mean": 0.00012065719999867496,
+            "min": 0.00011180900000340444,
+            "max": 0.00013397000000026082,
+            "std": 9.54129591202485e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.12065719999867497,
+            "error": null,
+            "output_size": 3
+          },
+          "orjson": {
+            "mean": 5.7244000004175176e-06,
+            "min": 3.325999998082807e-06,
+            "max": 1.2763000000859392e-05,
+            "std": 3.999976037675707e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.005724400000417518,
+            "error": null,
+            "output_size": 3
+          },
+          "ujson": {
+            "mean": 8.165599999188089e-06,
+            "min": 5.940999997733343e-06,
+            "max": 1.1831999998435094e-05,
+            "std": 2.689587385096854e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.008165599999188089,
+            "error": null,
+            "output_size": 3
+          },
+          "json": {
+            "mean": 9.982800001751002e-06,
+            "min": 8.325999999669875e-06,
+            "max": 1.3705000000641121e-05,
+            "std": 2.254267441120356e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.009982800001751002,
+            "error": null,
+            "output_size": 3
+          },
+          "pickle": {
+            "mean": 6.125200000894892e-06,
+            "min": 4.3380000036563615e-06,
+            "max": 9.668000004126043e-06,
+            "std": 2.1176980912921218e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.006125200000894893,
+            "error": null,
+            "output_size": 3
+          },
+          "msgpack": {
+            "mean": 0.00011795239999941032,
+            "min": 0.00010320300000188354,
+            "max": 0.0001636850000039658,
+            "std": 2.58448164225063e-05,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.11795239999941032,
+            "error": null,
+            "output_size": 3
+          }
+        },
+        "output_size": {
+          "datason": {
+            "size": 3,
+            "size_type": "string chars",
+            "supports_binary": true
+          },
+          "orjson": {
+            "size": 863,
+            "size_type": "bytes",
+            "supports_binary": true
+          },
+          "ujson": {
+            "size": 863,
+            "size_type": "string chars",
+            "supports_binary": false
+          },
+          "json": {
+            "size": 952,
+            "size_type": "string chars",
+            "supports_binary": false
+          },
+          "pickle": {
+            "size": 702,
+            "size_type": "bytes",
+            "supports_binary": true
+          },
+          "msgpack": {
+            "size": 682,
+            "size_type": "bytes",
+            "supports_binary": true
+          }
+        },
+        "description": "Competitive analysis for api_response_processing",
+        "competitors_tested": [
+          "datason",
+          "orjson",
+          "ujson",
+          "json",
+          "pickle",
+          "msgpack"
+        ]
+      },
+      "secure_data_storage": {
+        "serialization": {
+          "datason": {
+            "mean": 6.9338999999502e-05,
+            "min": 3.962399999579702e-05,
+            "max": 9.482600000154662e-05,
+            "std": 1.9950764548918367e-05,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.069338999999502,
+            "error": null,
+            "output_size": 2
+          },
+          "orjson": {
+            "mean": 9.941999991269768e-07,
+            "min": 4.6099999906346056e-07,
+            "max": 1.973999999904663e-06,
+            "std": 6.320804532440793e-07,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.0009941999991269768,
+            "error": null,
+            "output_size": 309
+          },
+          "ujson": {
+            "mean": 2.9573999995591294e-06,
+            "min": 1.8530000005512193e-06,
+            "max": 5.910999995251132e-06,
+            "std": 1.6997406544461669e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.0029573999995591294,
+            "error": null,
+            "output_size": 309
+          },
+          "json": {
+            "mean": 6.259599999225429e-06,
+            "min": 4.117999999664335e-06,
+            "max": 1.1381000000199037e-05,
+            "std": 2.979963640992163e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.006259599999225429,
+            "error": null,
+            "output_size": 331
+          },
+          "pickle": {
+            "mean": 2.6873999999565966e-06,
+            "min": 1.4330000013274002e-06,
+            "max": 5.4510000069285525e-06,
+            "std": 1.70909458806098e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.0026873999999565967,
+            "error": null,
+            "output_size": 329
+          },
+          "msgpack": {
+            "mean": 2.962760000144726e-05,
+            "min": 2.4967000001652195e-05,
+            "max": 3.8422000002924506e-05,
+            "std": 5.224872372493733e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.029627600001447263,
+            "error": null,
+            "output_size": 258
+          }
+        },
+        "deserialization": {
+          "datason": {
+            "mean": 6.831979999759597e-05,
+            "min": 6.349899999946729e-05,
+            "max": 8.095099999394506e-05,
+            "std": 7.203111943677075e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.06831979999759596,
+            "error": null,
+            "output_size": 2
+          },
+          "orjson": {
+            "mean": 2.530599999772676e-06,
+            "min": 1.3629999955355743e-06,
+            "max": 4.989000004229638e-06,
+            "std": 1.5005375067522165e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.002530599999772676,
+            "error": null,
+            "output_size": 2
+          },
+          "ujson": {
+            "mean": 3.684800000769428e-06,
+            "min": 2.455000000622931e-06,
+            "max": 6.071000001384164e-06,
+            "std": 1.4863563512915776e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.003684800000769428,
+            "error": null,
+            "output_size": 2
+          },
+          "json": {
+            "mean": 8.373599997923975e-06,
+            "min": 3.7670000025968875e-06,
+            "max": 2.122999999443209e-05,
+            "std": 7.450526711464928e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.008373599997923975,
+            "error": null,
+            "output_size": 2
+          },
+          "pickle": {
+            "mean": 3.2500000003210515e-06,
+            "min": 2.044000005696489e-06,
+            "max": 5.4099999999834836e-06,
+            "std": 1.3844029384825702e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.0032500000003210516,
+            "error": null,
+            "output_size": 2
+          },
+          "msgpack": {
+            "mean": 3.3630599999412426e-05,
+            "min": 2.9374999996889528e-05,
+            "max": 4.198799999954872e-05,
+            "std": 5.101436298326427e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.033630599999412425,
+            "error": null,
+            "output_size": 2
+          }
+        },
+        "output_size": {
+          "datason": {
+            "size": 2,
+            "size_type": "string chars",
+            "supports_binary": true
+          },
+          "orjson": {
+            "size": 309,
+            "size_type": "bytes",
+            "supports_binary": true
+          },
+          "ujson": {
+            "size": 309,
+            "size_type": "string chars",
+            "supports_binary": false
+          },
+          "json": {
+            "size": 331,
+            "size_type": "string chars",
+            "supports_binary": false
+          },
+          "pickle": {
+            "size": 329,
+            "size_type": "bytes",
+            "supports_binary": true
+          },
+          "msgpack": {
+            "size": 258,
+            "size_type": "bytes",
+            "supports_binary": true
+          }
+        },
+        "description": "Competitive analysis for secure_data_storage",
+        "competitors_tested": [
+          "datason",
+          "orjson",
+          "ujson",
+          "json",
+          "pickle",
+          "msgpack"
+        ]
+      },
+      "ml_model_serialization": {
+        "serialization": {
+          "datason": {
+            "mean": 0.00011080700000007938,
+            "min": 7.149400000372452e-05,
+            "max": 0.00016259299999887844,
+            "std": 4.7363287168795586e-05,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.11080700000007937,
+            "error": null,
+            "output_size": 1
+          },
+          "orjson": {
+            "mean": 4.594399999291454e-06,
+            "min": 3.657000000600874e-06,
+            "max": 6.561999995824408e-06,
+            "std": 1.2073809650612699e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.004594399999291454,
+            "error": null,
+            "output_size": 1181
+          },
+          "ujson": {
+            "mean": 1.5044199999181274e-05,
+            "min": 1.3074999998252679e-05,
+            "max": 2.008799999941857e-05,
+            "std": 2.904941084052731e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.015044199999181274,
+            "error": null,
+            "output_size": 1181
+          },
+          "json": {
+            "mean": 3.922939999796426e-05,
+            "min": 3.5205999999732285e-05,
+            "max": 4.879200000118544e-05,
+            "std": 5.55209121098476e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.039229399997964265,
+            "error": null,
+            "output_size": 1308
+          },
+          "pickle": {
+            "mean": 7.416000001114753e-06,
+            "min": 3.0460000033372125e-06,
+            "max": 1.9186000002946457e-05,
+            "std": 6.765295227219347e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.007416000001114753,
+            "error": null,
+            "output_size": 1171
+          },
+          "msgpack": {
+            "mean": 9.814500000118186e-05,
+            "min": 9.29130000031364e-05,
+            "max": 0.00011137799999971776,
+            "std": 7.597918233926908e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.09814500000118187,
+            "error": null,
+            "output_size": 1113
+          }
+        },
+        "deserialization": {
+          "datason": {
+            "mean": 0.00026614479999835793,
+            "min": 0.0002581819999960544,
+            "max": 0.000280312999997534,
+            "std": 1.0234593041519059e-05,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.26614479999835794,
+            "error": null,
+            "output_size": 1
+          },
+          "orjson": {
+            "mean": 7.748199999468853e-06,
+            "min": 4.2679999978645355e-06,
+            "max": 1.4806999999450454e-05,
+            "std": 4.487200820224212e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.007748199999468852,
+            "error": null,
+            "output_size": 1
+          },
+          "ujson": {
+            "mean": 1.1948400000960646e-05,
+            "min": 9.638000001643832e-06,
+            "max": 1.5509000000690776e-05,
+            "std": 2.3670212925325026e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.011948400000960646,
+            "error": null,
+            "output_size": 1
+          },
+          "json": {
+            "mean": 2.6321199999301826e-05,
+            "min": 2.2051000001965804e-05,
+            "max": 3.1258999996452985e-05,
+            "std": 4.547820652286554e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.026321199999301825,
+            "error": null,
+            "output_size": 1
+          },
+          "pickle": {
+            "mean": 7.339800002625907e-06,
+            "min": 5.751000003328954e-06,
+            "max": 8.987000001070555e-06,
+            "std": 1.570343017470815e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.007339800002625907,
+            "error": null,
+            "output_size": 1
+          },
+          "msgpack": {
+            "mean": 0.00014875560000433553,
+            "min": 0.00014121400000277617,
+            "max": 0.00016912600000296152,
+            "std": 1.1784000054187726e-05,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.14875560000433552,
+            "error": null,
+            "output_size": 1
+          }
+        },
+        "output_size": {
+          "datason": {
+            "size": 1,
+            "size_type": "string chars",
+            "supports_binary": true
+          },
+          "orjson": {
+            "size": 1181,
+            "size_type": "bytes",
+            "supports_binary": true
+          },
+          "ujson": {
+            "size": 1181,
+            "size_type": "string chars",
+            "supports_binary": false
+          },
+          "json": {
+            "size": 1308,
+            "size_type": "string chars",
+            "supports_binary": false
+          },
+          "pickle": {
+            "size": 1171,
+            "size_type": "bytes",
+            "supports_binary": true
+          },
+          "msgpack": {
+            "size": 1113,
+            "size_type": "bytes",
+            "supports_binary": true
+          }
+        },
+        "description": "Competitive analysis for ml_model_serialization",
+        "competitors_tested": [
+          "datason",
+          "orjson",
+          "ujson",
+          "json",
+          "pickle",
+          "msgpack"
+        ]
+      },
+      "mobile_app_sync": {
+        "serialization": {
+          "datason": {
+            "mean": 8.95312000025683e-05,
+            "min": 5.2358000004915084e-05,
+            "max": 0.00011789999999933798,
+            "std": 3.0683915014494266e-05,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.08953120000256831,
+            "error": null,
+            "output_size": 1
+          },
+          "orjson": {
+            "mean": 1.8918000009193747e-06,
+            "min": 1.0220000064009582e-06,
+            "max": 3.6469999997734703e-06,
+            "std": 1.0629504679130577e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.0018918000009193747,
+            "error": null,
+            "output_size": 937
+          },
+          "ujson": {
+            "mean": 5.466400000386784e-06,
+            "min": 4.337999996550934e-06,
+            "max": 8.456000003320696e-06,
+            "std": 1.727205924447041e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.005466400000386784,
+            "error": null,
+            "output_size": 937
+          },
+          "json": {
+            "mean": 1.0491599999795653e-05,
+            "min": 7.934999999292813e-06,
+            "max": 1.6039999998440635e-05,
+            "std": 3.3074664467796482e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.010491599999795653,
+            "error": null,
+            "output_size": 1002
+          },
+          "pickle": {
+            "mean": 4.410000002508241e-06,
+            "min": 2.6539999993246965e-06,
+            "max": 7.725000003233617e-06,
+            "std": 2.1821000213389036e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.004410000002508241,
+            "error": null,
+            "output_size": 928
+          },
+          "msgpack": {
+            "mean": 7.216280000079677e-05,
+            "min": 6.115400000084037e-05,
+            "max": 9.271300000079918e-05,
+            "std": 1.3339670092406465e-05,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.07216280000079678,
+            "error": null,
+            "output_size": 789
+          }
+        },
+        "deserialization": {
+          "datason": {
+            "mean": 0.00011535920000085297,
+            "min": 0.00011015599999808501,
+            "max": 0.000129051000001823,
+            "std": 7.781089044183177e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.11535920000085298,
+            "error": null,
+            "output_size": 1
+          },
+          "orjson": {
+            "mean": 6.005600002367828e-06,
+            "min": 2.9950000026701673e-06,
+            "max": 1.0400000000743148e-05,
+            "std": 3.5262389736154364e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.006005600002367828,
+            "error": null,
+            "output_size": 1
+          },
+          "ujson": {
+            "mean": 7.978999998670134e-06,
+            "min": 5.590999997195922e-06,
+            "max": 1.2052999998957148e-05,
+            "std": 2.7696256071196967e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.007978999998670133,
+            "error": null,
+            "output_size": 1
+          },
+          "json": {
+            "mean": 9.192999999640961e-06,
+            "min": 7.142999997711286e-06,
+            "max": 1.2884999996742863e-05,
+            "std": 2.3447507315665893e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.00919299999964096,
+            "error": null,
+            "output_size": 1
+          },
+          "pickle": {
+            "mean": 6.486399999516834e-06,
+            "min": 4.848999999751413e-06,
+            "max": 9.337999998138002e-06,
+            "std": 1.9009443181476742e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.006486399999516834,
+            "error": null,
+            "output_size": 1
+          },
+          "msgpack": {
+            "mean": 8.961740000188457e-05,
+            "min": 8.244300000370686e-05,
+            "max": 9.535800000293193e-05,
+            "std": 6.042574641659267e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.08961740000188456,
+            "error": null,
+            "output_size": 1
+          }
+        },
+        "output_size": {
+          "datason": {
+            "size": 1,
+            "size_type": "string chars",
+            "supports_binary": true
+          },
+          "orjson": {
+            "size": 937,
+            "size_type": "bytes",
+            "supports_binary": true
+          },
+          "ujson": {
+            "size": 937,
+            "size_type": "string chars",
+            "supports_binary": false
+          },
+          "json": {
+            "size": 1002,
+            "size_type": "string chars",
+            "supports_binary": false
+          },
+          "pickle": {
+            "size": 928,
+            "size_type": "bytes",
+            "supports_binary": true
+          },
+          "msgpack": {
+            "size": 789,
+            "size_type": "bytes",
+            "supports_binary": true
+          }
+        },
+        "description": "Competitive analysis for mobile_app_sync",
+        "competitors_tested": [
+          "datason",
+          "orjson",
+          "ujson",
+          "json",
+          "pickle",
+          "msgpack"
+        ]
+      },
+      "web_service_integration": {
+        "serialization": {
+          "datason": {
+            "mean": 8.163060000043743e-05,
+            "min": 4.706800000064959e-05,
+            "max": 0.00012845999999910873,
+            "std": 3.4024066633077296e-05,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.08163060000043743,
+            "error": null,
+            "output_size": 1
+          },
+          "orjson": {
+            "mean": 1.1500000013597856e-06,
+            "min": 5.910000027142814e-07,
+            "max": 2.374000004579102e-06,
+            "std": 7.434389694692871e-07,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.0011500000013597855,
+            "error": null,
+            "output_size": 341
+          },
+          "ujson": {
+            "mean": 4.0336000012075605e-06,
+            "min": 2.725000001646549e-06,
+            "max": 7.854999999779011e-06,
+            "std": 2.1825844309505257e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.00403360000120756,
+            "error": null,
+            "output_size": 345
+          },
+          "json": {
+            "mean": 8.09540000261677e-06,
+            "min": 5.641000001332941e-06,
+            "max": 1.4167000003340036e-05,
+            "std": 3.5901171716511535e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.00809540000261677,
+            "error": null,
+            "output_size": 374
+          },
+          "pickle": {
+            "mean": 3.249799999593961e-06,
+            "min": 1.8029999964142007e-06,
+            "max": 6.3720000014200195e-06,
+            "std": 1.945515793703721e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.003249799999593961,
+            "error": null,
+            "output_size": 358
+          },
+          "msgpack": {
+            "mean": 3.6838200000488544e-05,
+            "min": 3.352199999540062e-05,
+            "max": 4.540400000507816e-05,
+            "std": 4.913533680102101e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.03683820000048854,
+            "error": null,
+            "output_size": 284
+          }
+        },
+        "deserialization": {
+          "datason": {
+            "mean": 6.700900000140564e-05,
+            "min": 6.277700000367759e-05,
+            "max": 7.87769999988086e-05,
+            "std": 6.642876596689514e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.06700900000140564,
+            "error": null,
+            "output_size": 1
+          },
+          "orjson": {
+            "mean": 2.9556000001207396e-06,
+            "min": 1.5520000005153634e-06,
+            "max": 6.001999999227792e-06,
+            "std": 1.8471129626155936e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.0029556000001207394,
+            "error": null,
+            "output_size": 1
+          },
+          "ujson": {
+            "mean": 4.52439999918397e-06,
+            "min": 3.235999997741601e-06,
+            "max": 7.2429999988798954e-06,
+            "std": 1.6903629191720597e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.00452439999918397,
+            "error": null,
+            "output_size": 1
+          },
+          "json": {
+            "mean": 7.300000000043383e-06,
+            "min": 4.7290000040334235e-06,
+            "max": 1.0359999997433533e-05,
+            "std": 2.315339065014847e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.007300000000043383,
+            "error": null,
+            "output_size": 1
+          },
+          "pickle": {
+            "mean": 3.66099999951075e-06,
+            "min": 2.484999995999715e-06,
+            "max": 5.831000002842757e-06,
+            "std": 1.383371427337411e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.00366099999951075,
+            "error": null,
+            "output_size": 1
+          },
+          "msgpack": {
+            "mean": 4.8368200000936665e-05,
+            "min": 4.135700000063025e-05,
+            "max": 6.0091999998235224e-05,
+            "std": 7.4005817797180756e-06,
+            "successful_runs": 5,
+            "error_count": 0,
+            "mean_ms": 0.04836820000093667,
+            "error": null,
+            "output_size": 1
+          }
+        },
+        "output_size": {
+          "datason": {
+            "size": 1,
+            "size_type": "string chars",
+            "supports_binary": true
+          },
+          "orjson": {
+            "size": 341,
+            "size_type": "bytes",
+            "supports_binary": true
+          },
+          "ujson": {
+            "size": 345,
+            "size_type": "string chars",
+            "supports_binary": false
+          },
+          "json": {
+            "size": 374,
+            "size_type": "string chars",
+            "supports_binary": false
+          },
+          "pickle": {
+            "size": 358,
+            "size_type": "bytes",
+            "supports_binary": true
+          },
+          "msgpack": {
+            "size": 284,
+            "size_type": "bytes",
+            "supports_binary": true
+          }
+        },
+        "description": "Competitive analysis for web_service_integration",
+        "competitors_tested": [
+          "datason",
+          "orjson",
+          "ujson",
+          "json",
+          "pickle",
+          "msgpack"
+        ]
+      }
+    },
+    "competitors_available": [
+      "datason",
+      "orjson",
+      "ujson",
+      "json",
+      "pickle",
+      "msgpack"
+    ],
+    "metadata": {
+      "timestamp": "2026-03-17T07:02:24.246396",
+      "python_version": "3.12.0",
+      "datason_version": "0.13.0",
+      "benchmark_framework": "improved_v1",
+      "focus": "api_modes_competitors_versions"
+    }
+  },
+  "version_evolution": {
+    "type": "version_evolution",
+    "description": "DataSON performance tracking across versions",
+    "current_version": "0.13.0",
+    "baseline_performance": {
+      "api_response_processing": {
+        "serialize": {
+          "mean": 0.00014182519999934585,
+          "min": 9.869499999837217e-05,
+          "max": 0.0002020379999976285,
+          "std": 4.9904518516222426e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.14182519999934584,
+          "error": null,
+          "output_size": 3
+        },
+        "deserialize": {
+          "mean": 0.00011451419999843892,
+          "min": 0.00010848300000532163,
+          "max": 0.00012635599999555325,
+          "std": 7.171310526396852e-06,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.11451419999843893,
+          "error": null,
+          "output_size": 3
+        },
+        "output_size": 3
+      },
+      "secure_data_storage": {
+        "serialize": {
+          "mean": 6.993259999887869e-05,
+          "min": 3.8130999996610626e-05,
+          "max": 0.00010648900000376216,
+          "std": 2.477879307865419e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.06993259999887869,
+          "error": null,
+          "output_size": 2
+        },
+        "deserialize": {
+          "mean": 6.60711999998398e-05,
+          "min": 6.196500000044125e-05,
+          "max": 7.600200000013047e-05,
+          "std": 5.701872824125393e-06,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.06607119999983979,
+          "error": null,
+          "output_size": 2
+        },
+        "output_size": 2
+      },
+      "ml_model_serialization": {
+        "serialize": {
+          "mean": 0.00010759099999972932,
+          "min": 7.256600000005164e-05,
+          "max": 0.00017091899999854832,
+          "std": 4.596584272092369e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.10759099999972932,
+          "error": null,
+          "output_size": 1
+        },
+        "deserialize": {
+          "mean": 0.000266080999999474,
+          "min": 0.0002589439999951537,
+          "max": 0.0002805229999935932,
+          "std": 9.555960570791065e-06,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.266080999999474,
+          "error": null,
+          "output_size": 1
+        },
+        "output_size": 1
+      },
+      "mobile_app_sync": {
+        "serialize": {
+          "mean": 8.199720000021671e-05,
+          "min": 5.141599999802793e-05,
+          "max": 0.00011663800000150104,
+          "std": 2.911174297028115e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.08199720000021671,
+          "error": null,
+          "output_size": 1
+        },
+        "deserialize": {
+          "mean": 0.00011749319999978524,
+          "min": 0.0001096239999966997,
+          "max": 0.00012628599999686685,
+          "std": 8.041449042870704e-06,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.11749319999978525,
+          "error": null,
+          "output_size": 1
+        },
+        "output_size": 1
+      },
+      "web_service_integration": {
+        "serialize": {
+          "mean": 7.576160000155596e-05,
+          "min": 4.5735999997020826e-05,
+          "max": 0.00010338300000256595,
+          "std": 2.6046259873585732e-05,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.07576160000155596,
+          "error": null,
+          "output_size": 1
+        },
+        "deserialize": {
+          "mean": 7.046959999996716e-05,
+          "min": 6.357899999898109e-05,
+          "max": 8.10510000022191e-05,
+          "std": 7.650619997100812e-06,
+          "successful_runs": 5,
+          "error_count": 0,
+          "mean_ms": 0.07046959999996716,
+          "error": null,
+          "output_size": 1
+        },
+        "output_size": 1
+      }
+    },
+    "metadata": {
+      "timestamp": "2026-03-17T07:02:24.246396",
+      "python_version": "3.12.0",
+      "datason_version": "0.13.0",
+      "benchmark_framework": "improved_v1",
+      "focus": "api_modes_competitors_versions"
+    },
+    "note": "This establishes baseline for future version comparisons"
+  }
+}
