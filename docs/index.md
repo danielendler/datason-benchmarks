@@ -1,6 +1,6 @@
 # DataSON Benchmarks - Live Results
 
-Last updated: 2026-06-01 12:18
+Last updated: 2026-06-02 06:28
 
 ## 📊 Available Benchmark Reports
 
